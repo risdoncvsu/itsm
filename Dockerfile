@@ -1,6 +1,6 @@
 FROM php:8.4-cli
 
-# Install system dependencies, zip tools, and PostgreSQL drivers for NeonDB
+# Install system dependencies, PostgreSQL drivers, and prepare Node.js repository
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -10,12 +10,14 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    libpq-dev
+    libpq-dev \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions (Added 'zip' here)
+# Install PHP extensions
 RUN docker-php-ext-install pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Get latest Composer
@@ -27,8 +29,11 @@ WORKDIR /app
 # Copy the NEXORA project files
 COPY . .
 
-# Install dependencies safely: ignore platform strictness and skip premature scripts
+# Install PHP dependencies safely
 RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
+
+# Install Node dependencies and compile frontend assets
+RUN npm install && npm run build
 
 # Set directory permissions for Laravel
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
