@@ -5,21 +5,42 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\UserController;
 
-// The route to show the login page
+/*
+|--------------------------------------------------------------------------
+| Public Routes (No Authentication Required)
+|--------------------------------------------------------------------------
+*/
+
+// 1. The Public Landing Page for Potential Customers
+Route::get('/', function () {
+    return view('landing'); // Assumes resources/views/landing.blade.php exists
+})->name('home');
+
+// 2. Authentication Flow
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
-// The route that processes the form submission using your code
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth')->group(function () {
 
+/*
+|--------------------------------------------------------------------------
+| Protected Routes (Strict Bouncer Control via 'auth' Middleware)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+
+    // General Dashboard Redirector Route
     Route::get('/dashboard', function () {
         return redirect()->route('admin.itsm.registration');
     })->name('dashboard');
 
+    // ==========================================
+    // ADMIN ITSM PORTAL
+    // ==========================================
     Route::prefix('admin/itsm')->name('admin.itsm.')->group(function () {
+        
         Route::get('/registration', function () {
             return view('dashboard');
         })->name('registration');
@@ -39,7 +60,11 @@ Route::middleware('auth')->group(function () {
         })->name('service-desk');
     });
 
+    // ==========================================
+    // CLIENT ITSM PORTAL
+    // ==========================================
     Route::prefix('client/itsm')->name('client.itsm.')->group(function () {
+        
         Route::get('/', function () {
             return redirect()->route('client.itsm.employees');
         })->name('dashboard');
@@ -60,9 +85,11 @@ Route::middleware('auth')->group(function () {
         Route::view('/risk', 'risk')->name('risk');
     });
 
+    // ==========================================
+    // GLOBAL USER MANAGEMENT
+    // ==========================================
     Route::get('/users', [UserController::class, 'employees'])->name('users.index');
-});
 
-Route::get('/', function () {
-    return redirect()->route('login');
+    // Logout Action
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
