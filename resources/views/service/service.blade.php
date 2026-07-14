@@ -5,7 +5,9 @@
     $subtitle = $subtitle ?? 'Track and manage ITSM tickets';
     $tickets = $tickets ?? collect();
     $ticketType = $ticketType ?? 'erp_module';
-    $canCreateTicket = $canCreateTicket ?? $portal !== 'admin';
+    $canCreateTicket = $canCreateTicket ?? ($portal === 'client' && $ticketType === 'nexora_support');
+    $canUpdateTicket = $canUpdateTicket ?? ($portal === 'admin' || ($portal === 'client' && $ticketType === 'erp_module'));
+    $updateMode = $updateMode ?? 'full';
     $navItems = $portal === 'admin'
         ? [
             ['label' => 'Registration', 'route' => route('admin.itsm.registration'), 'key' => 'registration'],
@@ -24,7 +26,7 @@
     $updateTemplate = $portal === 'admin'
         ? route('admin.itsm.service-desk.update', ['ticket' => '__ID__'])
         : route('client.itsm.service-desk.update', ['ticket' => '__ID__']);
-    $createLabel = $ticketType === 'nexora_support' ? 'Ask Nexora Support' : 'Create ERP Ticket';
+    $createLabel = 'Ask Nexora Support';
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -55,11 +57,10 @@
                             <a href="#" class="block font-medium hover:text-[#346DCB]">Knowledge Base</a>
                             <a href="#" class="block font-medium hover:text-[#346DCB]">SLA Review</a>
                         @else
-                            <a href="{{ route('client.itsm.service-desk') }}" class="block {{ $ticketType === 'erp_module' ? 'font-extrabold' : 'font-medium hover:text-[#346DCB]' }}">ERP Module Tickets</a>
+                            <a href="{{ route('client.itsm.service-desk') }}" class="block {{ $ticketType === 'erp_module' ? 'font-extrabold' : 'font-medium hover:text-[#346DCB]' }}">Module Ticket Dashboard</a>
                             <a href="{{ route('client.itsm.service-desk.support') }}" class="block {{ $ticketType === 'nexora_support' ? 'font-extrabold' : 'font-medium hover:text-[#346DCB]' }}">Ask Nexora Support</a>
-                            <a href="#" class="block font-medium hover:text-[#346DCB]">Assigned Tickets</a>
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">Resolved Tickets</a>
                             <a href="#" class="block font-medium hover:text-[#346DCB]">Knowledge Base</a>
-                            <a href="#" class="block font-medium hover:text-[#346DCB]">Service Catalog</a>
                         @endif
                     </nav>
                 </aside>
@@ -124,7 +125,9 @@
                                         <th class="py-3">Category</th>
                                         <th class="py-3">Priority</th>
                                         <th class="py-3">Status</th>
-                                        <th class="py-3 text-right">Action</th>
+                                        @if ($canUpdateTicket)
+                                            <th class="py-3 text-right">Action</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm">
@@ -147,13 +150,17 @@
                                             <td class="py-4">{{ $ticket->category }}</td>
                                             <td class="py-4">{{ $ticket->priority }}</td>
                                             <td class="py-4">{{ $ticket->status }}</td>
-                                            <td class="py-4 text-right">
-                                                <button type="button" class="edit-ticket rounded-md border border-slate-300 px-3 py-1 font-semibold hover:bg-slate-100">Edit</button>
-                                            </td>
+                                            @if ($canUpdateTicket)
+                                                <td class="py-4 text-right">
+                                                    <button type="button" class="edit-ticket rounded-md border border-slate-300 px-3 py-1 font-semibold hover:bg-slate-100">
+                                                        {{ $updateMode === 'status_only' ? 'Resolve' : 'Edit' }}
+                                                    </button>
+                                                </td>
+                                            @endif
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="py-12 text-center text-slate-500">No tickets found.</td>
+                                            <td colspan="{{ $canUpdateTicket ? 8 : 7 }}" class="py-12 text-center text-slate-500">No tickets found.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -176,71 +183,85 @@
                     <input type="hidden" name="_method" id="ticketMethod" value="POST">
                     <input type="hidden" name="ticket_type" value="{{ $ticketType }}">
 
-                    <label class="block">
-                        <span class="mb-2 block text-sm font-semibold">Requester</span>
-                        <input type="text" name="requester" id="ticket_requester" class="h-11 w-full rounded border border-slate-300 px-3">
-                    </label>
+                    @if ($updateMode === 'status_only')
+                        <label class="block md:col-span-2">
+                            <span class="mb-2 block text-sm font-semibold">Resolution Status</span>
+                            <select name="status" id="ticket_status" class="h-11 w-full rounded border border-slate-300 px-3">
+                                <option>In Progress</option>
+                                <option>Resolved</option>
+                                <option>Closed</option>
+                            </select>
+                        </label>
+                    @else
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-semibold">Requester</span>
+                            <input type="text" name="requester" id="ticket_requester" class="h-11 w-full rounded border border-slate-300 px-3">
+                        </label>
 
-                    <label class="block">
-                        <span class="mb-2 block text-sm font-semibold">Category</span>
-                        <input type="text" name="category" id="ticket_category" required class="h-11 w-full rounded border border-slate-300 px-3">
-                    </label>
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-semibold">Category</span>
+                            <input type="text" name="category" id="ticket_category" required class="h-11 w-full rounded border border-slate-300 px-3">
+                        </label>
 
-                    <label class="block">
-                        <span class="mb-2 block text-sm font-semibold">ERP Module</span>
-                        <select name="module" id="ticket_module" class="h-11 w-full rounded border border-slate-300 px-3">
-                            @if ($ticketType === 'nexora_support')
-                                <option>Nexora Platform</option>
-                                <option>Account & Access</option>
-                                <option>Billing & Subscription</option>
-                                <option>System Configuration</option>
-                                <option>Other</option>
-                            @else
-                                <option>HR</option>
-                                <option>Finance</option>
-                                <option>Inventory</option>
-                                <option>Operations</option>
-                                <option>Procurement</option>
-                                <option>Sales</option>
-                                <option>General ERP</option>
-                            @endif
-                        </select>
-                    </label>
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-semibold">Area</span>
+                            <select name="module" id="ticket_module" class="h-11 w-full rounded border border-slate-300 px-3">
+                                @if ($ticketType === 'nexora_support')
+                                    <option>Nexora Platform</option>
+                                    <option>Account & Access</option>
+                                    <option>Billing & Subscription</option>
+                                    <option>System Configuration</option>
+                                    <option>Other</option>
+                                @else
+                                    <option>HR</option>
+                                    <option>Business Intelligence</option>
+                                    <option>Finance</option>
+                                    <option>Inventory</option>
+                                    <option>Operations</option>
+                                    <option>Procurement</option>
+                                    <option>Sales</option>
+                                    <option>General ERP</option>
+                                @endif
+                            </select>
+                        </label>
 
-                    <label class="block">
-                        <span class="mb-2 block text-sm font-semibold">Priority</span>
-                        <select name="priority" id="ticket_priority" class="h-11 w-full rounded border border-slate-300 px-3">
-                            <option>Low</option>
-                            <option selected>Medium</option>
-                            <option>High</option>
-                            <option>Critical</option>
-                        </select>
-                    </label>
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-semibold">Priority</span>
+                            <select name="priority" id="ticket_priority" class="h-11 w-full rounded border border-slate-300 px-3">
+                                <option>Low</option>
+                                <option selected>Medium</option>
+                                <option>High</option>
+                                <option>Critical</option>
+                            </select>
+                        </label>
 
-                    <label class="block">
-                        <span class="mb-2 block text-sm font-semibold">Status</span>
-                        <select name="status" id="ticket_status" class="h-11 w-full rounded border border-slate-300 px-3">
-                            <option>Open</option>
-                            <option>In Progress</option>
-                            <option>Pending Review</option>
-                            <option>Resolved</option>
-                            <option>Closed</option>
-                        </select>
-                    </label>
+                        @if ($portal === 'admin')
+                            <label class="block">
+                                <span class="mb-2 block text-sm font-semibold">Status</span>
+                                <select name="status" id="ticket_status" class="h-11 w-full rounded border border-slate-300 px-3">
+                                    <option>Open</option>
+                                    <option>In Progress</option>
+                                    <option>Pending Review</option>
+                                    <option>Resolved</option>
+                                    <option>Closed</option>
+                                </select>
+                            </label>
+                        @endif
 
-                    <label class="block md:col-span-2">
-                        <span class="mb-2 block text-sm font-semibold">Subject</span>
-                        <input type="text" name="subject" id="ticket_subject" required class="h-11 w-full rounded border border-slate-300 px-3">
-                    </label>
+                        <label class="block md:col-span-2">
+                            <span class="mb-2 block text-sm font-semibold">Subject</span>
+                            <input type="text" name="subject" id="ticket_subject" required class="h-11 w-full rounded border border-slate-300 px-3">
+                        </label>
 
-                    <label class="block md:col-span-2">
-                        <span class="mb-2 block text-sm font-semibold">Description</span>
-                        <textarea name="description" id="ticket_description" rows="4" class="w-full rounded border border-slate-300 px-3 py-2"></textarea>
-                    </label>
+                        <label class="block md:col-span-2">
+                            <span class="mb-2 block text-sm font-semibold">Description</span>
+                            <textarea name="description" id="ticket_description" rows="4" class="w-full rounded border border-slate-300 px-3 py-2"></textarea>
+                        </label>
+                    @endif
 
                     <div class="flex justify-end gap-3 pt-5 md:col-span-2">
                         <button type="button" id="cancelTicketModal" class="rounded-md border border-slate-300 px-5 py-2 font-semibold text-slate-700 hover:bg-slate-100">Cancel</button>
-                        <button type="submit" class="rounded-md bg-[#346DCB] px-5 py-2 font-semibold text-white hover:bg-[#2554a3]">Save ticket</button>
+                        <button type="submit" id="ticketSubmitButton" class="rounded-md bg-[#346DCB] px-5 py-2 font-semibold text-white hover:bg-[#2554a3]">Save ticket</button>
                     </div>
                 </form>
             </div>
@@ -254,6 +275,8 @@
         const ticketForm = document.getElementById('ticketForm');
         const ticketMethod = document.getElementById('ticketMethod');
         const ticketModalTitle = document.getElementById('ticketModalTitle');
+        const ticketSubmitButton = document.getElementById('ticketSubmitButton');
+        const updateMode = @json($updateMode);
 
         function setTicketField(id, value) {
             const field = document.getElementById(id);
@@ -263,12 +286,19 @@
         function openTicketModal(row = null) {
             ticketForm.action = row ? updateTemplate.replace('__ID__', row.dataset.id) : storeRoute;
             ticketMethod.value = row ? 'PATCH' : 'POST';
-            ticketModalTitle.textContent = row ? 'Edit Ticket' : 'Create Ticket';
+            ticketModalTitle.textContent = row
+                ? (updateMode === 'status_only' ? 'Resolve Module Ticket' : 'Edit Ticket')
+                : 'Ask Nexora Support';
+            if (ticketSubmitButton) {
+                ticketSubmitButton.textContent = row
+                    ? (updateMode === 'status_only' ? 'Update status' : 'Save changes')
+                    : 'Submit ticket';
+            }
             setTicketField('ticket_requester', row?.dataset.requester);
             setTicketField('ticket_module', row?.dataset.module || @json($ticketType === 'nexora_support' ? 'Nexora Platform' : 'General ERP'));
             setTicketField('ticket_category', row?.dataset.category);
             setTicketField('ticket_priority', row?.dataset.priority || 'Medium');
-            setTicketField('ticket_status', row?.dataset.status || 'Open');
+            setTicketField('ticket_status', row?.dataset.status || (updateMode === 'status_only' ? 'Resolved' : 'Open'));
             setTicketField('ticket_subject', row?.dataset.subject);
             setTicketField('ticket_description', row?.dataset.description);
             ticketModal.classList.remove('hidden');

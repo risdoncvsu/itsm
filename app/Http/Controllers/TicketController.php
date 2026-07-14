@@ -26,7 +26,9 @@ class TicketController extends Controller
             'portal' => $portal,
             'active' => 'service-desk',
             'ticketType' => $portal === 'admin' ? 'nexora_support' : $ticketType,
-            'canCreateTicket' => $portal !== 'admin',
+            'canCreateTicket' => $portal === 'client' && $ticketType === 'nexora_support',
+            'canUpdateTicket' => $portal === 'admin' || ($portal === 'client' && $ticketType === 'erp_module'),
+            'updateMode' => $portal === 'client' && $ticketType === 'erp_module' ? 'status_only' : 'full',
             'title' => $this->titleFor($portal, $ticketType),
             'subtitle' => $this->subtitleFor($portal, $ticketType),
             'tickets' => $query->get(),
@@ -40,18 +42,24 @@ class TicketController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $this->validatedTicket($request);
+        if (! Auth::user()->company_id) {
+            abort(403);
+        }
+
+        if ($request->input('ticket_type') !== 'nexora_support') {
+            abort(403, 'System admins cannot create ERP module tickets.');
+        }
+
+        $validated = $this->validatedNewSupportTicket($request);
         $company = $this->companyForRequest($request);
-        $ticketType = $request->input('ticket_type') === 'nexora_support'
-            ? 'nexora_support'
-            : 'erp_module';
 
         ServiceTicket::create($validated + [
             'company_id' => $company?->id,
             'created_by' => Auth::id(),
             'client_name' => $company?->company_name,
             'ticket_no' => $this->nextTicketNo(),
-            'ticket_type' => $ticketType,
+            'ticket_type' => 'nexora_support',
+            'status' => 'Open',
         ]);
 
         return back()->with('success', 'Ticket created successfully.');
@@ -61,9 +69,31 @@ class TicketController extends Controller
     {
         $this->authorizePortalAccess($ticket);
 
+        if (Auth::user()->company_id) {
+            if ($ticket->ticket_type !== 'erp_module') {
+                abort(403, 'System admins can only view Nexora support ticket statuses.');
+            }
+
+            $ticket->update($this->validatedResolution($request));
+
+            return back()->with('success', 'Ticket status updated successfully.');
+        }
+
         $ticket->update($this->validatedTicket($request));
 
         return back()->with('success', 'Ticket updated successfully.');
+    }
+
+    private function validatedNewSupportTicket(Request $request): array
+    {
+        return $request->validate([
+            'requester' => ['nullable', 'string', 'max:255'],
+            'module' => ['nullable', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:255'],
+            'priority' => ['required', 'string', 'max:50'],
+            'subject' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+        ]);
     }
 
     private function validatedTicket(Request $request): array
@@ -76,6 +106,13 @@ class TicketController extends Controller
             'status' => ['required', 'string', 'max:50'],
             'subject' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+        ]);
+    }
+
+    private function validatedResolution(Request $request): array
+    {
+        return $request->validate([
+            'status' => ['required', 'string', 'in:In Progress,Resolved,Closed'],
         ]);
     }
 
@@ -124,7 +161,7 @@ class TicketController extends Controller
         }
 
         return $ticketType === 'nexora_support'
-            ? 'Create tickets for Nexora root admins when your company needs platform-level help.'
-            : 'Track tickets raised from ERP modules such as HR, Finance, Inventory, and Operations.';
+            ? 'Create tickets for Nexora root admins when your company needs platform-level help, then track their status.'
+            : 'Review and resolve tickets raised by ERP modules such as HR, Business Intelligence, Finance, and Operations.';
     }
 }
