@@ -57,6 +57,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/service-desk', [TicketController::class, 'index'])->defaults('portal', 'client')->name('service-desk');
         Route::post('/service-desk', [TicketController::class, 'store'])->name('service-desk.store');
         Route::patch('/service-desk/{ticket}', [TicketController::class, 'update'])->name('service-desk.update');
+        Route::get('/service-desk/nexora-support', [TicketController::class, 'supportIndex'])->name('service-desk.support');
+        Route::post('/service-desk/nexora-support', [TicketController::class, 'store'])->name('service-desk.support.store');
 
         Route::get('/compliance', [ComplianceItemController::class, 'index'])->name('compliance');
         Route::post('/compliance', [ComplianceItemController::class, 'store'])->name('compliance.store');

@@ -4,6 +4,8 @@
     $title = $title ?? 'Service Desk';
     $subtitle = $subtitle ?? 'Track and manage ITSM tickets';
     $tickets = $tickets ?? collect();
+    $ticketType = $ticketType ?? 'erp_module';
+    $canCreateTicket = $canCreateTicket ?? $portal !== 'admin';
     $navItems = $portal === 'admin'
         ? [
             ['label' => 'Registration', 'route' => route('admin.itsm.registration'), 'key' => 'registration'],
@@ -16,10 +18,13 @@
             ['label' => 'Compliance Tracking', 'route' => route('client.itsm.compliance'), 'key' => 'compliance'],
             ['label' => 'Risk Management', 'route' => route('client.itsm.risk'), 'key' => 'risk'],
         ];
-    $storeRoute = $portal === 'admin' ? route('admin.itsm.service-desk.store') : route('client.itsm.service-desk.store');
+    $storeRoute = $ticketType === 'nexora_support'
+        ? route('client.itsm.service-desk.support.store')
+        : route('client.itsm.service-desk.store');
     $updateTemplate = $portal === 'admin'
         ? route('admin.itsm.service-desk.update', ['ticket' => '__ID__'])
         : route('client.itsm.service-desk.update', ['ticket' => '__ID__']);
+    $createLabel = $ticketType === 'nexora_support' ? 'Ask Nexora Support' : 'Create ERP Ticket';
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -44,10 +49,18 @@
             <section class="relative z-10 grid gap-6 lg:grid-cols-[22rem_1fr]">
                 <aside class="rounded-[1.875rem] bg-white p-8 text-slate-950">
                     <nav class="space-y-6 text-xl">
-                        <a href="#" class="block font-extrabold">All Tickets</a>
-                        <a href="#" class="block font-medium hover:text-[#346DCB]">Assigned Tickets</a>
-                        <a href="#" class="block font-medium hover:text-[#346DCB]">Knowledge Base</a>
-                        <a href="#" class="block font-medium hover:text-[#346DCB]">Service Catalog</a>
+                        @if ($portal === 'admin')
+                            <a href="{{ route('admin.itsm.service-desk') }}" class="block font-extrabold">Nexora Support Queue</a>
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">Assigned Requests</a>
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">Knowledge Base</a>
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">SLA Review</a>
+                        @else
+                            <a href="{{ route('client.itsm.service-desk') }}" class="block {{ $ticketType === 'erp_module' ? 'font-extrabold' : 'font-medium hover:text-[#346DCB]' }}">ERP Module Tickets</a>
+                            <a href="{{ route('client.itsm.service-desk.support') }}" class="block {{ $ticketType === 'nexora_support' ? 'font-extrabold' : 'font-medium hover:text-[#346DCB]' }}">Ask Nexora Support</a>
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">Assigned Tickets</a>
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">Knowledge Base</a>
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">Service Catalog</a>
+                        @endif
                     </nav>
                 </aside>
 
@@ -56,7 +69,9 @@
                         <p class="text-sm font-semibold uppercase tracking-wide text-[#346DCB]">{{ $portal === 'admin' ? 'Nexora admin portal' : 'Company admin portal' }}</p>
                         <div class="mt-2 flex flex-wrap items-center justify-between gap-4">
                             <h1 class="text-5xl font-bold">{{ $title }}</h1>
-                            <button type="button" id="openCreateTicket" class="rounded-full bg-[#346DCB] px-5 py-2 font-semibold text-white transition hover:bg-[#2554a3]">Create Ticket</button>
+                            @if ($canCreateTicket)
+                                <button type="button" id="openCreateTicket" class="rounded-full bg-[#346DCB] px-5 py-2 font-semibold text-white transition hover:bg-[#2554a3]">{{ $createLabel }}</button>
+                            @endif
                         </div>
                         <p class="mt-3 text-lg text-slate-600">{{ $subtitle }}</p>
                     </div>
@@ -104,6 +119,7 @@
                                     <tr class="border-b-2 border-slate-200 text-left text-sm uppercase tracking-wide text-slate-500">
                                         <th class="py-3">Ticket</th>
                                         <th class="py-3">{{ $portal === 'admin' ? 'Client' : 'Requester' }}</th>
+                                        <th class="py-3">Module</th>
                                         <th class="py-3">Subject</th>
                                         <th class="py-3">Category</th>
                                         <th class="py-3">Priority</th>
@@ -117,6 +133,7 @@
                                             class="border-b border-slate-200"
                                             data-id="{{ $ticket->id }}"
                                             data-requester="{{ e($ticket->requester) }}"
+                                            data-module="{{ e($ticket->module) }}"
                                             data-category="{{ e($ticket->category) }}"
                                             data-priority="{{ e($ticket->priority) }}"
                                             data-status="{{ e($ticket->status) }}"
@@ -125,6 +142,7 @@
                                         >
                                             <td class="py-4 font-semibold">{{ $ticket->ticket_no }}</td>
                                             <td class="py-4">{{ $portal === 'admin' ? ($ticket->client_name ?? 'Internal') : ($ticket->requester ?? 'Company user') }}</td>
+                                            <td class="py-4">{{ $ticket->module ?? ($ticket->ticket_type === 'nexora_support' ? 'Nexora Platform' : 'General') }}</td>
                                             <td class="py-4">{{ $ticket->subject }}</td>
                                             <td class="py-4">{{ $ticket->category }}</td>
                                             <td class="py-4">{{ $ticket->priority }}</td>
@@ -135,7 +153,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="py-12 text-center text-slate-500">No tickets found.</td>
+                                            <td colspan="8" class="py-12 text-center text-slate-500">No tickets found.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -156,6 +174,7 @@
                 <form id="ticketForm" method="POST" action="{{ $storeRoute }}" class="grid grid-cols-1 gap-5 md:grid-cols-2">
                     @csrf
                     <input type="hidden" name="_method" id="ticketMethod" value="POST">
+                    <input type="hidden" name="ticket_type" value="{{ $ticketType }}">
 
                     <label class="block">
                         <span class="mb-2 block text-sm font-semibold">Requester</span>
@@ -165,6 +184,27 @@
                     <label class="block">
                         <span class="mb-2 block text-sm font-semibold">Category</span>
                         <input type="text" name="category" id="ticket_category" required class="h-11 w-full rounded border border-slate-300 px-3">
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block text-sm font-semibold">ERP Module</span>
+                        <select name="module" id="ticket_module" class="h-11 w-full rounded border border-slate-300 px-3">
+                            @if ($ticketType === 'nexora_support')
+                                <option>Nexora Platform</option>
+                                <option>Account & Access</option>
+                                <option>Billing & Subscription</option>
+                                <option>System Configuration</option>
+                                <option>Other</option>
+                            @else
+                                <option>HR</option>
+                                <option>Finance</option>
+                                <option>Inventory</option>
+                                <option>Operations</option>
+                                <option>Procurement</option>
+                                <option>Sales</option>
+                                <option>General ERP</option>
+                            @endif
+                        </select>
                     </label>
 
                     <label class="block">
@@ -225,6 +265,7 @@
             ticketMethod.value = row ? 'PATCH' : 'POST';
             ticketModalTitle.textContent = row ? 'Edit Ticket' : 'Create Ticket';
             setTicketField('ticket_requester', row?.dataset.requester);
+            setTicketField('ticket_module', row?.dataset.module || @json($ticketType === 'nexora_support' ? 'Nexora Platform' : 'General ERP'));
             setTicketField('ticket_category', row?.dataset.category);
             setTicketField('ticket_priority', row?.dataset.priority || 'Medium');
             setTicketField('ticket_status', row?.dataset.status || 'Open');
