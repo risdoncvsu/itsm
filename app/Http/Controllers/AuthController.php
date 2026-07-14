@@ -11,28 +11,41 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         // 1. Validate the inputs
-        $credentials = $request->validate([
+        $request->validate([
             'username' => 'required',
             'password' => 'required'
         ]);
 
-        // 2. Use Auth::attempt() instead of manual plain-text comparison
-        // This automatically hashes the input and checks it against the database
-        if (Auth::attempt($credentials)) {
+        // 2. Find the user in the database
+        $user = User::where('username', $request->username)->first();
+
+        // 3. Manual plain-text comparison
+        if ($user && $request->password === $user->password) {
             
-            // Regenerate session to prevent session fixation attacks (Best Practice)
+            // Log them in and secure the session
+            Auth::login($user);
             $request->session()->regenerate();
             
             // TODO: Fire a 'UserLoggedIn' event for the ITSM audit trail
             
-            $destination = Auth::user()->role === 'company_admin'
+            // 4. Auto-route based on the user's role
+            $destination = $user->role === 'company_admin'
                 ? route('client.itsm.employees')
                 : route('admin.itsm.registration');
 
             return redirect()->intended($destination);
         }
 
-        // 3. If it fails, send them back
+        // 5. If it fails, send them back with an error
         return back()->withErrors(['username' => 'Invalid credentials.']);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }
