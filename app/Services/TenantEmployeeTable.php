@@ -76,4 +76,14 @@ class TenantEmployeeTable
             ->where('id', $employeeId)
             ->update($values + ['updated_at' => now()]);
     }
+
+    public function createEmployee(Company $company, array $values): int
+    {
+        $tableName = $this->ensure($company);
+
+        return DB::table($tableName)->insertGetId($values + [
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
 }

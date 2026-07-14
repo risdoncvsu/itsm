@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ComplianceItemController;
+use App\Http\Controllers\RiskAssessmentController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
 
 // Public Routes
@@ -35,14 +38,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/clients', [UserController::class, 'clients'])->name('clients');
         Route::patch('/clients/{company}', [CompanyController::class, 'update'])->name('clients.update');
 
-        Route::get('/service-desk', function () {
-            return view('service.service', [
-                'portal' => 'admin',
-                'active' => 'service-desk',
-                'title' => 'Client Service Desk',
-                'subtitle' => 'Requests from client companies using Nexora ERP',
-            ]);
-        })->name('service-desk');
+        Route::get('/service-desk', [TicketController::class, 'index'])->defaults('portal', 'admin')->name('service-desk');
+        Route::post('/service-desk', [TicketController::class, 'store'])->name('service-desk.store');
+        Route::patch('/service-desk/{ticket}', [TicketController::class, 'update'])->name('service-desk.update');
     });
 
     // Client ITSM Portal
@@ -53,19 +51,20 @@ Route::middleware(['auth'])->group(function () {
         })->name('dashboard');
 
         Route::get('/employees', [UserController::class, 'employees'])->name('employees');
+        Route::post('/employees', [UserController::class, 'storeEmployee'])->name('employees.store');
         Route::patch('/employees/{employee}', [UserController::class, 'updateEmployee'])->name('employees.update');
 
-        Route::get('/service-desk', function () {
-            return view('service.service', [
-                'portal' => 'client',
-                'active' => 'service-desk',
-                'title' => 'Company Service Desk',
-                'subtitle' => 'Internal ITSM requests for your company users',
-            ]);
-        })->name('service-desk');
+        Route::get('/service-desk', [TicketController::class, 'index'])->defaults('portal', 'client')->name('service-desk');
+        Route::post('/service-desk', [TicketController::class, 'store'])->name('service-desk.store');
+        Route::patch('/service-desk/{ticket}', [TicketController::class, 'update'])->name('service-desk.update');
 
-        Route::view('/compliance', 'compliance')->name('compliance');
-        Route::view('/risk', 'risk')->name('risk');
+        Route::get('/compliance', [ComplianceItemController::class, 'index'])->name('compliance');
+        Route::post('/compliance', [ComplianceItemController::class, 'store'])->name('compliance.store');
+        Route::patch('/compliance/{compliance}', [ComplianceItemController::class, 'update'])->name('compliance.update');
+
+        Route::get('/risk', [RiskAssessmentController::class, 'index'])->name('risk');
+        Route::post('/risk', [RiskAssessmentController::class, 'store'])->name('risk.store');
+        Route::patch('/risk/{risk}', [RiskAssessmentController::class, 'update'])->name('risk.update');
     });
 
     // Global User Management

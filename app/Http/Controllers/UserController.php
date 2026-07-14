@@ -55,6 +55,27 @@ class UserController extends Controller
         ]);
     }
 
+    public function storeEmployee(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $company = Company::findOrFail(Auth::user()->company_id);
+        $validated = $request->validate([
+            'username' => ['nullable', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'department' => ['nullable', 'string', 'max:255'],
+            'status' => ['required', 'string', 'max:50'],
+        ]);
+
+        $employeeId = $this->tenantEmployeeTable->createEmployee($company, $validated);
+        $this->tenantEmployeeTable->updateEmployee($company, $employeeId, [
+            'employee_code' => 'EMP-' . str_pad((string) $employeeId, 5, '0', STR_PAD_LEFT),
+        ]);
+
+        return redirect()
+            ->route('client.itsm.employees')
+            ->with('success', 'Employee created successfully.');
+    }
+
     public function updateEmployee(Request $request, int $employee): \Illuminate\Http\RedirectResponse
     {
         $company = Company::findOrFail(Auth::user()->company_id);
