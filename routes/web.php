@@ -13,8 +13,8 @@ use App\Http\Controllers\UserController;
 
 // 1. The Public Landing Page for Potential Customers
 Route::get('/', function () {
-    return view('landing'); // Assumes resources/views/landing.blade.php exists
-})->name('home');
+    return view('auth.login'); // Assumes resources/views/landing.blade.php exists
+})->name('login');
 
 // 2. Authentication Flow
 Route::get('/login', function () {
