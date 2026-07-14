@@ -1,79 +1,74 @@
-@extends('layouts.app') @section('content')
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexora | Registration</title>
+    <title>Nexora | Risk Management</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('images/nexora-icon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-[#1B365D] font-sans text-white">
     <div class="flex min-h-screen flex-col">
         <x-itsm-header
-            :home-route="route('admin.itsm.registration')"
-            active="registration"
+            :home-route="route('client.itsm.employees')"
+            active="risk"
             :nav-items="[
-                ['label' => 'Registration', 'route' => route('admin.itsm.registration'), 'key' => 'registration'],
-                ['label' => 'Client Management', 'route' => route('admin.itsm.clients'), 'key' => 'clients'],
-                ['label' => 'Service Desk', 'route' => route('admin.itsm.service-desk'), 'key' => 'service-desk'],
+                ['label' => 'Employee Management', 'route' => route('client.itsm.employees'), 'key' => 'employees'],
+                ['label' => 'Service Desk', 'route' => route('client.itsm.service-desk'), 'key' => 'service-desk'],
+                ['label' => 'Compliance Tracking', 'route' => route('client.itsm.compliance'), 'key' => 'compliance'],
+                ['label' => 'Risk Management', 'route' => route('client.itsm.risk'), 'key' => 'risk'],
             ]"
         />
 
-        <main class="relative flex flex-1 items-center justify-center overflow-hidden px-6 py-12">
+        <main class="relative flex-1 overflow-hidden p-6">
             <img src="{{ asset('images/nexora-icon.png') }}" alt="" class="pointer-events-none absolute left-1/2 top-1/2 w-[64rem] -translate-x-1/2 -translate-y-1/2 opacity-10 blur-sm">
 
-            <section class="relative z-10 w-full max-w-3xl">
-                <h1 class="mb-12 text-center text-5xl font-light">Register <span class="font-semibold italic">a new</span> company</h1>
+            <section class="relative z-10 grid gap-6 lg:grid-cols-[22rem_1fr]">
+                <aside class="rounded-[1.875rem] bg-white p-8 text-slate-950">
+                    <nav class="space-y-6 text-xl">
+                        <a href="#" class="block font-extrabold">Risk Register</a>
+                        <a href="#" class="block font-medium hover:text-[#346DCB]">Mitigation Plans</a>
+                        <a href="#" class="block font-medium hover:text-[#346DCB]">Incident Report</a>
+                        <a href="#" class="block font-medium hover:text-[#346DCB]">Risk Analytics</a>
+                    </nav>
+                </aside>
 
-                @if ($errors->any())
-                    <div class="mb-6 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
-                        {{ $errors->first() }}
+                <div class="space-y-6">
+                    <div class="rounded-[1.875rem] bg-white/90 px-10 py-8 text-slate-950">
+                        <p class="text-sm font-semibold uppercase tracking-wide text-[#346DCB]">Company admin portal</p>
+                        <h1 class="mt-2 text-5xl font-bold">Risk Management</h1>
+                        <p class="mt-3 text-lg text-slate-600">Track operational, compliance, and workforce risks for your company.</p>
                     </div>
-                @endif
 
-                <form action="{{ route('admin.itsm.registration.store') }}" method="POST" class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
-                    @csrf
-
-                    <label class="block">
-                        <span class="mb-2 block text-sm font-light text-white">Company Name</span>
-                        <input type="text" name="company_name" value="{{ old('company_name') }}" placeholder="Type here.." class="h-11 w-full rounded-sm border-0 bg-white px-4 text-sm text-slate-900 outline-none placeholder:italic placeholder:text-slate-400">
-                    </label>
-
-                    <label class="block">
-                        <span class="mb-2 block text-sm font-light text-white">Industry</span>
-                        <select name="industry" class="h-11 w-full rounded-sm border-0 bg-white px-4 text-sm text-slate-500 outline-none">
-                            <option value="" disabled selected hidden>Please Select</option>
-                            <option value="tech" @selected(old('industry') === 'tech')>Technology</option>
-                            <option value="finance" @selected(old('industry') === 'finance')>Finance</option>
-                            <option value="retail" @selected(old('industry') === 'retail')>Retail</option>
-                            <option value="manufacturing" @selected(old('industry') === 'manufacturing')>Manufacturing</option>
-                        </select>
-                    </label>
-
-                    <label class="block">
-                        <span class="mb-2 block text-sm font-light text-white">Company E-mail</span>
-                        <input type="email" name="company_email" value="{{ old('company_email') }}" placeholder="sample@company.com" class="h-11 w-full rounded-sm border-0 bg-white px-4 text-sm text-slate-900 outline-none placeholder:italic placeholder:text-slate-400">
-                    </label>
-
-                    <label class="block">
-                        <span class="mb-2 block text-sm font-light text-white">Phone No.</span>
-                        <input type="text" name="phone_no" value="{{ old('phone_no') }}" placeholder="Type here.." class="h-11 w-full rounded-sm border-0 bg-white px-4 text-sm text-slate-900 outline-none placeholder:italic placeholder:text-slate-400">
-                    </label>
-
-                    <label class="block md:col-span-2 md:max-w-[calc(50%-1rem)]">
-                        <span class="mb-2 block text-sm font-light text-white">Admin Name</span>
-                        <input type="text" name="admin_name" value="{{ old('admin_name') }}" placeholder="Type here.." class="h-11 w-full rounded-sm border-0 bg-white px-4 text-sm text-slate-900 outline-none placeholder:italic placeholder:text-slate-400">
-                    </label>
-
-                    <div class="pt-20 text-center md:col-span-2">
-                        <button type="submit" class="rounded-md bg-white px-10 py-3 text-2xl font-bold text-[#0B1E3D] shadow-lg transition hover:-translate-y-0.5 hover:bg-slate-100">Register</button>
+                    <div class="grid gap-6 xl:grid-cols-3">
+                        @foreach ([
+                            ['title' => 'High Employee Turnover', 'level' => 'High', 'owner' => 'HR', 'status' => 'Mitigation Open'],
+                            ['title' => 'Access Review Overdue', 'level' => 'Medium', 'owner' => 'IT', 'status' => 'Pending Review'],
+                            ['title' => 'Vendor SLA Breach', 'level' => 'Low', 'owner' => 'Operations', 'status' => 'Monitoring'],
+                        ] as $item)
+                            <article class="rounded-2xl bg-white p-6 text-slate-950">
+                                <h2 class="text-2xl font-semibold">{{ $item['title'] }}</h2>
+                                <dl class="mt-8 space-y-4 text-sm">
+                                    <div class="flex justify-between">
+                                        <dt class="font-semibold text-slate-500">Risk Level</dt>
+                                        <dd class="font-bold">{{ $item['level'] }}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="font-semibold text-slate-500">Owner</dt>
+                                        <dd>{{ $item['owner'] }}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="font-semibold text-slate-500">Status</dt>
+                                        <dd>{{ $item['status'] }}</dd>
+                                    </div>
+                                </dl>
+                                <button class="mt-8 w-full rounded-md border-2 border-slate-950 py-2 font-medium transition hover:bg-slate-950 hover:text-white">Open</button>
+                            </article>
+                        @endforeach
                     </div>
-                </form>
+                </div>
             </section>
         </main>
     </div>
 </body>
 </html>
-    @endsection
