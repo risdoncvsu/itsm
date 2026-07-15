@@ -39,21 +39,21 @@
          TOP NAVBAR
     ====================================================== -->
     <header class="w-full h-[150px] bg-[#132B52] flex items-center justify-between pl-[1px] pr-[5px] border-b border-white/5 shadow-[0_1px_0_rgba(255,255,255,.03)_inset] sticky top-0 z-[1000]">
- 
-        <!-- Left -->
+
+        <!-- Left a-->
         <div class="flex items-center gap-3">
             <img src="{{ asset('images/logo.png') }}" class="h-[86px] w-auto object-contain block" alt="Header Logo">
         </div>
- 
+
         <div class="flex items-center gap-7">
             <nav class="flex items-center gap-px">
- 
+
                 <div class="relative group">
                     <a href="/dashboard" class="text-white no-underline text-xl py-2.5 px-[18px] flex items-center gap-2 rounded-full transition-all duration-250 hover:text-[#66A6FF] hover:bg-[#1B3A6B] hover:-translate-y-px hover:font-bold active:scale-[.97]">
                         Dashboard
                     </a>
                 </div>
- 
+
                 <div class="relative group">
                     <a href="#" class="text-white no-underline text-xl py-2.5 px-[18px] flex items-center gap-2 rounded-full transition-all duration-250 hover:text-[#66A6FF] hover:bg-[#1B3A6B] hover:-translate-y-px hover:font-bold active:scale-[.97]">
                         Workforce
@@ -61,21 +61,19 @@
                             <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </a>
- 
+
                     <div class="absolute top-[120%] left-1/2 -translate-x-1/2 translate-y-2.5 w-[220px] bg-[#132B52] rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2.5 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
                         <a href="{{ route('employees.index') }}" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Employee List</a>
                         <a href="{{ route('departments.index') }}" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Department List</a>
                     </div>
                 </div>
- 
+
                 <div class="relative group">
                     <a href="{{ route('onboarding.step1') }}" class="text-white no-underline text-xl py-2.5 px-[18px] flex items-center gap-2 rounded-full transition-all duration-250 hover:text-[#66A6FF] hover:bg-[#1B3A6B] hover:-translate-y-px hover:font-bold active:scale-[.97]">
                         Employee Onboarding
-                        
                     </a>
-                    
                 </div>
- 
+
                 <div class="relative group">
                     <a href="#" class="text-white no-underline text-xl py-2.5 px-[18px] flex items-center gap-2 rounded-full transition-all duration-250 hover:text-[#66A6FF] hover:bg-[#1B3A6B] hover:-translate-y-px hover:font-bold active:scale-[.97]">
                         Reports and Analytics
@@ -86,29 +84,50 @@
                     <div class="absolute top-[120%] left-1/2 -translate-x-1/2 translate-y-2.5 w-[220px] bg-[#132B52] rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2.5 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
                         <a href="/reports-analytics/attendance-overview" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Attendance Record</a>
                         <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Leave Record</a>
-                       
                     </div>
                 </div>
- 
+
                 <div class="relative group">
                     <a href="#" class="text-white no-underline text-xl py-2.5 px-[18px] flex items-center gap-2 rounded-full transition-all duration-250 hover:text-[#66A6FF] hover:bg-[#1B3A6B] hover:-translate-y-px hover:font-bold active:scale-[.97]">
-                        Leave Management
+                        Employee Management
+                        <svg class="w-3.5 h-3.5 opacity-80 transition-transform duration-300 origin-center group-hover:rotate-180 group-hover:opacity-100" viewBox="0 0 24 24" fill="none">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </a>
                     <div class="absolute top-[120%] left-1/2 -translate-x-1/2 translate-y-2.5 w-[220px] bg-[#132B52] rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2.5 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
-                        <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Placeholder 1</a>
-                        <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Placeholder 2</a>
-                        <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Placeholder 3</a>
+                        <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Leave Management</a>
+                        <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Resignation Management</a>
+                      
                     </div>
                 </div>
- 
+
             </nav>
- 
-            <div class="w-11 h-11 mr-[15px] rounded-full grid place-items-center bg-white/[.06] shadow-[inset_0_0_0_1px_rgba(255,255,255,.06)] " aria-label="Profile">
-                <svg class="w-10 h-10" viewBox="0 0 36 36" fill="none">
-                    <circle cx="18" cy="18" r="17" fill="white" opacity=".97"/>
-                    <circle cx="18" cy="13" r="5.2" fill="#223B63"/>
-                    <path d="M8.8 28.3C10.7 23.8 14.1 21.7 18 21.7C21.9 21.7 25.3 23.8 27.2 28.3" fill="#223B63"/>
-                </svg>
+
+            <!-- Profile dropdown with Logout -->
+            <div class="relative group mr-[15px]">
+                <div class="w-11 h-11 rounded-full grid place-items-center bg-white/[.06] shadow-[inset_0_0_0_1px_rgba(255,255,255,.06)] cursor-pointer" aria-label="Profile">
+                    <svg class="w-10 h-10" viewBox="0 0 36 36" fill="none">
+                        <circle cx="18" cy="18" r="17" fill="white" opacity=".97"/>
+                        <circle cx="18" cy="13" r="5.2" fill="#223B63"/>
+                        <path d="M8.8 28.3C10.7 23.8 14.1 21.7 18 21.7C21.9 21.7 25.3 23.8 27.2 28.3" fill="#223B63"/>
+                    </svg>
+                </div>
+
+                <div class="absolute top-[120%] right-0 left-auto translate-y-2.5 w-[160px] bg-[#132B52] rounded-2xl shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full text-left bg-none border-none cursor-pointer">
+                            <a href="#" onclick="event.preventDefault(); this.closest('form').submit();"
+                               class="flex items-center gap-2 no-underline text-[#FFB4B4] py-2.5 px-3 rounded-[10px] text-[13px] font-semibold transition-all duration-200 hover:bg-[#2c1414] hover:text-[#ff6b6b]">
+                                <svg class="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none">
+                                    <path d="M15 17l5-5-5-5M20 12H9M13 5H7a2 2 0 00-2 2v10a2 2 0 002 2h6"
+                                          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Logout
+                            </a>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
@@ -272,7 +291,7 @@
 
                         <div class="flex gap-3.5 ml-[146px] w-full">
                             <div class="relative w-[210.4px]">
-                                <label class="absolute top-[3px] left-4 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Date Added</label>
+                                <label class="absolute top-[3px] left-4 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Hire Date</label>
                                 <input type="text" readonly value="{{ $employee->created_at->format('M d, Y') }}"
                                     class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none cursor-not-allowed">
                             </div>
@@ -290,7 +309,7 @@
 
                         <div class="relative w-[265px]">
                             <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">First Name</label>
-                            <input name="first_name" value="{{ old('first_name',$employee->first_name) }}"
+                            <input name="first_name" id="first_name" value="{{ old('first_name',$employee->first_name) }}"
                                 class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
                                 <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -300,7 +319,7 @@
 
                         <div class="relative w-[265px]">
                             <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Middle Name</label>
-                            <input name="middle_name" value="{{ old('middle_name',$employee->middle_name) }}"
+                            <input name="middle_name" id="middle_name" value="{{ old('middle_name',$employee->middle_name) }}" 
                                 class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
                                 <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -310,7 +329,7 @@
 
                         <div class="relative w-[265px]">
                             <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Last Name</label>
-                            <input name="last_name" value="{{ old('last_name',$employee->last_name) }}"
+                            <input name="last_name" id="last_name" value="{{ old('last_name',$employee->last_name) }}" 
                                 class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
                                 <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -326,15 +345,15 @@
                             <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Department</label>
                             <select id="department" name="department" required
                                 class="inside-select w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)]">
-                                <option value="BUSINESS INTELLIGENCE" {{ $employee->department == 'BUSINESS INTELLIGENCE' ? 'selected' : '' }}>BUSINESS INTELLIGENCE</option>
-                                <option value="ELECTRONIC COMMERCE" {{ $employee->department == 'ELECTRONIC COMMERCE' ? 'selected' : '' }}>ELECTRONIC COMMERCE</option>
-                                <option value="FINANCE" {{ $employee->department == 'FINANCE' ? 'selected' : '' }}>FINANCE</option>
-                                <option value="HUMAN RESOURCES" {{ $employee->department == 'HUMAN RESOURCES' ? 'selected' : '' }}>HUMAN RESOURCES</option>
-                                <option value="INFORMATION TECHNOLOGY SERVICE MANAGEMENT" {{ $employee->department == 'INFORMATION TECHNOLOGY SERVICE MANAGEMENT' ? 'selected' : '' }}>INFORMATION TECHNOLOGY SERVICE MANAGEMENT</option>
-                                <option value="INVENTORY MANAGEMENT" {{ $employee->department == 'INVENTORY MANAGEMENT' ? 'selected' : '' }}>INVENTORY MANAGEMENT</option>
-                                <option value="ORDER MANAGEMENT" {{ $employee->department == 'ORDER MANAGEMENT' ? 'selected' : '' }}>ORDER MANAGEMENT</option>
-                                <option value="PROCUREMENT MANAGEMENT" {{ $employee->department == 'PROCUREMENT MANAGEMENT' ? 'selected' : '' }}>PROCUREMENT MANAGEMENT</option>
-                                <option value="PRODUCTION MANAGEMENT" {{ $employee->department == 'PRODUCTION MANAGEMENT' ? 'selected' : '' }}>PRODUCTION MANAGEMENT</option>
+                                <option value="Business Intelligence" {{ $employee->department == 'Business Intelligence' ? 'selected' : '' }}>Business Intelligence</option>
+                                <option value="E-commerce" {{ $employee->department == 'E-commerce' ? 'selected' : '' }}>E-commerce</option>
+                                <option value="Finance" {{ $employee->department == 'Finance' ? 'selected' : '' }}>Finance</option>
+                                <option value="Human Resources" {{ $employee->department == 'Human Resources' ? 'selected' : '' }}>Human Resources</option>
+                                <option value="IT Service Management" {{ $employee->department == 'IT Service Management' ? 'selected' : '' }}>IT Service Management</option>
+                                <option value="Inventory Management" {{ $employee->department == 'Inventory Management' ? 'selected' : '' }}>Inventory Management</option>
+                                <option value="Order Management" {{ $employee->department == 'Order Management' ? 'selected' : '' }}>Order Management</option>
+                                <option value="Procurement Management" {{ $employee->department == 'Procurement Management' ? 'selected' : '' }}>Procurement Management</option>
+                                <option value="Production Management" {{ $employee->department == 'Production Management' ? 'selected' : '' }}>Production Management</option>
                             </select>
                         </div>
 
@@ -375,40 +394,46 @@
 
                     <!-- Row 4: Address -->
                     <div class="mb-[15px]">
-                        <div class="relative w-[837px]">
-                            <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Address</label>
-                            <textarea name="address"
-    class="w-full h-10 overflow-hidden box-border py-3 px-2.5 pt-4 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none resize-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)]">{{ old('address', $employee->address) }}</textarea>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-[18px] w-3.5 h-3.5 text-white opacity-90">
-                                <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                    </div>
+    <div class="relative w-[837px]">
+        <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Address</label>
+        <textarea name="address" id="address" rows="1"
+            class="w-full h-10 overflow-hidden box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none resize-none text-center flex items-center focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)]">{{ old('address', $employee->address) }}</textarea>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-[12px] w-3.5 h-3.5 text-white opacity-90">
+            <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+</div>
 
                     <!-- Contact Details -->
                     <div class="mb-[15px]">
                         <h3 class="text-[13px] font-light text-white uppercase whitespace-nowrap mb-[15px] mt-[30px]">Contact Details</h3>
 
-                        <div class="relative w-[837px]">
-                            <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Email Address</label>
-                            <input type="email" name="email" value="{{ old('email', $employee->email) }}"
-                                class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
-                                <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                    </div>
+                        
+    <div class="relative w-[837px]">
+        <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Email Address</label>
+        <input type="email" name="email" value="{{ old('email', $employee->email) }}"
+            class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none text-center focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
+            <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+</div>
 
                     <!-- Phone -->
-                    <div class="mb-[15px]">
-                        <div class="relative w-[837px] pr-[430px]">
-                            <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Phone Number</label>
-                            <input type="text" name="phone" value="{{ old('phone', $employee->phone) }}"
-                                class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
-                        </div>
-                    </div>
+                   <div class="mb-[15px]">
+    <div class="relative w-[837px] pr-[430px]">
+        <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Phone Number</label>
+        <input type="text" name="phone" id="phone" value="{{ old('phone', $employee->phone) }}"
+            maxlength="11" inputmode="numeric" pattern="\d{11}"
+            class="w-full h-10 box-border py-3 px-2.5 pt-3 pl-[-38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none text-center focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute left-[45%] top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
+            <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+</div>
 
                 </div>
 
@@ -448,7 +473,7 @@
 
                 <button type="button" id="undoBtn"
                     class="w-[218px] h-12 border border-[#5D8CFF] rounded-[10px] text-[15px] font-light cursor-pointer transition-all duration-250 shadow-[inset_0_2px_3px_rgba(61,49,49,.15),inset_0_8px_12px_rgba(255,255,255,.05)] bg-[#0048FF20] text-white hover:bg-[#0048FF50]">
-                    UNDO
+                    EDIT
                 </button>
 
                 </form>
@@ -470,16 +495,16 @@
     <script>
         // Positions available per department (kept in sync with the departments list above)
         const positionsByDepartment = {
-            "BUSINESS INTELLIGENCE": ["BI MANAGER", "BI ANALYST", "DATA ANALYST", "BUSINESS ANALYST"],
-            "ELECTRONIC COMMERCE": ["E-COMMERCE MANAGER", "MARKETPLACE SPECIALIST", "PRODUCT LISTING SPECIALIST", "DIGITAL MERCHANDISER", "SEO SPECIALIST"],
-            "FINANCE": ["FINANCE MANAGER", "ACCOUNTANT", "FINANCIAL ANALYST"],
-            "HUMAN RESOURCES": ["HR MANAGER", "HR OFFICER", "RECRUITER", "HR ASSISTANT"],
-            "INFORMATION TECHNOLOGY SERVICE MANAGEMENT": ["IT MANAGER", "SYSTEM ADMINISTRATOR", "NETWORK ADMINISTRATOR", "IT SUPPORT SPECIALIST", "SOFTWARE DEVELOPER"],
-            "INVENTORY MANAGEMENT": ["INVENTORY MANAGER", "INVENTORY CONTROLLER", "WAREHOUSE STAFF", "INVENTORY ANALYST"],
-            "ORDER MANAGEMENT": ["SHIPPING COORDINATOR", "RETURNS SPECIALIST", "CUSTOMER SERVICE REPRESENTATIVE"],
-            "PROCUREMENT MANAGEMENT": ["PROCUREMENT MANAGER", "PURCHASING OFFICER", "VENDOR COORDINATOR"],
-            "PRODUCTION MANAGEMENT": ["PRODUCTION MANAGER", "PRODUCTION SUPERVISOR", "PRODUCTION PLANNER", "PRODUCTION STAFF"]
-        };
+    "Business Intelligence": ["BI Manager", "BI Analyst", "Data Analyst", "Business Analyst"],
+    "E-commerce": ["E-commerce Manager", "Marketplace Specialist", "Product Listing Specialist", "Digital Merchandiser", "SEO Specialist"],
+    "Finance": ["Finance Manager", "Accountant", "Financial Analyst"],
+    "Human Resources": ["HR Manager", "HR Officer", "Recruiter", "HR Assistant"],
+    "IT Service Management": ["IT Manager", "System Administrator", "Network Administrator", "IT Support Specialist", "Software Developer"],
+    "Inventory Management": ["Inventory Manager", "Inventory Controller", "Warehouse Staff", "Inventory Analyst"],
+    "Order Management": ["Shipping Coordinator", "Returns Specialist", "Customer Service Representative"],
+    "Procurement Management": ["Procurement Manager", "Purchasing Officer", "Vendor Coordinator"],
+    "Production Management": ["Production Manager", "Production Supervisor", "Production Planner", "Production Staff"]
+};
 
         const departmentSelect = document.getElementById("department");
         const positionSelect = document.getElementById("position");
@@ -579,7 +604,46 @@
     if (!confirm('Are you sure you want to delete this employee? This action cannot be undone.')) {
         e.preventDefault();
     }
-});s
+});
+
+    /* =========================================================
+       PHONE NUMBER: digits only, max 11
+    ========================================================= */
+    const phoneInput = document.getElementById("phone");
+    phoneInput.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 11);
+    });
+    phoneInput.addEventListener("keypress", function (e) {
+        if (!/[0-9]/.test(e.key)) {
+            e.preventDefault();
+        }
+    });
+    phoneInput.addEventListener("paste", function (e) {
+        const pasted = (e.clipboardData || window.clipboardData).getData("text");
+        if (!/^\d+$/.test(pasted)) {
+            e.preventDefault();
+        }
+    });
+
+    /* =========================================================
+       BLOCK STARTING WITH LOWERCASE LETTER
+       (First Name, Middle Name, Last Name, Address)
+    ========================================================= */
+    function blockLeadingLowercase(el) {
+        el.addEventListener("input", function () {
+            const val = this.value;
+            if (val.length > 0 && /^[a-z]/.test(val)) {
+                // auto-capitalize the first letter instead of just blocking
+                this.value = val.charAt(0).toUpperCase() + val.slice(1);
+            }
+        });
+    }
+
+    ["first_name", "middle_name", "last_name", "address"].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) blockLeadingLowercase(el);
+    });
+
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>

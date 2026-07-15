@@ -132,54 +132,55 @@ class EmployeeOnboardingController extends Controller
     }
 
     public function storeStep4(Request $request)
-    {
-        $step1 = session('step1');
-        $step2 = session('step2');
-        $step3 = session('step3');
+{
+    $step1 = session('step1');
+    $step2 = session('step2');
+    $step3 = session('step3');
 
-        if (! $step1 || ! $step2 || ! $step3) {
-            return redirect()->route('onboarding.step1')
-                ->with('error', 'Your onboarding session expired. Please start again.');
-        }
-
-        $employeeId = date('Y') . str_pad(Employee::count() + 1, 4, '0', STR_PAD_LEFT);
-
-        $firstName = preg_replace('/\s+/', '', $step1['first_name']);
-        $lastName = preg_replace('/\s+/', '', $step1['last_name']);
-
-        $companyEmail = strtolower($firstName . $lastName . '@nexora.com');
-        $password = 'NEX-' . Str::upper(Str::random(6));
-
-        $employee = Employee::create([
-            'first_name' => $step1['first_name'],
-            'middle_name' => $step1['middle_name'] ?? null,
-            'last_name' => $step1['last_name'],
-            'suffix' => $step1['suffix'] ?? null,
-            'gender' => $step1['gender'] ?? null,
-            'marital_status' => $step1['marital_status'] ?? null,
-            'nationality' => $step1['nationality'] ?? null,
-            'address' => $step1['address'] ?? null,
-            'phone' => $step1['phone'] ?? null,
-            'email' => $step1['email'],
-            'profile_picture' => $step1['profile_picture'] ?? null,
-            'department' => $step2['department'],
-            'position' => $step2['position'],
-            'hire_date' => $step2['hire_date'],
-            'work_schedule' => $step2['work_schedule'],
-            'birth_certificate' => $step3['birth_certificate'] ?? null,
-            'curriculum_vitae' => $step3['curriculum_vitae'] ?? null,
-            'valid_id' => $step3['valid_id'] ?? null,
-            'medical_certificate' => $step3['medical_certificate'] ?? null,
-            'employee_id' => $employeeId,
-            'company_email' => $companyEmail,
-            'temporary_password' => $password,
-        ]);
-
-        session()->forget(['step1', 'step2', 'step3']);
-        session(['employee' => $employee]);
-
-        return redirect()->route('onboarding.success');
+    if (! $step1 || ! $step2 || ! $step3) {
+        return redirect()->route('onboarding.step1')
+            ->with('error', 'Your onboarding session expired. Please start again.');
     }
+
+    $firstName = preg_replace('/\s+/', '', $step1['first_name']);
+    $lastName = preg_replace('/\s+/', '', $step1['last_name']);
+
+    $companyEmail = strtolower($firstName . $lastName . '@nexora.com');
+    $password = 'NEX-' . Str::upper(Str::random(6));
+
+    $employee = Employee::create([
+        'first_name' => $step1['first_name'],
+        'middle_name' => $step1['middle_name'] ?? null,
+        'last_name' => $step1['last_name'],
+        'suffix' => $step1['suffix'] ?? null,
+        'gender' => $step1['gender'] ?? null,
+        'marital_status' => $step1['marital_status'] ?? null,
+        'nationality' => $step1['nationality'] ?? null,
+        'address' => $step1['address'] ?? null,
+        'phone' => $step1['phone'] ?? null,
+        'email' => $step1['email'],
+        'profile_picture' => $step1['profile_picture'] ?? null,
+        'department' => $step2['department'],
+        'position' => $step2['position'],
+        'hire_date' => $step2['hire_date'],
+        'work_schedule' => $step2['work_schedule'],
+        'birth_certificate' => $step3['birth_certificate'] ?? null,
+        'curriculum_vitae' => $step3['curriculum_vitae'] ?? null,
+        'valid_id' => $step3['valid_id'] ?? null,
+        'medical_certificate' => $step3['medical_certificate'] ?? null,
+        'company_email' => $companyEmail,
+        'temporary_password' => $password,
+    ]);
+
+    // Ngayon meron na tayong auto-increment id, gamitin natin siya
+    $employee->employee_id = date('Y') . str_pad($employee->id, 4, '0', STR_PAD_LEFT);
+    $employee->save();
+
+    session()->forget(['step1', 'step2', 'step3']);
+    session(['employee' => $employee]);
+
+    return redirect()->route('onboarding.success');
+}
 
     public function success()
     {

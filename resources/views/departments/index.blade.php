@@ -28,27 +28,27 @@
     </script>
 </head>
 
-<body class="font-sans m-0 bg-[#0f2a55] text-white">
+<body class="font-sans m-0 bg-[#1B3A6B] text-white">
 
-    <!-- =====================================================
+   <!-- =====================================================
             TOP NAVBAR
         ====================================================== -->
     <header class="w-full h-[150px] bg-[#132B52] flex items-center justify-between pl-[1px] pr-[5px] border-b border-white/5 shadow-[0_1px_0_rgba(255,255,255,.03)_inset] sticky top-0 z-[1000]">
- 
+
         <!-- Left a-->
         <div class="flex items-center gap-3">
             <img src="{{ asset('images/logo.png') }}" class="h-[86px] w-auto object-contain block" alt="Header Logo">
         </div>
- 
+
         <div class="flex items-center gap-7">
             <nav class="flex items-center gap-px">
- 
+
                 <div class="relative group">
                     <a href="/dashboard" class="text-white no-underline text-xl py-2.5 px-[18px] flex items-center gap-2 rounded-full transition-all duration-250 hover:text-[#66A6FF] hover:bg-[#1B3A6B] hover:-translate-y-px hover:font-bold active:scale-[.97]">
                         Dashboard
                     </a>
                 </div>
- 
+
                 <div class="relative group">
                     <a href="#" class="text-white no-underline text-xl py-2.5 px-[18px] flex items-center gap-2 rounded-full transition-all duration-250 hover:text-[#66A6FF] hover:bg-[#1B3A6B] hover:-translate-y-px hover:font-bold active:scale-[.97]">
                         Workforce
@@ -56,21 +56,19 @@
                             <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </a>
- 
+
                     <div class="absolute top-[120%] left-1/2 -translate-x-1/2 translate-y-2.5 w-[220px] bg-[#132B52] rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2.5 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
                         <a href="{{ route('employees.index') }}" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Employee List</a>
                         <a href="{{ route('departments.index') }}" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Department List</a>
                     </div>
                 </div>
- 
+
                 <div class="relative group">
                     <a href="{{ route('onboarding.step1') }}" class="text-white no-underline text-xl py-2.5 px-[18px] flex items-center gap-2 rounded-full transition-all duration-250 hover:text-[#66A6FF] hover:bg-[#1B3A6B] hover:-translate-y-px hover:font-bold active:scale-[.97]">
                         Employee Onboarding
-                        
                     </a>
-                    
                 </div>
- 
+
                 <div class="relative group">
                     <a href="#" class="text-white no-underline text-xl py-2.5 px-[18px] flex items-center gap-2 rounded-full transition-all duration-250 hover:text-[#66A6FF] hover:bg-[#1B3A6B] hover:-translate-y-px hover:font-bold active:scale-[.97]">
                         Reports and Analytics
@@ -81,29 +79,50 @@
                     <div class="absolute top-[120%] left-1/2 -translate-x-1/2 translate-y-2.5 w-[220px] bg-[#132B52] rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2.5 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
                         <a href="/reports-analytics/attendance-overview" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Attendance Record</a>
                         <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Leave Record</a>
-                       
                     </div>
                 </div>
- 
+
                 <div class="relative group">
                     <a href="#" class="text-white no-underline text-xl py-2.5 px-[18px] flex items-center gap-2 rounded-full transition-all duration-250 hover:text-[#66A6FF] hover:bg-[#1B3A6B] hover:-translate-y-px hover:font-bold active:scale-[.97]">
-                        Leave Management
+                        Employee Management
+                        <svg class="w-3.5 h-3.5 opacity-80 transition-transform duration-300 origin-center group-hover:rotate-180 group-hover:opacity-100" viewBox="0 0 24 24" fill="none">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </a>
                     <div class="absolute top-[120%] left-1/2 -translate-x-1/2 translate-y-2.5 w-[220px] bg-[#132B52] rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2.5 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
-                        <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Placeholder 1</a>
-                        <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Placeholder 2</a>
-                        <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Placeholder 3</a>
+                        <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Leave Management</a>
+                        <a href="#" class="block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">Resignation Management</a>
+                      
                     </div>
                 </div>
- 
+
             </nav>
- 
-            <div class="w-11 h-11 mr-[15px] rounded-full grid place-items-center bg-white/[.06] shadow-[inset_0_0_0_1px_rgba(255,255,255,.06)] " aria-label="Profile">
-                <svg class="w-10 h-10" viewBox="0 0 36 36" fill="none">
-                    <circle cx="18" cy="18" r="17" fill="white" opacity=".97"/>
-                    <circle cx="18" cy="13" r="5.2" fill="#223B63"/>
-                    <path d="M8.8 28.3C10.7 23.8 14.1 21.7 18 21.7C21.9 21.7 25.3 23.8 27.2 28.3" fill="#223B63"/>
-                </svg>
+
+            <!-- Profile dropdown with Logout -->
+            <div class="relative group mr-[15px]">
+                <div class="w-11 h-11 rounded-full grid place-items-center bg-white/[.06] shadow-[inset_0_0_0_1px_rgba(255,255,255,.06)] cursor-pointer" aria-label="Profile">
+                    <svg class="w-10 h-10" viewBox="0 0 36 36" fill="none">
+                        <circle cx="18" cy="18" r="17" fill="white" opacity=".97"/>
+                        <circle cx="18" cy="13" r="5.2" fill="#223B63"/>
+                        <path d="M8.8 28.3C10.7 23.8 14.1 21.7 18 21.7C21.9 21.7 25.3 23.8 27.2 28.3" fill="#223B63"/>
+                    </svg>
+                </div>
+
+                <div class="absolute top-[120%] right-0 left-auto translate-y-2.5 w-[160px] bg-[#132B52] rounded-2xl shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full text-left bg-none border-none cursor-pointer">
+                            <a href="#" onclick="event.preventDefault(); this.closest('form').submit();"
+                               class="flex items-center gap-2 no-underline text-[#FFB4B4] py-2.5 px-3 rounded-[10px] text-[13px] font-semibold transition-all duration-200 hover:bg-[#2c1414] hover:text-[#ff6b6b]">
+                                <svg class="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none">
+                                    <path d="M15 17l5-5-5-5M20 12H9M13 5H7a2 2 0 00-2 2v10a2 2 0 002 2h6"
+                                          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Logout
+                            </a>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
@@ -124,7 +143,7 @@
             </a>
 
             <!-- E-COMMERCE -->
-            <a href="{{ route('departments.show', 'ecommerce') }}"
+            <a href="{{ route('departments.show', 'e-commerce') }}"
                 class="flex h-[190px] w-[480px] flex-col items-center justify-center gap-2 rounded-[15px] border border-white/[.08] bg-[#0B1E3D] text-center text-white no-underline transition duration-300 hover:-translate-y-1 hover:bg-[#132B52] hover:shadow-[0_10px_25px_rgba(0,0,0,.3)]">
            <svg fill="#ffffff" height="70px" width="70px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 427.286 427.286" xml:space="preserve" stroke="#ffffff" stroke-width="0.004272860000000001"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M395.579,50.143H31.707C14.224,50.143,0,64.366,0,81.85v214.558c0,17.483,14.224,31.707,31.707,31.707H171.54 l-10.559,34.028h-11.072c-4.142,0-7.5,3.358-7.5,7.5c0,4.142,3.358,7.5,7.5,7.5h16.597h100.966h16.597c4.143,0,7.5-3.358,7.5-7.5 c0-4.142-3.357-7.5-7.5-7.5h-11.071l-10.559-34.028h133.14c17.483,0,31.707-14.224,31.707-31.707V81.85 C427.286,64.366,413.062,50.143,395.579,50.143z M176.686,362.143l10.559-34.028h59.487l10.56,34.028H176.686z M412.286,296.408 c0,9.212-7.495,16.707-16.707,16.707h-143.32H181.72H31.707c-9.212,0-16.707-7.495-16.707-16.707v-10.886h397.286V296.408z M412.286,270.522H15V81.85c0-9.212,7.495-16.707,16.707-16.707h363.872c9.212,0,16.707,7.495,16.707,16.707V270.522z"></path> </g> </g> <g> <g> <path d="M185.879,197.248c-13.872,0-25.158,11.286-25.158,25.157c0,13.872,11.286,25.158,25.158,25.158 s25.158-11.286,25.158-25.158C211.037,208.534,199.751,197.248,185.879,197.248z M185.879,232.563 c-5.601,0-10.158-4.557-10.158-10.158c0-5.601,4.557-10.157,10.158-10.157c5.601,0,10.158,4.557,10.158,10.157 C196.037,228.007,191.48,232.563,185.879,232.563z"></path> </g> </g> <g> <g> <path d="M250.646,197.248c-13.872,0-25.157,11.286-25.157,25.157c0,13.872,11.285,25.158,25.157,25.158 s25.157-11.286,25.157-25.158C275.803,208.534,264.518,197.248,250.646,197.248z M250.646,232.563 c-5.601,0-10.157-4.557-10.157-10.158c0-5.601,4.557-10.157,10.157-10.157s10.157,4.557,10.157,10.157 C260.803,228.007,256.247,232.563,250.646,232.563z"></path> </g> </g> <g> <g> <path d="M288.077,113.811c-1.425-1.631-3.484-2.567-5.649-2.567H165.206l-2.382-14.372c-0.6-3.619-3.73-6.274-7.399-6.274h-29.566 c-4.142,0-7.5,3.358-7.5,7.5c0,4.142,3.357,7.499,7.499,7.499h23.207l2.364,14.262l9.426,69.326c0.505,3.718,3.68,6.49,7.432,6.49 h104.7c3.752,0,6.926-2.772,7.432-6.49l9.44-69.431C290.151,117.608,289.501,115.441,288.077,113.811z M266.438,180.674h-91.602 l-7.401-54.431h106.403L266.438,180.674z"></path> </g> </g> </g></svg>
                 <h3 class="text-[28px] font-normal tracking-wide">ELECTRONIC COMMERCE</h3>

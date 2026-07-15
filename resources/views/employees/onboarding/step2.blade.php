@@ -118,67 +118,70 @@
     @csrf
 
     <!-- Top Row -->
-    <div class="flex gap-6">
+    <!-- Top Row -->
+<div class="flex gap-6">
 
-        <!-- Department -->
-        <div>
-            <label class="block text-slate-300 text-xs mb-1">
-                Department
-            </label>
-            <select id="department" name="department" class="w-[350px] h-[40px] bg-[#0d1730] text-white text-sm rounded px-3 outline-none focus:ring-1 focus:ring-blue-500">
-                <option value="">Select Department</option>
-                <option>Business Intelligence</option>
-                <option>E-commerce</option>
-                <option>Finance</option>
-                <option>Human Resources</option>
-                <option>ITSM</option>
-                <option>Inventory</option>
-                <option>Order Management</option>
-                <option>Procurement</option>
-                <option>Production</option>
-            </select>
-        </div>
-
-        <!-- Position -->
-        <div>
-            <label class="block text-slate-300 text-xs mb-1">
-                Position
-            </label>
-            <select id="position" name="position" class="w-[350px] h-[40px] bg-[#0d1730] text-white text-sm rounded px-3 outline-none focus:ring-1 focus:ring-blue-500">
-                <option value="">Select Department First</option>
-            </select>
-        </div>
-
+    <!-- Department -->
+    <div>
+        <label class="block text-slate-300 text-xs mb-1">
+            Department <span class="text-red-500">*</span>
+        </label>
+        <select id="department" name="department" required class="w-[350px] h-[40px] bg-[#0d1730] text-white text-sm rounded px-3 outline-none focus:ring-1 focus:ring-blue-500">
+            <option value="">Select Department</option>
+            <option>Business Intelligence</option>
+            <option>E-commerce</option>
+            <option>Finance</option>
+            <option>Human Resources</option>
+            <option>IT Service Management</option>
+            <option>Inventory Management</option>
+            <option>Order Management</option>
+            <option>Procurement Management</option>
+            <option>Production Management</option>
+        </select>
     </div>
 
-    <!-- Bottom Row -->
-    <div class="flex gap-6">
-
-        <!-- Hire Date -->
-        <div>
-            <label class="block text-slate-300 text-xs mb-1">
-                Hire Date
-            </label>
-            <input
-            name="hire_date"
-                type="date"
-                class="w-[350px] h-[40px] bg-[#0d1730] text-white text-sm rounded px-3 outline-none focus:ring-1 focus:ring-blue-500"
-            />
-        </div>
-
-        <!-- Work Schedule -->
-        <div>
-            <label class="block text-slate-300 text-xs mb-1">
-                Work Time Schedule
-            </label>
-            <input
-            name="work_schedule"
-                type="time"
-                class="w-[350px] h-[40px] bg-[#0d1730] text-white text-sm rounded px-3 outline-none focus:ring-1 focus:ring-blue-500"
-            />
-        </div>
-
+    <!-- Position -->
+    <div>
+        <label class="block text-slate-300 text-xs mb-1">
+            Position <span class="text-red-500">*</span>
+        </label>
+        <select id="position" name="position" required class="w-[350px] h-[40px] bg-[#0d1730] text-white text-sm rounded px-3 outline-none focus:ring-1 focus:ring-blue-500">
+            <option value="">Select Department First</option>
+        </select>
     </div>
+
+</div>
+
+<!-- Bottom Row -->
+<div class="flex gap-6">
+
+    <!-- Hire Date -->
+    <div>
+        <label class="block text-slate-300 text-xs mb-1">
+            Hire Date <span class="text-red-500">*</span>
+        </label>
+        <input
+        name="hire_date"
+            type="date"
+            required
+            class="w-[350px] h-[40px] bg-[#0d1730] text-white text-sm rounded px-3 outline-none focus:ring-1 focus:ring-blue-500"
+        />
+    </div>
+
+    <!-- Work Schedule -->
+    <div>
+        <label class="block text-slate-300 text-xs mb-1">
+            Work Time Schedule <span class="text-red-500">*</span>
+        </label>
+        <input
+        name="work_schedule"
+            type="time"
+            required
+            class="w-[350px] h-[40px] bg-[#0d1730] text-white text-sm rounded px-3 outline-none focus:ring-1 focus:ring-blue-500"
+        />
+    </div>
+
+</div>
 
     <!-- Navigation Buttons -->
 <div class="pt-6 flex gap-4">
@@ -221,11 +224,11 @@
     "E-commerce": ["E-commerce Manager", "Marketplace Specialist", "Product Listing Specialist", "Digital Merchandiser", "SEO Specialist"],
     "Finance": ["Finance Manager", "Accountant", "Financial Analyst"],
     "Human Resources": ["HR Manager", "HR Officer", "Recruiter", "HR Assistant"],
-    "ITSM": ["IT Manager", "System Administrator", "Network Administrator", "IT Support Specialist", "Software Developer"],
-    "Inventory": ["Inventory Manager", "Inventory Controller", "Warehouse Staff", "Inventory Analyst"],
+    "IT Service Management": ["IT Manager", "System Administrator", "Network Administrator", "IT Support Specialist", "Software Developer"],
+    "Inventory Management": ["Inventory Manager", "Inventory Controller", "Warehouse Staff", "Inventory Analyst"],
     "Order Management": ["Shipping Coordinator", "Returns Specialist", "Customer Service Representative"],
-    "Procurement": ["Procurement Manager", "Purchasing Officer", "Vendor Coordinator"],
-    "Production": ["Production Manager", "Production Supervisor", "Production Planner", "Production Staff"]
+    "Procurement Management": ["Procurement Manager", "Purchasing Officer", "Vendor Coordinator"],
+    "Production Management": ["Production Manager", "Production Supervisor", "Production Planner", "Production Staff"]
   };
 
   const departmentSelect = document.getElementById("department");
