@@ -305,38 +305,52 @@
                     </div>
 
                     <!-- NAME ROW -->
-                    <div class="flex gap-[15px] mb-[15px]">
+<div class="flex gap-[15px] mb-[15px]">
 
-                        <div class="relative w-[265px]">
-    <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">First Name</label>
-    <input name="first_name" id="first_name" value="{{ old('first_name',$employee->first_name) }}"
-        class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none text-center focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
-        <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+    <div class="relative w-[220px]">
+        <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">First Name</label>
+        <input name="first_name" id="first_name" value="{{ old('first_name',$employee->first_name) }}"
+            class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none text-center focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
+            <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <div class="relative w-[220px]">
+        <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Middle Name</label>
+        <input name="middle_name" id="middle_name" value="{{ old('middle_name',$employee->middle_name) }}"
+            class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none text-center focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
+            <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <div class="relative w-[220px]">
+        <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Last Name</label>
+        <input name="last_name" id="last_name" value="{{ old('last_name',$employee->last_name) }}"
+            class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none text-center focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
+            <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <div class="relative w-[120px]">
+    <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Suffix</label>
+    <select name="suffix" id="suffix"
+        class="inside-select w-full h-10 box-border py-3 px-2.5 pt-3 bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)]">
+        <option value="" {{ old('suffix', $employee->suffix) == null ? 'selected' : '' }}>None</option>
+        <option value="Jr." {{ old('suffix', $employee->suffix) == 'Jr.' ? 'selected' : '' }}>Jr.</option>
+        <option value="Sr." {{ old('suffix', $employee->suffix) == 'Sr.' ? 'selected' : '' }}>Sr.</option>
+        <option value="II" {{ old('suffix', $employee->suffix) == 'II' ? 'selected' : '' }}>II</option>
+        <option value="III" {{ old('suffix', $employee->suffix) == 'III' ? 'selected' : '' }}>III</option>
+        <option value="IV" {{ old('suffix', $employee->suffix) == 'IV' ? 'selected' : '' }}>IV</option>
+    </select>
 </div>
 
-<div class="relative w-[265px]">
-    <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Middle Name</label>
-    <input name="middle_name" id="middle_name" value="{{ old('middle_name',$employee->middle_name) }}"
-        class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none text-center focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
-        <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
 </div>
-
-<div class="relative w-[265px]">
-    <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Last Name</label>
-    <input name="last_name" id="last_name" value="{{ old('last_name',$employee->last_name) }}"
-        class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none text-center focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
-        <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-</div>
-                    </div>
 
                     <!-- Row 2: Department / Position -->
                     <div class="flex gap-[15px] mb-[15px]">
@@ -367,30 +381,42 @@
                     </div>
 
                     <!-- Row 3: Gender / Marital Status -->
-                 <div class="flex gap-[15px] mb-[15px]">
+                <!-- Row 3: Gender / Marital Status / Nationality -->
+<div class="flex gap-[15px] mb-[15px]">
 
-                        <div class="relative w-[406px]">
-                            <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Gender</label>
-                            <select name="gender"
-                                class="inside-select w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)]">
-                                <option value="Male" {{ $employee->gender == 'Male' ? 'selected' : '' }}>Male</option>
-                                <option value="Female" {{ $employee->gender == 'Female' ? 'selected' : '' }}>Female</option>
-                                <option value="Prefer not to say" {{ $employee->gender == 'Prefer not to say' ? 'selected' : '' }}>Prefer not to say</option>
-                            </select>
-                        </div>
+    <div class="relative w-[269px]">
+        <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Gender</label>
+        <select name="gender"
+            class="inside-select w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)]">
+            <option value="Male" {{ $employee->gender == 'Male' ? 'selected' : '' }}>Male</option>
+            <option value="Female" {{ $employee->gender == 'Female' ? 'selected' : '' }}>Female</option>
+            <option value="Prefer not to say" {{ $employee->gender == 'Prefer not to say' ? 'selected' : '' }}>Prefer not to say</option>
+        </select>
+    </div>
 
-                        <div class="relative w-[406px]">
-                            <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Marital Status</label>
-                            <select name="marital_status"
-                                class="inside-select w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)]">
-                                <option value="Single" {{ $employee->marital_status == 'Single' ? 'selected' : '' }}>Single</option>
-                                <option value="Married" {{ $employee->marital_status == 'Married' ? 'selected' : '' }}>Married</option>
-                                <option value="Widowed" {{ $employee->marital_status == 'Widowed' ? 'selected' : '' }}>Widowed</option>
-                                <option value="Separated" {{ $employee->marital_status == 'Separated' ? 'selected' : '' }}>Separated</option>
-                                <option value="Divorced" {{ $employee->marital_status == 'Divorced' ? 'selected' : '' }}>Divorced</option>
-                            </select>
-                        </div>
-                    </div>
+    <div class="relative w-[269px]">
+        <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Marital Status</label>
+        <select name="marital_status"
+            class="inside-select w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)]">
+            <option value="Single" {{ $employee->marital_status == 'Single' ? 'selected' : '' }}>Single</option>
+            <option value="Married" {{ $employee->marital_status == 'Married' ? 'selected' : '' }}>Married</option>
+            <option value="Widowed" {{ $employee->marital_status == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+            <option value="Separated" {{ $employee->marital_status == 'Separated' ? 'selected' : '' }}>Separated</option>
+            <option value="Divorced" {{ $employee->marital_status == 'Divorced' ? 'selected' : '' }}>Divorced</option>
+        </select>
+    </div>
+
+    <div class="relative w-[269px]">
+        <label class="absolute top-[3px] left-[16.5px] text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Nationality</label>
+        <input type="text" name="nationality" id="nationality" value="{{ old('nationality', $employee->nationality) }}"
+            class="w-full h-10 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[11px] outline-none text-center focus:border-[#5D8CFF] focus:shadow-[0_0_0_2px_rgba(93,140,255,.2)] placeholder:text-[#8FA6D8]">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-90">
+            <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+</div>
 
                     <!-- Row 4: Address -->
                     <div class="mb-[15px]">
