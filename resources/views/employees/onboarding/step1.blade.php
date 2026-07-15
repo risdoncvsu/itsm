@@ -285,60 +285,7 @@
         </form>
       </div>
 
-      <!-- Right: profile image -->
-      <div class="flex flex-col items-center pt-2">
-        <span class="text-slate-300 text-xs tracking-wide mb-3">PROFILE IMAGE</span>
-        <div class="w-[300px] h-[300px] rounded-full bg-sky-300 overflow-hidden">
-
-    <img
-        id="imagePreview"
-        src=""
-        class="w-full h-full object-cover hidden">
-
-    <div
-        id="placeholder"
-        class="w-full h-full flex items-end justify-center">
-
-        <svg class="w-[280px] h-[280px] text-sky-500"
-            fill="currentColor"
-            viewBox="0 0 24 24">
-            <circle cx="12" cy="8.5" r="4"/>
-            <path d="M4 20c0-3.5 3.5-6 8-6s8 2.5 8 6"/>
-        </svg>
-
-    </div>
-
-</div>
-        <label for="profile_picture"
-    class="mt-4 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded shadow transition cursor-pointer">
-
-    Upload Photo
-
-    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round"
-            d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/>
-    </svg>
-</label>
-
-<input
-    type="file"
-    id="profile_picture"
-    name="profile_picture"
-    accept="image/*"
-    form="onboarding-step1-form"
-    class="hidden"
-    onchange="previewImage(event)">
-      </div>
-
-    </div>
-  </div>
-  
-
-
-    </div>
-
-   </div>
-
+      
    <script>
 function previewImage(event) {
 

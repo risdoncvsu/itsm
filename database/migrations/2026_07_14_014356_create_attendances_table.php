@@ -11,14 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('attendances', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('employee_id')->constrained()->cascadeOnDelete();
-    $table->timestamp('clock_in')->nullable();
-    $table->timestamp('clock_out')->nullable();
-    $table->date('attendance_date');
-    $table->timestamps();
-});
+        Schema::create('attendances', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
     }
 
     /**

@@ -77,11 +77,9 @@ Route::post('/signin', [AuthController::class, 'login'])
     Route::get('/departments', [DepartmentController::class, 'index'])
         ->name('departments.index');
 
-        Route::get('/employees', [DepartmentController::class, 'index'])
-        ->name('employees.index');
+   
           
-        Route::get('/employees', [DepartmentController::class, 'index'])
-        ->name('employees.index');
+       
 
         
     // all onboarding routes
@@ -134,3 +132,8 @@ Route::post('/clock-in', [AttendanceController::class, 'clockIn'])
         )->count()
     ]);
 });
+
+Route::get(
+    '/reports-analytics/employee-attendance/{employee}',
+    [AttendanceOverviewController::class, 'employeeAttendance']
+)->name('reports-analytics.employee-attendance');
