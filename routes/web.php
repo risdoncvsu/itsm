@@ -11,7 +11,7 @@ use App\Http\Controllers\ReportsAnalyticsController;
 use App\Models\Employee;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('signin');
 });
 
 Route::get('/signin', function () {
