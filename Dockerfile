@@ -30,4 +30,7 @@ RUN npm install && npm run build
 
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=$PORT"]
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+CMD ["sh", "-c", "/app/start.sh"]
