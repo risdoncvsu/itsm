@@ -33,33 +33,37 @@ class AuthController extends Controller
         )->first();
 
         if (!$employee) {
-            return back()->with('error', 'Invalid email or password');
+            return back()->with('error', 'Invalid email or password. Please try again.');
         }
 
         if ($employee->temporary_password !== $request->password) {
-            return back()->with('error', 'Invalid email or password');
+            return back()->with('error', 'Invalid email or password. Please try again.');
         }
 
-       session([
-    'employee_logged_in' => true,
-    'employee_id' => $employee->id,
-    'employee_name' => $employee->first_name,
-    'employee_email' => $employee->company_email,
-]);
+        session([
+            'employee_logged_in' => true,
+            'employee_role' => 'employee',
+            'employee_id' => $employee->id,
+            'employee_name' => $employee->first_name,
+            'employee_email' => $employee->company_email,
+            'employee_department' => $employee->department,
+        ]);
 
-        return redirect()->route('dashboard');
+        $department = strtolower(trim($employee->department ?? ''));
+        $route = $department === 'human resources'
+            ? 'dashboard'
+            : 'employee.dashboard';
+
+        return redirect()->route($route);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         session()->flush();
 
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect()->route('signin');
-
-        Auth::logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect()->route('login'); // sends them back to sign-in page
     }
 }

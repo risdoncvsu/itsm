@@ -255,9 +255,9 @@
                 </svg>
               </div>
               <div>
-                <div class="text-[11.9px] text-[#E7F0FF] mt-px">Present Today</div>
+                <div class="text-[11.9px] text-[#E7F0Ff] mt-px">Present Today</div>
                 <div class="flex items-end gap-2 mt-0">
-                  <div class="counter text-[22.2px] font-bold leading-none tracking-tight" data-target="647">0</div>
+                  <div class="counter text-[22.2px] font-bold leading-none tracking-tight" data-target="{{ $presentToday }}">{{ $presentToday }}</div>
                   <div class="text-[8.7px] text-[#93A9CC] -mt-px">98.6% of workforce</div>
                 </div>
               </div>

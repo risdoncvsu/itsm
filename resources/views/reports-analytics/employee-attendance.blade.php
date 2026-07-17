@@ -117,58 +117,64 @@
       <span class="text-sky-400">Employee Attendance</span>
     </nav>
 
-    <!-- Profile card + Stat cards: same row, same size -->
-    <div class="mt-4 mb-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+   
 
-      <!-- Employee profile card (compact, same footprint as stat cards) -->
-      <div class="col-span-2 flex h-[184px] flex-col items-center justify-center gap-2 rounded-xl bg-[#0B1E3D] px-4 py-4 text-center ring-1 ring-white/5 sm:col-span-1" id="profile-card">
-        <!-- filled by JS -->
-      </div>
+    <!-- Employee profile card -->
+    <div class="h-[184px] mt-4 mb-6 flex flex-wrap items-center gap-6 rounded-xl bg-[#0B1E3D] px-6 py-2 ring-1 ring-white/5" id="profile-card">
+      <!-- filled by JS -->
+    </div>
 
-      <div class="flex h-[184px] flex-col items-center justify-center gap-2 rounded-xl bg-[#0B1E3D] px-5 py-4 text-center ring-1 ring-white/5">
+    <!-- Stat cards -->
+    <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div class="flex items-center gap-4 rounded-xl bg-[#0B1E3D] px-5 py-4 ring-1 ring-white/5">
         <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-sky-500/15">
           <i class="fa-regular fa-calendar-check text-sky-300"></i>
         </div>
-        <div id="stat-present" class="text-2xl font-semibold leading-tight text-white">0</div>
-        <div class="truncate text-xs text-slate-400">Present Days</div>
+        <div class="min-w-0">
+          <div id="stat-present" class="text-2xl font-semibold leading-tight text-white">0</div>
+          <div class="truncate text-xs text-slate-400">Present Days</div>
+        </div>
       </div>
 
-      <div class="flex h-[184px] flex-col items-center justify-center gap-2 rounded-xl bg-[#0B1E3D] px-5 py-4 text-center ring-1 ring-white/5">
+      <div class="flex items-center gap-4 rounded-xl bg-[#0B1E3D] px-5 py-4 ring-1 ring-white/5">
         <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
           <i class="fa-solid fa-clock text-amber-300"></i>
         </div>
-        <div id="stat-late" class="text-2xl font-semibold leading-tight text-white">0</div>
-        <div class="truncate text-xs text-slate-400">Late Days</div>
+        <div class="min-w-0">
+          <div id="stat-late" class="text-2xl font-semibold leading-tight text-white">0</div>
+          <div class="truncate text-xs text-slate-400">Late Days</div>
+        </div>
       </div>
 
-      <div class="flex h-[184px] flex-col items-center justify-center gap-2 rounded-xl bg-[#0B1E3D] px-5 py-4 text-center ring-1 ring-white/5">
+      <div class="flex items-center gap-4 rounded-xl bg-[#0B1E3D] px-5 py-4 ring-1 ring-white/5">
         <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-rose-500/15">
           <i class="fa-solid fa-clock-rotate-left text-rose-300"></i>
         </div>
-        <div id="stat-absent" class="text-2xl font-semibold leading-tight text-white">0</div>
-        <div class="truncate text-xs text-slate-400">Absent Days</div>
+        <div class="min-w-0">
+          <div id="stat-absent" class="text-2xl font-semibold leading-tight text-white">0</div>
+          <div class="truncate text-xs text-slate-400">Absent Days</div>
+        </div>
       </div>
 
-      <div class="flex h-[184px] flex-col items-center justify-center gap-2 rounded-xl bg-[#0B1E3D] px-5 py-4 text-center ring-1 ring-white/5">
+      <div class="flex items-center gap-4 rounded-xl bg-[#0B1E3D] px-5 py-4 ring-1 ring-white/5">
         <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-sky-500/15">
           <i class="fa-regular fa-calendar-xmark text-sky-300"></i>
         </div>
-        <div id="stat-leave" class="text-2xl font-semibold leading-tight text-white">0</div>
-        <div class="truncate text-xs text-slate-400">Leave Days</div>
+        <div class="min-w-0">
+          <div id="stat-leave" class="text-2xl font-semibold leading-tight text-white">0</div>
+          <div class="truncate text-xs text-slate-400">Leave Days</div>
+        </div>
       </div>
 
-      <div class="flex h-[184px] flex-col items-center justify-center gap-2 rounded-xl bg-[#0B1E3D] px-5 py-4 text-center ring-1 ring-white/5">
+      <div class="flex items-center gap-4 rounded-xl bg-[#0B1E3D] px-5 py-4 ring-1 ring-white/5">
         <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15">
           <i class="fa-regular fa-square-check text-emerald-300"></i>
         </div>
-        <div id="stat-total" class="text-2xl font-semibold leading-tight text-white">0</div>
-        <div class="truncate text-xs text-slate-400">Total Days</div>
+        <div class="min-w-0">
+          <div id="stat-total" class="text-2xl font-semibold leading-tight text-white">0</div>
+          <div class="truncate text-xs text-slate-400">Total Days</div>
+        </div>
       </div>
-    </div>
-
-    <!-- Secondary info strip: Date of Joining, Employment Type, Location, Reporting Manager -->
-    <div class="mb-6 flex flex-wrap items-center gap-6 rounded-xl bg-[#0B1E3D] px-6 py-4 ring-1 ring-white/5" id="info-strip">
-      <!-- filled by JS -->
     </div>
 
     <!-- Date filter + record count -->
@@ -247,49 +253,48 @@
   function renderProfile() {
     const el = document.getElementById("profile-card");
     const avatar = EMPLOYEE.avatarUrl
-      ? `<img src="${EMPLOYEE.avatarUrl}" alt="${EMPLOYEE.name}" class="h-14 w-14 rounded-full object-cover" />`
-      : `<div class="flex h-14 w-14 items-center justify-center rounded-full bg-sky-500/20">
-           <i class="fa-solid fa-user text-xl text-sky-300"></i>
+      ? `<img src="${EMPLOYEE.avatarUrl}" alt="${EMPLOYEE.name}" class="h-16 w-16 rounded-full object-cover" />`
+      : `<div class="flex h-16 w-16 items-center justify-center rounded-full bg-sky-500/20">
+           <i class="fa-solid fa-user text-2xl text-sky-300"></i>
          </div>`;
 
     el.innerHTML = `
-      ${avatar}
-      <div class="min-w-0">
-        <div class="truncate text-sm font-semibold text-white">${EMPLOYEE.name}</div>
-        <div class="truncate text-xs text-slate-400">${EMPLOYEE.id} - ${EMPLOYEE.role}</div>
+      <div class="flex items-center gap-4">
+        ${avatar}
+        <div>
+          <div class="text-base font-semibold text-white">${EMPLOYEE.name}</div>
+          <div class="text-sm text-slate-400">${EMPLOYEE.id} - ${EMPLOYEE.role}</div>
+          <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
+            <i class="fa-regular fa-envelope"></i> ${EMPLOYEE.email}
+          </div>
+          <div class="mt-0.5 flex items-center gap-1.5 text-xs text-slate-400">
+            <i class="fa-regular fa-building"></i> ${EMPLOYEE.department}
+          </div>
+        </div>
       </div>
-      <div class="flex items-center gap-1.5 truncate text-[11px] text-slate-400">
-        <i class="fa-regular fa-envelope"></i> <span class="truncate">${EMPLOYEE.email}</span>
-      </div>
-      <div class="flex items-center gap-1.5 text-[11px] text-slate-400">
-        <i class="fa-regular fa-building"></i> ${EMPLOYEE.department}
-      </div>
-    `;
-  }
 
-  function renderInfoStrip() {
-    const el = document.getElementById("info-strip");
-    el.innerHTML = `
+      <div class="hidden h-14 w-px bg-white/10 sm:block"></div>
+
       <div>
         <div class="text-xs text-slate-400">Date of Joining</div>
         <div class="mt-1 text-sm font-semibold text-white">${EMPLOYEE.dateOfJoining}</div>
       </div>
 
-      <div class="hidden h-10 w-px bg-white/10 sm:block"></div>
+      <div class="hidden h-14 w-px bg-white/10 sm:block"></div>
 
       <div>
         <div class="text-xs text-slate-400">Employment Type</div>
         <div class="mt-1 text-sm font-semibold text-white">${EMPLOYEE.employmentType}</div>
       </div>
 
-      <div class="hidden h-10 w-px bg-white/10 sm:block"></div>
+      <div class="hidden h-14 w-px bg-white/10 sm:block"></div>
 
       <div>
         <div class="text-xs text-slate-400">Location</div>
         <div class="mt-1 text-sm font-semibold text-white">${EMPLOYEE.location}</div>
       </div>
 
-      <div class="hidden h-10 w-px bg-white/10 sm:block"></div>
+      <div class="hidden h-14 w-px bg-white/10 sm:block"></div>
 
       <div>
         <div class="text-xs text-slate-400">Reporting Manager</div>
@@ -340,7 +345,6 @@
   }
 
   renderProfile();
-  renderInfoStrip();
   renderStats();
   renderTable();    
 </script>

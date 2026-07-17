@@ -6,17 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attendance extends Model
 {
- 
-
-    $table->foreignId('employee_id');
-
-    $table->date('attendance_date');
-
-    $table->enum(
+    protected $fillable = [
+        'employee_id',
+        'attendance_date',
+        'time_in',
+        'time_out',
         'status',
-        ['Present','Late','Absent','Leave']
-    );
-
-    $table->timestamps();
-});
+    ];
 }

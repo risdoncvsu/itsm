@@ -104,6 +104,12 @@
             height: 100vh;
         }
 
+        /* Applied via JS when we need to skip the splash/intro (e.g. after a failed login) */
+        .main-wrapper.no-intro {
+            opacity: 1;
+            animation: none;
+        }
+
         @keyframes showPage {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -149,6 +155,7 @@
             background-size: 1920px;
             background-repeat: no-repeat;
             background-position-x: bottom center;
+            background-size: cover;
             
         }
 
@@ -177,6 +184,30 @@
             font-weight: 800;
             color: #D9DFE9;
             margin-bottom: 32px;
+        }
+
+        /* Error / warning banner shown when credentials are wrong */
+        .alert-error {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: rgba(220, 38, 38, 0.12);
+            border: 1px solid rgba(248, 113, 113, 0.5);
+            color: #FCA5A5;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            padding: 12px 14px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+        }
+
+        .alert-error svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+            stroke: #FCA5A5;
         }
 
         .input-group {
@@ -208,6 +239,10 @@
         input:focus {
             border: 1px solid #1B6FC8;
             box-shadow: 0 0 0 2px rgba(27, 111, 200, 0.2);
+        }
+
+        input.input-error {
+            border: 1px solid #DC2626;
         }
 
         input::placeholder {
@@ -297,14 +332,14 @@
         <div class="circle"></div>
         <div class="brand">
             <img src="images/Nexora_Logo_Transparent (2).png" class="logo" alt="Logo">
-            <img src="images/Banner Name White.png" class="banner" alt="Banner">
+            <img src="images/banner2.png" class="banner" alt="Banner">
         </div>
     </div>
 
-    <div class="main-wrapper">
+    <div class="main-wrapper" id="mainWrapper">
         
         <header class="header">
-            <a href="signIn.html" class="nexora-logo">
+            <a href="/signin" class="nexora-logo">
                 <img src="images/logo.png" alt="Nexora Logo">
             </a>
         </header>
@@ -313,6 +348,17 @@
             <div class="form-col">
                 <div class="login-card">
                     <h1>Sign In</h1>
+
+                    @if ($errors->any() || session('error'))
+                        <div class="alert-error">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="13"></line>
+                                <line x1="12" y1="16" x2="12" y2="16.01"></line>
+                            </svg>
+                            <span>{{ session('error') ?? $errors->first() }}</span>
+                        </div>
+                    @endif
                     
                     <form method="POST" action="{{ route('signin.post') }}">
     @csrf
@@ -325,6 +371,8 @@
     type="email"
     name="company_email"
     placeholder="Enter Company Email"
+    value="{{ old('company_email') }}"
+    class="{{ ($errors->any() || session('error')) ? 'input-error' : '' }}"
     required>
     </div>
 
@@ -336,6 +384,7 @@
                 name="password"
                 id="password"
                 placeholder="Enter Password"
+                class="{{ ($errors->any() || session('error')) ? 'input-error' : '' }}"
                 required>
             <span class="toggle-password" id="togglePassword" role="button" aria-label="Show password" tabindex="0">
                 <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
@@ -365,12 +414,22 @@
     <script>
     const SPLASH_DURATION = 4300;
     const splash = document.getElementById("splash");
+    const mainWrapper = document.getElementById("mainWrapper");
+    const hasError = document.querySelector(".alert-error") !== null;
 
-    // 1. Hide splash screen after initial load
-    setTimeout(() => {
-        splash.style.opacity = "0";
-        splash.style.pointerEvents = "none";
-    }, SPLASH_DURATION);
+    if (hasError) {
+        // A failed login just reloaded this page (e.g. server redirected back
+        // with validation errors) — skip the splash intro entirely and show
+        // the form immediately with the warning message already in place.
+        splash.style.display = "none";
+        mainWrapper.classList.add("no-intro");
+    } else {
+        // 1. Hide splash screen after initial load
+        setTimeout(() => {
+            splash.style.opacity = "0";
+            splash.style.pointerEvents = "none";
+        }, SPLASH_DURATION);
+    }
 
     // 2. Smooth, fast fade-out for exiting the page
     function smoothExit(e, url) {

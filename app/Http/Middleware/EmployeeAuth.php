@@ -13,12 +13,21 @@ class EmployeeAuth
      *
      * @param  Closure(Request): (Response)  $next
      */
-   public function handle(Request $request, Closure $next): Response
-{
-    if (!session('employee_logged_in')) {
-        return redirect()->route('signin');
-    }
+    public function handle(Request $request, Closure $next): Response
+    {
+        if (! session('employee_logged_in')) {
+            return redirect()->route('signin');
+        }
 
-    return $next($request);
-}
+        $role = session('employee_role');
+        $department = strtolower(trim(session('employee_department', '')));
+
+        if ($role === 'employee' && $department !== 'human resources') {
+            if (! $request->routeIs('employee.dashboard') && ! $request->routeIs('logout')) {
+                return redirect()->route('employee.dashboard');
+            }
+        }
+
+        return $next($request);
+    }
 }

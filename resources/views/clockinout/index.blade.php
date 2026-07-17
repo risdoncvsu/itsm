@@ -58,20 +58,54 @@
 
             <div class="mt-8 sm:mt-[60px]">
 
-                <div class="w-full h-[60px] sm:h-[75px] bg-[#132B52] rounded-[10px] flex items-center px-4 sm:px-7 mb-5 sm:mb-6">
-                    <span class="text-white text-base sm:text-[22px] font-medium mr-3 sm:mr-5 whitespace-nowrap">Employee ID:</span>
-                    <input
-                        type="text"
-                        id="empID"
-                        inputmode="numeric"
-                        autocomplete="off"
-                        class="flex-1 h-full border-none outline-none bg-transparent text-white text-base sm:text-2xl min-w-0">
-                </div>
+                @php
+                    $attendanceButtonLabel = session('clocked_in', false) && !session('clocked_out', false)
+                        ? '◴ Clock Out'
+                        : '◴ Clock In';
+                @endphp
 
-                <div id="captureBtn"
-                    class="w-full h-[50px] bg-[#173d73] text-white rounded-md flex justify-center items-center mb-5 text-base sm:text-xl cursor-pointer select-none">
-                    [◉] Capture Photo
-                </div>
+                @if (session('success'))
+                    <div class="mb-5 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-left text-sm text-green-800">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="mb-5 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-left text-sm text-red-800">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="mb-5 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-left text-sm text-red-800">
+                        <ul class="list-disc list-inside">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('clockinout.index') }}" id="attendanceForm">
+                    @csrf
+                    <input type="hidden" name="action" id="attendanceAction" value="clock_in">
+
+                    <div class="w-full h-[60px] sm:h-[75px] bg-[#132B52] rounded-[10px] flex items-center px-4 sm:px-7 mb-5 sm:mb-6">
+                        <span class="text-white text-base sm:text-[22px] font-medium mr-3 sm:mr-5 whitespace-nowrap">Employee ID:</span>
+                        <input
+                            type="text"
+                            id="empID"
+                            name="employee_id"
+                            inputmode="numeric"
+                            autocomplete="off"
+                            value="{{ old('employee_id', session('employee_id')) }}"
+                            class="flex-1 h-full border-none outline-none bg-transparent text-white text-base sm:text-2xl min-w-0">
+                    </div>
+
+                    <div id="captureBtn"
+                        class="w-full h-[50px] bg-[#173d73] text-white rounded-md flex justify-center items-center mb-5 text-base sm:text-xl cursor-pointer select-none">
+                        [◉] Capture Photo
+                    </div>
 
                 <video id="video" autoplay playsinline
                     class="hidden w-full rounded-[10px] my-5 mx-auto"></video>
@@ -80,14 +114,15 @@
 
                 <img id="photo" class="hidden w-full rounded-[10px] mt-5 mx-auto" alt="Captured attendance photo">
 
-                <button id="attendanceBtn" disabled
+                <button id="attendanceBtn" type="button" disabled
                     class="w-full h-[80px] sm:h-[114px] border-none rounded-[7.9px] bg-[#132B52] text-white text-xl sm:text-[28.6px] font-normal cursor-pointer transition-colors duration-[250ms] mb-2 flex justify-center items-center hover:bg-[#0f2e59] disabled:hover:bg-[#132B52]">
-                    ◴ Clock In
+                    {{ $attendanceButtonLabel }}
                 </button>
 
                 <div id="requirementNote" class="text-sm sm:text-base text-[#6c757d] mb-5 sm:mb-6 text-center">
                     Enter your Employee ID and capture a photo to enable Clock In.
                 </div>
+            </form>
 
                 <div class="text-lg sm:text-xl md:text-[22px] text-[#333] leading-relaxed text-left sm:text-center">
                     <div>Clock In Time: <span id="clockIn"></span></div>
@@ -130,6 +165,7 @@ setInterval(updateClock,1000);
 let clockedIn=false;
 let photoCaptured=false;
 
+const attendanceForm = document.getElementById("attendanceForm");
 const btn=document.getElementById("attendanceBtn");
 const empIDInput=document.getElementById("empID");
 const requirementNote=document.getElementById("requirementNote");
@@ -222,50 +258,16 @@ btn.onclick=function(){
 
     const now=new Date().toLocaleTimeString();
 
-    if(!clockedIn){
-
-        if(confirm("Clock in now?")){
-
-            document.getElementById("clockIn").innerHTML=now;
-
-            alert("You have successfully Clocked In.");
-
-            btn.innerHTML="◴ Clock Out";
-
-            clockedIn=true;
-
-            // Require a fresh photo capture before clocking out
-            photoCaptured=false;
-            photo.classList.add("hidden");
-            captureBtn.innerHTML="[◉] Capture Photo";
-            checkRequirements();
-
+    if (! clockedIn) {
+        if (confirm("Clock in now?")) {
+            document.getElementById('attendanceAction').value = 'clock_in';
+            attendanceForm.submit();
         }
-
-    }
-
-    else{
-
-        if(confirm("Clock out now?")){
-
-            document.getElementById("clockOut").innerHTML=now;
-
-            alert("You have successfully Clocked Out.");
-
-            btn.disabled=true;
-
-            btn.innerHTML="Completed";
-
-            btn.classList.remove("bg-[#132B52]","hover:bg-[#0f2e59]");
-            btn.classList.add("bg-[#6c757d]","cursor-not-allowed");
-
-            empIDInput.disabled = true;
-            captureBtn.classList.add("opacity-55","pointer-events-none");
-
-            requirementNote.innerHTML = "";
-
+    } else {
+        if (confirm("Clock out now?")) {
+            document.getElementById('attendanceAction').value = 'clock_out';
+            attendanceForm.submit();
         }
-
     }
 
 }
@@ -275,8 +277,33 @@ const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const photo = document.getElementById("photo");
 
+const serverClockIn = @json(session('clock_in'));
+const serverClockOut = @json(session('clock_out'));
+const serverClockedIn = @json(session('clocked_in', false));
+const serverClockedOut = @json(session('clocked_out', false));
+
 let stream = null;
 let cameraOpen = false;
+
+if (serverClockIn) {
+    document.getElementById("clockIn").textContent = serverClockIn;
+    clockedIn = true;
+}
+
+if (serverClockOut) {
+    document.getElementById("clockOut").textContent = serverClockOut;
+}
+
+if (serverClockedOut) {
+    btn.disabled = true;
+    btn.innerHTML = "Completed";
+    btn.classList.remove("bg-[#132B52]","hover:bg-[#0f2e59]");
+    btn.classList.add("bg-[#6c757d]","cursor-not-allowed");
+    empIDInput.disabled = true;
+    captureBtn.classList.add("opacity-55","pointer-events-none");
+} else if (clockedIn) {
+    btn.innerHTML = "◴ Clock Out";
+}
 
 captureBtn.addEventListener("click", async () => {
 
