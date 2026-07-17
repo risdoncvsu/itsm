@@ -129,6 +129,7 @@
     method="POST"
     enctype="multipart/form-data"
     class="space-y-4 max-w-3xl">
+    
 
     @csrf
 
@@ -282,7 +283,49 @@
     </svg>
 </button>
           </div>
-        </form>
+       
+
+        <!-- Right: profile picture upload -->
+      <div class="w-full lg:w-[220px] flex flex-col items-center">
+        <h2 class="text-white text-sm font-bold tracking-wide mb-4 self-start lg:self-center">PROFILE PICTURE</h2>
+
+        <label for="profile_picture" class="cursor-pointer group">
+            <div class="relative w-[160px] h-[160px] rounded-full bg-[#0d1730] border-2 border-dashed border-slate-500 flex items-center justify-center overflow-hidden shadow-lg shadow-black/30 group-hover:border-blue-500 transition">
+
+                <!-- Placeholder icon (shown when no image selected yet) -->
+                <svg id="placeholder" class="w-16 h-16 text-slate-500 group-hover:text-blue-400 transition" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M4.5 20c1.5-4 4.5-6 7.5-6s6 2 7.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+
+                <!-- Preview image (hidden until a file is chosen) -->
+                <img id="imagePreview" src="" alt="Profile Preview" class="hidden w-full h-full object-cover">
+
+                <!-- Hover overlay -->
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <span class="text-white text-[11px] font-semibold tracking-wide">CHANGE PHOTO</span>
+                </div>
+               
+            </div>
+        </label>
+
+        <input
+            type="file"
+            name="profile_picture"
+            id="profile_picture"
+            accept="image/png, image/jpeg, image/jpg"
+            class="hidden"
+        
+            onchange="previewImage(event)">
+
+              </form>
+
+        <p class="text-slate-400 text-[11px] mt-3 text-center max-w-[180px]">
+            JPG or PNG. Max size 2MB.
+        </p>
+
+        <p id="profilePictureError" class="text-red-400 text-[11px] mt-1 text-center max-w-[180px] hidden"></p>
+      </div>
       </div>
 
       
@@ -290,16 +333,35 @@
 function previewImage(event) {
 
     const file = event.target.files[0];
+    const errorEl = document.getElementById('profilePictureError');
+
+    errorEl.classList.add('hidden');
+    errorEl.textContent = '';
 
     if (!file) return;
 
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    const maxSizeBytes = 2 * 1024 * 1024; // 2MB
+
+    if (!allowedTypes.includes(file.type)) {
+        errorEl.textContent = 'Only JPG or PNG files are allowed.';
+        errorEl.classList.remove('hidden');
+        event.target.value = '';
+        return;
+    }
+
+    if (file.size > maxSizeBytes) {
+        errorEl.textContent = 'File must be 2MB or smaller.';
+        errorEl.classList.remove('hidden');
+        event.target.value = '';
+        return;
+    }
+
     const reader = new FileReader();
 
-    reader.onload = function(e) {
-
+    reader.onload = function (e) {
         document.getElementById('imagePreview').src = e.target.result;
         document.getElementById('imagePreview').classList.remove('hidden');
-
         document.getElementById('placeholder').classList.add('hidden');
     };
 

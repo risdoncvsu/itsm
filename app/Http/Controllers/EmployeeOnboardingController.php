@@ -14,26 +14,28 @@ class EmployeeOnboardingController extends Controller
     }
 
     public function storeStep1(Request $request)
-    {
-        $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required|email|unique:employees,email',
-            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+{
 
-        $data = $request->except('profile_picture');
+    $request->validate([
+        'first_name' => 'required',
+        'last_name' => 'required',
+        'email' => 'required|email|unique:employees,email',
+        'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-        if ($request->hasFile('profile_picture')) {
-            $data['profile_picture'] = $request
-                ->file('profile_picture')
-                ->store('profile_picture', 'public');
-        }
+    $data = $request->except('profile_picture');
 
-        session(['step1' => $data]);
+    if ($request->hasFile('profile_picture')) {
+        $imageName = time() . '.' . $request->file('profile_picture')->extension();
+        $request->file('profile_picture')->move(public_path('profile_pictures'), $imageName);
 
-        return redirect()->route('onboarding.step2');
+        $data['profile_picture'] = $imageName;
     }
+
+    session(['step1' => $data]);
+
+    return redirect()->route('onboarding.step2');
+}
 
     public function step2()
     {

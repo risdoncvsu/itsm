@@ -293,6 +293,66 @@
 
         </div>
 
+        {{-- =========================
+             PAGINATION (13 per page)
+             $employees must come from ->paginate(13) in EmployeeController@index
+        ========================== --}}
+        @if ($employees instanceof \Illuminate\Contracts\Pagination\Paginator || $employees instanceof \Illuminate\Pagination\LengthAwarePaginator)
+        <div class="w-full flex items-center justify-between flex-wrap gap-3 mt-5 mb-8">
+
+            <div class="text-[11.5px] text-[#93abd3]">
+                @if ($employees->total() > 0)
+                    Showing {{ $employees->firstItem() }}–{{ $employees->lastItem() }} of {{ $employees->total() }} employees
+                @else
+                    No employees to show
+                @endif
+            </div>
+
+            <nav class="flex items-center gap-1.5">
+
+                {{-- Previous --}}
+                @if ($employees->onFirstPage())
+                    <span class="w-9 h-9 grid place-items-center rounded-lg bg-[#0B1E3D] text-[#4c6291] cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-left text-[11px]"></i>
+                    </span>
+                @else
+                    <a href="{{ $employees->previousPageUrl() }}"
+                       class="w-9 h-9 grid place-items-center rounded-lg bg-[#0B1E3D] text-white transition-colors duration-200 hover:bg-[#2e5ca3]">
+                        <i class="fa-solid fa-chevron-left text-[11px]"></i>
+                    </a>
+                @endif
+
+                {{-- Page numbers --}}
+                @foreach ($employees->getUrlRange(1, $employees->lastPage()) as $page => $url)
+                    @if ($page == $employees->currentPage())
+                        <span class="w-9 h-9 grid place-items-center rounded-lg bg-[#2D7EFF] text-white text-[12px] font-semibold">
+                            {{ $page }}
+                        </span>
+                    @else
+                        <a href="{{ $url }}"
+                           class="w-9 h-9 grid place-items-center rounded-lg bg-[#0B1E3D] text-[#C9DAF8] text-[12px] transition-colors duration-200 hover:bg-[#2e5ca3] hover:text-white">
+                            {{ $page }}
+                        </a>
+                    @endif
+                @endforeach
+
+                {{-- Next --}}
+                @if ($employees->hasMorePages())
+                    <a href="{{ $employees->nextPageUrl() }}"
+                       class="w-9 h-9 grid place-items-center rounded-lg bg-[#0B1E3D] text-white transition-colors duration-200 hover:bg-[#2e5ca3]">
+                        <i class="fa-solid fa-chevron-right text-[11px]"></i>
+                    </a>
+                @else
+                    <span class="w-9 h-9 grid place-items-center rounded-lg bg-[#0B1E3D] text-[#4c6291] cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-right text-[11px]"></i>
+                    </span>
+                @endif
+
+            </nav>
+
+        </div>
+        @endif
+
     </div>
 
 </body>

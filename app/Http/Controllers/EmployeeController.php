@@ -42,7 +42,7 @@ switch (request('sort')) {
     case 'oldest':          $employees->orderBy('created_at', 'asc'); break;
 }
 
-    $employees = $employees->get();
+    $employees = $employees->paginate(13)->withQueryString();
 
    return view('employees.index', compact('employees'));
 }
@@ -103,27 +103,29 @@ Employee::create([
 
     return view('employees.employeeform', compact('employee'));
 }
-
 public function update(Request $request, Employee $employee)
 {
     $request->validate([
-        'email' => 'required|email|unique:employees,email,' . $employee->id,
+        'email'           => 'required|email|unique:employees,email,' . $employee->id,
+        'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 2MB
     ]);
 
-   $employee->update([
-    'first_name'     => $request->first_name,
-    'middle_name'    => $request->middle_name,
-    'last_name'      => $request->last_name,
-    'department'     => $request->department,
-    'position'       => $request->position,
-    'gender'         => $request->gender,
-    'marital_status' => $request->marital_status,
-    'address'        => $request->address,
-    'email'          => $request->email,
-    'phone'          => $request->phone,
-]);
+    $data = [
+        'first_name'     => $request->first_name,
+        'middle_name'    => $request->middle_name,
+        'last_name'      => $request->last_name,
+        'suffix'         => $request->suffix,
+        'department'     => $request->department,
+        'position'       => $request->position,
+        'gender'         => $request->gender,
+        'marital_status' => $request->marital_status,
+        'nationality'    => $request->nationality,
+        'address'        => $request->address,
+        'email'          => $request->email,
+        'phone'          => $request->phone,
+    ];
 
-
+    $employee->update($data);
 
     return back()->with('success', 'Employee updated successfully.');
 }
@@ -145,8 +147,3 @@ public function destroy($id)
     ->with('success','Employee deleted successfully!');
 }
 }
-
-
-
-
-

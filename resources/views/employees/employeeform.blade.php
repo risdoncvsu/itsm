@@ -273,18 +273,37 @@
                 <div class="pl-10">
 
                     <!-- Profile Image -->
-                    <div>
-                        <h3 class="text-[13px] font-normal text-[#D7E4FF] tracking-[.5px] mb-[7px] uppercase">PROFILE IMAGE</h3>
+                    <!-- Profile Image -->
+<div>
+    <h3 class="text-[13px] font-normal text-[#D7E4FF] tracking-[.5px] mb-[7px] uppercase">PROFILE IMAGE</h3>
 
-                        <div class="w-[100px] h-[100px] rounded-full bg-[#7FB3FF] flex justify-center items-center overflow-hidden">
-                            @if($employee->profile_picture)
-                                <img src="{{ asset('profile_pictures/'.$employee->profile_picture) }}"
-                                     alt="Profile" class="w-full h-full object-cover rounded-full">
-                            @else
-                                <i class="fa-solid fa-circle-user text-[120px] text-[#1C4176]"></i>
-                            @endif
-                        </div>
-                    </div>
+    <label for="edit_profile_picture" class="cursor-pointer group inline-block">
+        <div class="relative w-[100px] h-[100px] rounded-full bg-[#7FB3FF] flex justify-center items-center overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,.35)]">
+
+            <img id="editProfilePreview"
+                 src="{{ $employee->profile_picture ? asset('profile_pictures/'.$employee->profile_picture) : '' }}"
+                 alt="Profile"
+                 class="w-full h-full object-cover rounded-full {{ $employee->profile_picture ? '' : 'hidden' }}">
+
+            <i id="editProfilePlaceholder"
+               class="fa-solid fa-circle-user text-[120px] text-[#1C4176] {{ $employee->profile_picture ? 'hidden' : '' }}"></i>
+
+            <!-- Hover overlay -->
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span class="text-white text-[9px] font-semibold tracking-wide text-center px-2">CHANGE<br>PHOTO</span>
+            </div>
+        </div>
+    </label>
+
+    <input type="file"
+           name="profile_picture"
+           id="edit_profile_picture"
+           accept="image/png, image/jpeg, image/jpg"
+           class="hidden"
+           onchange="previewEditProfilePicture(event)">
+
+    <p id="editProfilePictureError" class="text-red-400 text-[10px] mt-1.5 hidden"></p>
+</div>
 
                     <div class="flex items-end gap-2 mb-3.5 mt-6">
                         <h3 class="text-[13px] font-light text-white uppercase whitespace-nowrap m-0">Employee Details</h3>
@@ -518,6 +537,53 @@
 
     </div>
 
+    <!-- =====================================================
+     DELETE CONFIRMATION MODAL
+====================================================== -->
+<div id="deleteModalOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[2000] hidden items-center justify-center">
+    <div class="w-[420px] bg-[#132B52] rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,.45),inset_0_1px_0_rgba(255,255,255,.05)] p-7 relative border border-white/5">
+
+        <!-- Icon -->
+        <div class="w-14 h-14 rounded-full bg-[#FF000420] flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-[#FF6B6B]" viewBox="0 0 24 24" fill="none">
+                <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                      stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+
+        <h2 class="text-white text-lg font-medium text-center mb-2">Delete Employee?</h2>
+
+        <p class="text-[#C9DAF8] text-[13px] text-center leading-relaxed mb-1">
+            Are you sure you want to delete
+        </p>
+        <p class="text-white text-[15px] font-semibold text-center mb-1">
+            {{ strtoupper($employee->first_name . ' ' . $employee->last_name) }}
+        </p>
+        <p class="text-[#8FA6D8] text-[11px] text-center mb-5">
+            Employee ID: {{ '2026' . str_pad($employee->id, 4, '0', STR_PAD_LEFT) }}
+        </p>
+
+        <p class="text-[#8FA6D8] text-[11px] text-center mb-4 leading-relaxed">
+            This action cannot be undone. Type <span class="text-[#FF6B6B] font-semibold tracking-wide">DELETE</span> below to confirm.
+        </p>
+
+        <input type="text" id="deleteConfirmInput" autocomplete="off"
+            placeholder="Type DELETE to confirm"
+            class="w-full h-11 box-border py-3 px-3.5 bg-[#0B1E3D] text-white border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] outline-none text-center tracking-[2px] uppercase placeholder:text-[#8FA6D8] placeholder:tracking-normal placeholder:normal-case focus:shadow-[0_0_0_2px_rgba(255,107,107,.35)] mb-5">
+
+        <div class="flex gap-3">
+            <button type="button" id="cancelDeleteBtn"
+                class="flex-1 h-11 border border-[#5D8CFF] rounded-[10px] text-[13px] font-light text-white bg-[#0048FF20] hover:bg-[#0048FF50] transition-all duration-250 cursor-pointer">
+                CANCEL
+            </button>
+            <button type="button" id="confirmDeleteBtn" disabled
+                class="flex-1 h-11 border border-[#5D8CFF] rounded-[10px] text-[13px] font-light text-white bg-[#FF000420] opacity-40 cursor-not-allowed transition-all duration-250">
+                DELETE
+            </button>
+        </div>
+    </div>
+</div>
+
     <script>
         // Positions available per department (kept in sync with the departments list above)
         const positionsByDepartment = {
@@ -626,11 +692,67 @@
             }
         });
 
-         document.getElementById('deleteForm').addEventListener('submit', function(e) {
-    if (!confirm('Are you sure you want to delete this employee? This action cannot be undone.')) {
-        e.preventDefault();
+        const deleteForm      = document.getElementById("deleteForm");
+    const deleteModal     = document.getElementById("deleteModalOverlay");
+    const deleteInput     = document.getElementById("deleteConfirmInput");
+    const confirmDeleteBtn= document.getElementById("confirmDeleteBtn");
+    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+
+    if (deleteForm) {
+        // Intercept the normal submit and open the modal instead
+        deleteForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            openDeleteModal();
+        });
     }
-});
+
+    function openDeleteModal() {
+        deleteInput.value = "";
+        toggleConfirmBtn();
+        deleteModal.classList.remove("hidden");
+        deleteModal.classList.add("flex");
+        setTimeout(() => deleteInput.focus(), 50);
+    }
+
+    function closeDeleteModal() {
+        deleteModal.classList.add("hidden");
+        deleteModal.classList.remove("flex");
+    }
+
+    function toggleConfirmBtn() {
+        const isMatch = deleteInput.value.trim() === "DELETE";
+        confirmDeleteBtn.disabled = !isMatch;
+        confirmDeleteBtn.classList.toggle("opacity-40", !isMatch);
+        confirmDeleteBtn.classList.toggle("cursor-not-allowed", !isMatch);
+        confirmDeleteBtn.classList.toggle("bg-[#C0392B95]", isMatch);
+        confirmDeleteBtn.classList.toggle("cursor-pointer", isMatch);
+    }
+
+    deleteInput.addEventListener("input", function () {
+        // force caps so it's clearly "DELETE" while typing
+        this.value = this.value.toUpperCase();
+        toggleConfirmBtn();
+    });
+
+    // Allow Enter key to confirm once valid
+    deleteInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !confirmDeleteBtn.disabled) {
+            deleteForm.submit();
+        }
+    });
+
+    cancelDeleteBtn.addEventListener("click", closeDeleteModal);
+
+    // Click outside modal card to cancel
+    deleteModal.addEventListener("click", function (e) {
+        if (e.target === deleteModal) closeDeleteModal();
+    });
+
+    confirmDeleteBtn.addEventListener("click", function () {
+        if (deleteInput.value.trim() === "DELETE") {
+            deleteForm.submit();
+        }
+    });
 
     /* =========================================================
        PHONE NUMBER: digits only, max 11
@@ -670,10 +792,53 @@
         if (el) blockLeadingLowercase(el);
     });
 
+    function previewEditProfilePicture(event) {
+
+    const file = event.target.files[0];
+    const errorEl = document.getElementById('editProfilePictureError');
+    const previewImg = document.getElementById('editProfilePreview');
+    const placeholderIcon = document.getElementById('editProfilePlaceholder');
+
+    errorEl.classList.add('hidden');
+    errorEl.textContent = '';
+
+    if (!file) return;
+
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    const maxSizeBytes = 2 * 1024 * 1024; // 2MB
+
+    if (!allowedTypes.includes(file.type)) {
+        errorEl.textContent = 'Only JPG or PNG files are allowed.';
+        errorEl.classList.remove('hidden');
+        event.target.value = '';
+        return;
+    }
+
+    if (file.size > maxSizeBytes) {
+        errorEl.textContent = 'File must be 2MB or smaller.';
+        errorEl.classList.remove('hidden');
+        event.target.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        previewImg.src = e.target.result;
+        previewImg.classList.remove('hidden');
+        placeholderIcon.classList.add('hidden');
+    };
+
+    reader.readAsDataURL(file);
+}
     </script>
+
+    
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
+
+
 </html>

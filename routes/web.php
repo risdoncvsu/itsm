@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\EmployeeOnboardingController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReportsAnalyticsController;
 
 
 Route::get('/', function () {
@@ -108,16 +109,9 @@ Route::get('/reports-analytics/employee-attendance', function () {
 
 use App\Models\Employee;
 
-Route::get('/reports-analytics/attendance-overview', function () {
 
-    $employees = Employee::all();
-
-    return view(
-        'reports-analytics.attendance-overview',
-        compact('employees')
-    );
-
-})->name('reports-analytics.attendance-overview');
+Route::get('/reports-analytics/attendance-overview', [ReportsAnalyticsController::class, 'index'])
+    ->name('reports-analytics.attendance-overview');
 
 
 
@@ -135,5 +129,17 @@ Route::post('/clock-in', [AttendanceController::class, 'clockIn'])
 
 Route::get(
     '/reports-analytics/employee-attendance/{employee}',
-    [AttendanceOverviewController::class, 'employeeAttendance']
+    [ReportsAnalyticsController::class, 'employeeAttendance']
 )->name('reports-analytics.employee-attendance');
+
+Route::get('/reports-analytics/leave', function () {
+
+    $employees = Employee::all();
+    $employeeCount = $employees->count();
+
+    return view('reports-analytics.leave', compact(
+        'employees',
+        'employeeCount'
+    ));
+
+})->name('reports-analytics.leave');
