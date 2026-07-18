@@ -505,6 +505,12 @@
                             class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
                     </div>
 
+                    <div class="relative w-[536px]">
+                        <label class="absolute top-[3px] left-2.5 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Valid ID</label>
+                        <input type="file"
+                            class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                    </div>
+
                 </div>
 
             </div>
