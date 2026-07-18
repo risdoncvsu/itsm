@@ -81,12 +81,6 @@ class EmployeeOnboardingController extends Controller
                 ->with('error', 'Your onboarding session expired. Please start again.');
         }
 
-        $request->validate([
-            'birth_certificate' => 'required|file',
-            'curriculum_vitae' => 'required|file',
-            'valid_id' => 'required|file',
-        ]);
-
         $data = $request->except([
             'birth_certificate',
             'curriculum_vitae',
