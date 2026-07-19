@@ -56,5 +56,5 @@ Route::middleware('inventory.access')->name('inventory.')->group(function (): vo
 // New code uses inventory.index.trend-data; this alias prevents stale Blade
 // caches from failing during a rolling deployment.
 Route::middleware('inventory.access')
-    ->get('/index/trend-data', [DashboardController::class, 'trendData'])
+    ->get('/legacy/index/trend-data', [DashboardController::class, 'trendData'])
     ->name('index.trend-data');
