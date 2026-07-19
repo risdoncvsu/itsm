@@ -51,6 +51,7 @@ class Employee extends Model
         'company_email',
         'temporary_password',
         'must_change_password',
+        'approval_status',
         'birth_certificate',
         'curriculum_vitae',
         'valid_id',
