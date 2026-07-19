@@ -41,13 +41,13 @@
             <div class="relative z-10 grid min-h-[calc(100vh-10rem)] grid-cols-[22rem_1fr] gap-6">
                 <aside class="rounded-[1.875rem] bg-white p-8 text-slate-950">
                     <nav class="space-y-6 text-xl">
-                        <a href="#" class="block font-extrabold">All {{ ucfirst($entityLabelPlural) }}</a>
+                        <a href="{{ $portal === 'admin' ? route('admin.itsm.clients') : route('client.itsm.employees') }}" class="block {{ $active === 'employees' || $active === 'clients' ? 'font-extrabold' : 'font-medium hover:text-[#346DCB]' }}">All {{ $portal === 'admin' ? ucfirst($entityLabelPlural) : 'Employees' }}</a>
                         @if ($portal === 'admin')
                             <a href="#" class="block font-medium hover:text-[#346DCB]">Create New {{ ucfirst($entityLabel) }}</a>
                             <a href="#" class="block font-medium hover:text-[#346DCB]">Pending Approvals</a>
                         @else
-                            <a href="#" class="block font-medium hover:text-[#346DCB]">HR Sync Queue</a>
-                            <a href="#" class="block font-medium hover:text-[#346DCB]">Pending Approvals</a>
+                            <a href="{{ route('client.itsm.employees') }}" class="block font-medium hover:text-[#346DCB]">HR Sync Queue</a>
+                            <a href="{{ route('client.itsm.pending-approvals') }}" class="block {{ $active === 'pending-approvals' ? 'font-extrabold text-[#346DCB]' : 'font-medium hover:text-[#346DCB]' }}">Pending Approvals</a>
                         @endif
                         <a href="#" class="block font-medium hover:text-[#346DCB]">Roles & Permissions</a>
                         <a href="#" class="block font-medium hover:text-[#346DCB]">Teams & Groups</a>
@@ -70,9 +70,11 @@
                                 </button>
                             @endif
 
-                            <button type="button" id="editSelectedButton" disabled class="rounded-full bg-slate-500 px-6 py-3 text-xl font-semibold text-white opacity-50 transition enabled:bg-[#0B1E3D] enabled:opacity-100 enabled:hover:bg-[#132B52]">
-                                Edit selected
-                            </button>
+                            @if ($active !== 'pending-approvals')
+                                <button type="button" id="editSelectedButton" disabled class="rounded-full bg-slate-500 px-6 py-3 text-xl font-semibold text-white opacity-50 transition enabled:bg-[#0B1E3D] enabled:opacity-100 enabled:hover:bg-[#132B52]">
+                                    Edit selected
+                                </button>
+                            @endif
 
                             @if ($portal === 'admin')
                                 <button type="button" id="deleteSelectedButton" disabled class="rounded-full bg-red-500 px-6 py-3 text-xl font-semibold text-white opacity-50 transition enabled:opacity-100 enabled:hover:bg-red-600">
@@ -112,11 +114,13 @@
                         @endif
 
                         <div class="mb-6 flex items-center justify-between">
-                            <h2 class="text-xl font-semibold">All {{ $entityLabelPlural }}</h2>
-                            <label class="flex items-center gap-2 text-base">
-                                <input type="checkbox" id="selectAllCheckbox" class="h-5 w-5 accent-[#346DCB]">
-                                Select All
-                            </label>
+                            <h2 class="text-xl font-semibold">{{ $active === 'pending-approvals' ? 'HR manager requests awaiting your approval' : 'All ' . $entityLabelPlural }}</h2>
+                            @if ($active !== 'pending-approvals')
+                                <label class="flex items-center gap-2 text-base">
+                                    <input type="checkbox" id="selectAllCheckbox" class="h-5 w-5 accent-[#346DCB]">
+                                    Select All
+                                </label>
+                            @endif
                         </div>
 
                         <div class="overflow-x-auto">
@@ -129,7 +133,7 @@
                                         <th class="sortable cursor-pointer whitespace-nowrap px-2 py-4">{{ $portal === 'admin' ? 'Admin Login' : 'Email' }}</th>
                                         <th class="sortable cursor-pointer whitespace-nowrap px-2 py-4">{{ $portal === 'admin' ? 'Industry' : 'Department' }}</th>
                                         <th class="sortable cursor-pointer whitespace-nowrap px-2 py-4">Status</th>
-                                        <th class="px-2 py-4 text-center"></th>
+                                        <th class="px-2 py-4 text-center">{{ $active === 'pending-approvals' ? 'Action' : '' }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -154,7 +158,16 @@
                                             <td class="px-2 py-4">{{ $portal === 'admin' ? ($user->adminUser?->username ?? 'Not generated') : ($user->email ?? 'employee@company.com') }}</td>
                                             <td class="px-2 py-4">{{ $portal === 'admin' ? ($user->industry ?? 'ERP Client') : ($user->department ?? 'General') }}</td>
                                             <td class="px-2 py-4">{{ $user->status ?? 'Active' }}</td>
-                                            <td class="px-2 py-4 text-center"><input type="checkbox" class="row-checkbox h-5 w-5 accent-[#346DCB]"></td>
+                                            <td class="px-2 py-4 text-center">
+                                                @if ($active === 'pending-approvals')
+                                                    <form method="POST" action="{{ route('client.itsm.pending-approvals.approve', ['employee' => $user->id]) }}">
+                                                        @csrf
+                                                        <button type="submit" class="rounded-md bg-[#346DCB] px-4 py-2 font-semibold text-white hover:bg-[#2554a3]">Approve</button>
+                                                    </form>
+                                                @else
+                                                    <input type="checkbox" class="row-checkbox h-5 w-5 accent-[#346DCB]">
+                                                @endif
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>

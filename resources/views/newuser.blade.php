@@ -565,7 +565,7 @@
                         <p class="form-text">Your ERP workspace has been successfully configured.</p>
                         <p class="form-text">Your organization is now ready to start managing employees and business operations.</p>
 
-                        <p class="form-text">The HR manager profile is now listed in Employee Management for approval. Login credentials will be generated only after the client system admin approves it.</p>
+                        <p class="form-text">The HR manager profile is now awaiting approval in the client ITSM dashboard's Pending Approvals tab. No HR login credentials have been generated. Credentials are created only when the client system admin approves the request.</p>
 
                         <div class="button-container stage4">
                             <a href="{{ route('login') }}" class="submit-btn" role="button" aria-label="Done">Done</a>

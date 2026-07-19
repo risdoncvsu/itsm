@@ -8,6 +8,7 @@ use App\Services\HrEmployeeProfileProvisioner;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class UserController extends Controller
 {
@@ -59,9 +60,30 @@ class UserController extends Controller
         ]);
     }
 
-    public function updateEmployee(Request $request, int $employee): \Illuminate\Http\RedirectResponse
+    public function pendingApprovals()
     {
-        $company = Company::findOrFail(Auth::user()->company_id);
+        $company = $this->clientCompany();
+        $employees = $company
+            ? $this->tenantEmployeeTable->employeesFor($company)
+                ->filter(fn (object $employee): bool => $employee->status === 'Pending' && $employee->department === 'Human Resources')
+                ->values()
+            : collect();
+
+        return view('users.index', [
+            'users' => $employees,
+            'portal' => 'client',
+            'active' => 'pending-approvals',
+            'title' => 'Pending Approvals',
+            'entityLabel' => 'approval',
+            'entityLabelPlural' => 'approvals',
+            'primaryIdLabel' => 'Employee ID',
+        ]);
+    }
+
+    public function updateEmployee(Request $request, int $employee): RedirectResponse
+    {
+        $company = $this->clientCompany();
+        abort_unless($company, 403);
         $validated = $request->validate([
             'username' => ['nullable', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -73,29 +95,60 @@ class UserController extends Controller
         $currentEmployee = $this->tenantEmployeeTable->find($company, $employee);
         abort_unless($currentEmployee, 404);
 
-        $credentials = null;
         if (
             $currentEmployee->status === 'Pending'
             && $validated['status'] === 'Active'
             && $currentEmployee->department === 'Human Resources'
         ) {
-            $password = Str::password(16, symbols: true);
-            $provisioned = $this->hrEmployeeProfileProvisioner->provisionApprovedHrManager($company, $currentEmployee, $password);
-            $validated['username'] = $provisioned['email'];
-            $credentials = [
-                'username' => $provisioned['email'],
-                'password' => $password,
-            ];
-
-            $company->update(['hr_employee_id' => $provisioned['employee_id']]);
+            return redirect()
+                ->route('client.itsm.pending-approvals')
+                ->withErrors(['status' => 'Approve the HR manager from Pending Approvals to create their login credentials.']);
         }
 
         $this->tenantEmployeeTable->updateEmployee($company, $employee, $validated);
 
-        $response = redirect()
+        return redirect()
             ->route('client.itsm.employees')
-            ->with('success', $credentials ? 'HR manager approved and login credentials generated.' : 'Employee updated successfully.');
+            ->with('success', 'Employee updated successfully.');
+    }
 
-        return $credentials ? $response->with('hr_credentials', $credentials) : $response;
+    public function approveHrManager(int $employee): RedirectResponse
+    {
+        $company = $this->clientCompany();
+        abort_unless($company, 403);
+
+        $manager = $this->tenantEmployeeTable->find($company, $employee);
+        abort_unless(
+            $manager && $manager->status === 'Pending' && $manager->department === 'Human Resources',
+            404
+        );
+
+        $password = Str::password(16, symbols: true);
+        $provisioned = $this->hrEmployeeProfileProvisioner->provisionApprovedHrManager($company, $manager, $password);
+
+        $this->tenantEmployeeTable->updateEmployee($company, $employee, [
+            'username' => $provisioned['email'],
+            'status' => 'Active',
+        ]);
+        $company->update(['hr_employee_id' => $provisioned['employee_id']]);
+
+        return redirect()
+            ->route('client.itsm.pending-approvals')
+            ->with('success', 'HR manager approved and login credentials generated.')
+            ->with('hr_credentials', [
+                'username' => $provisioned['email'],
+                'password' => $password,
+            ]);
+    }
+
+    private function clientCompany(): ?Company
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->role !== 'company_admin') {
+            return null;
+        }
+
+        return Company::find($user->company_id);
     }
 }

@@ -60,6 +60,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/employees', [UserController::class, 'employees'])->name('employees');
         Route::patch('/employees/{employee}', [UserController::class, 'updateEmployee'])->name('employees.update');
+        Route::get('/pending-approvals', [UserController::class, 'pendingApprovals'])->name('pending-approvals');
+        Route::post('/pending-approvals/{employee}/approve', [UserController::class, 'approveHrManager'])->name('pending-approvals.approve');
 
         Route::get('/service-desk', [TicketController::class, 'index'])->name('service-desk');
         Route::post('/service-desk', [TicketController::class, 'store'])->name('service-desk.store');
