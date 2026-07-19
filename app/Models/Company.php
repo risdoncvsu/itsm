@@ -15,10 +15,20 @@ use Illuminate\Database\Eloquent\Model;
     'status',
     'admin_user_id',
     'employee_table_name',
+    'logo_path',
+    'hr_employee_id',
+    'setup_completed_at',
 ])]
 class Company extends Model
 {
     use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'setup_completed_at' => 'datetime',
+        ];
+    }
 
     public function adminUser()
     {

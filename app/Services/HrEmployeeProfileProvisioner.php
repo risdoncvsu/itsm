@@ -9,62 +9,60 @@ use Illuminate\Support\Facades\Schema;
 
 class HrEmployeeProfileProvisioner
 {
-    public function provisionCompanyAdmin(Company $company, User $admin, string $plainPassword): void
+    public function provisionHrManager(Company $company, array $manager, string $plainPassword): int
     {
         if (! Schema::hasTable('employees')) {
-            return;
+            return 0;
         }
 
-        $this->upsertEmployee([
-            'employee_id' => 'HR-ADMIN-' . str_pad((string) $company->id, 5, '0', STR_PAD_LEFT),
-            'name' => $admin->name,
-            'email' => $admin->email ?: $admin->username,
-            'company_email' => $admin->username,
+        return $this->upsertEmployee([
+            'employee_id' => $manager['employee_id'],
+            'first_name' => $manager['first_name'],
+            'last_name' => $manager['last_name'],
+            'email' => $manager['email'],
+            'company_email' => $manager['email'],
             'temporary_password' => $plainPassword,
             'phone' => $company->phone_no,
             'department' => 'Human Resources',
-            'position' => 'Company Administrator',
+            'position' => 'HR Manager',
             'hire_date' => now()->toDateString(),
             'work_schedule' => '08:00-17:00',
         ]);
     }
 
-    public function provisionItsmEmployee(Company $company, array $employee, string $plainPassword): void
+    public function attemptHrLogin(string $companyEmail, string $password): bool
     {
-        if (! Schema::hasTable('employees')) {
-            return;
+        if (
+            ! Schema::hasTable('employees') ||
+            ! Schema::hasColumn('employees', 'company_email') ||
+            ! Schema::hasColumn('employees', 'temporary_password')
+        ) {
+            return false;
         }
 
-        $login = $employee['username'] ?: $employee['email'];
+        $employee = DB::table('employees')
+            ->where('company_email', $companyEmail)
+            ->where('temporary_password', $password)
+            ->first();
 
-        if (! $login) {
-            return;
+        if (! $employee) {
+            return false;
         }
 
-        $this->upsertEmployee([
-            'employee_id' => $employee['employee_code'] ?? null,
-            'name' => $employee['name'],
-            'email' => $employee['email'] ?: $login,
-            'company_email' => $login,
-            'temporary_password' => $plainPassword,
-            'phone' => $company->phone_no,
-            'department' => $employee['department'] ?: 'General',
-            'position' => $employee['department'] ?: 'Employee',
-            'hire_date' => now()->toDateString(),
-            'work_schedule' => '08:00-17:00',
-        ]);
+        $this->putEmployeeSession($employee);
+
+        return true;
     }
 
-    private function upsertEmployee(array $attributes): void
+    private function upsertEmployee(array $attributes): int
     {
-        $name = $this->splitName($attributes['name']);
         $companyEmail = $attributes['company_email'];
         $email = $attributes['email'];
 
         $values = $this->onlyExistingEmployeeColumns([
             'employee_id' => $attributes['employee_id'],
-            'first_name' => $name['first_name'],
-            'last_name' => $name['last_name'],
+            'first_name' => $attributes['first_name'],
+            'last_name' => $attributes['last_name'],
             'email' => $email,
             'company_email' => $companyEmail,
             'temporary_password' => $attributes['temporary_password'],
@@ -88,10 +86,10 @@ class HrEmployeeProfileProvisioner
         if ($existing) {
             DB::table('employees')->where('id', $existing->id)->update($values);
 
-            return;
+            return (int) $existing->id;
         }
 
-        DB::table('employees')->insert($values + ['created_at' => now()]);
+        return (int) DB::table('employees')->insertGetId($values + ['created_at' => now()]);
     }
 
     public function putHrSessionFor(User $admin): void
@@ -106,14 +104,7 @@ class HrEmployeeProfileProvisioner
             return;
         }
 
-        session([
-            'employee_logged_in' => true,
-            'employee_role' => 'employee',
-            'employee_id' => $employee->id,
-            'employee_name' => $employee->first_name ?? $admin->name,
-            'employee_email' => $employee->company_email ?? $admin->username,
-            'employee_department' => $employee->department ?? 'Human Resources',
-        ]);
+        $this->putEmployeeSession($employee);
     }
 
     private function onlyExistingEmployeeColumns(array $values): array
@@ -123,13 +114,15 @@ class HrEmployeeProfileProvisioner
             ->all();
     }
 
-    private function splitName(string $name): array
+    private function putEmployeeSession(object $employee): void
     {
-        $parts = preg_split('/\s+/', trim($name), 2) ?: [];
-
-        return [
-            'first_name' => $parts[0] ?? 'Company',
-            'last_name' => $parts[1] ?? 'Administrator',
-        ];
+        session([
+            'employee_logged_in' => true,
+            'employee_role' => 'employee',
+            'employee_id' => $employee->id,
+            'employee_name' => $employee->first_name ?? 'HR Manager',
+            'employee_email' => $employee->company_email,
+            'employee_department' => $employee->department ?? 'Human Resources',
+        ]);
     }
 }

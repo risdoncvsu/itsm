@@ -42,8 +42,13 @@
                 <aside class="rounded-[1.875rem] bg-white p-8 text-slate-950">
                     <nav class="space-y-6 text-xl">
                         <a href="#" class="block font-extrabold">All {{ ucfirst($entityLabelPlural) }}</a>
-                        <a href="#" class="block font-medium hover:text-[#346DCB]">Create New {{ ucfirst($entityLabel) }}</a>
-                        <a href="#" class="block font-medium hover:text-[#346DCB]">Pending Approvals</a>
+                        @if ($portal === 'admin')
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">Create New {{ ucfirst($entityLabel) }}</a>
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">Pending Approvals</a>
+                        @else
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">HR Sync Queue</a>
+                            <a href="#" class="block font-medium hover:text-[#346DCB]">Pending Approvals</a>
+                        @endif
                         <a href="#" class="block font-medium hover:text-[#346DCB]">Roles & Permissions</a>
                         <a href="#" class="block font-medium hover:text-[#346DCB]">Teams & Groups</a>
                     </nav>
@@ -59,9 +64,11 @@
                                 <input type="text" id="tableSearch" class="w-48 border-0 bg-transparent text-xl text-slate-900 outline-none">
                             </label>
 
-                            <button type="button" id="addEntityButton" class="rounded-full bg-[#346DCB] px-6 py-3 text-xl font-semibold text-white transition hover:bg-[#2554a3]">
-                                Add {{ $entityLabel }}
-                            </button>
+                            @if ($portal === 'admin')
+                                <button type="button" id="addEntityButton" class="rounded-full bg-[#346DCB] px-6 py-3 text-xl font-semibold text-white transition hover:bg-[#2554a3]">
+                                    Add {{ $entityLabel }}
+                                </button>
+                            @endif
 
                             <button type="button" id="editSelectedButton" disabled class="rounded-full bg-slate-500 px-6 py-3 text-xl font-semibold text-white opacity-50 transition enabled:bg-[#0B1E3D] enabled:opacity-100 enabled:hover:bg-[#132B52]">
                                 Edit selected
@@ -87,14 +94,6 @@
                                 <p class="font-bold">Company admin credentials</p>
                                 <p class="mt-2">Username: <span class="font-mono">{{ session('generated_credentials.username') }}</span></p>
                                 <p>Password: <span class="font-mono">{{ session('generated_credentials.password') }}</span></p>
-                            </div>
-                        @endif
-
-                        @if (session('generated_employee_credentials'))
-                            <div class="mb-6 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
-                                <p class="font-bold">HR profile credentials</p>
-                                <p class="mt-2">Company email: <span class="font-mono">{{ session('generated_employee_credentials.username') }}</span></p>
-                                <p>Password: <span class="font-mono">{{ session('generated_employee_credentials.password') }}</span></p>
                             </div>
                         @endif
 
@@ -232,55 +231,6 @@
             </div>
         </div>
 
-        @if ($portal === 'client')
-            <div id="addModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-6">
-                <div class="w-full max-w-2xl rounded-2xl bg-white p-8 text-slate-950 shadow-2xl">
-                    <div class="mb-6 flex items-center justify-between">
-                        <h2 class="text-2xl font-bold">Add Employee</h2>
-                        <button type="button" id="closeAddModal" class="text-2xl font-bold text-slate-500 hover:text-slate-950">&times;</button>
-                    </div>
-
-                    <form method="POST" action="{{ route('client.itsm.employees.store') }}" class="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        @csrf
-
-                        <label class="block">
-                            <span class="mb-2 block text-sm font-semibold">Username</span>
-                            <input type="text" name="username" value="{{ old('username') }}" class="h-11 w-full rounded border border-slate-300 px-3">
-                        </label>
-
-                        <label class="block">
-                            <span class="mb-2 block text-sm font-semibold">Full Name</span>
-                            <input type="text" name="name" value="{{ old('name') }}" required class="h-11 w-full rounded border border-slate-300 px-3">
-                        </label>
-
-                        <label class="block">
-                            <span class="mb-2 block text-sm font-semibold">Email</span>
-                            <input type="email" name="email" value="{{ old('email') }}" class="h-11 w-full rounded border border-slate-300 px-3">
-                        </label>
-
-                        <label class="block">
-                            <span class="mb-2 block text-sm font-semibold">Department</span>
-                            <input type="text" name="department" value="{{ old('department') }}" class="h-11 w-full rounded border border-slate-300 px-3">
-                        </label>
-
-                        <label class="block">
-                            <span class="mb-2 block text-sm font-semibold">Status</span>
-                            <select name="status" class="h-11 w-full rounded border border-slate-300 px-3">
-                                <option value="Active" @selected(old('status') === 'Active')>Active</option>
-                                <option value="Inactive" @selected(old('status') === 'Inactive')>Inactive</option>
-                                <option value="Pending" @selected(old('status') === 'Pending')>Pending</option>
-                                <option value="Suspended" @selected(old('status') === 'Suspended')>Suspended</option>
-                            </select>
-                        </label>
-
-                        <div class="flex justify-end gap-3 pt-5 md:col-span-2">
-                            <button type="button" id="cancelAddModal" class="rounded-md border border-slate-300 px-5 py-2 font-semibold text-slate-700 hover:bg-slate-100">Cancel</button>
-                            <button type="submit" class="rounded-md bg-[#346DCB] px-5 py-2 font-semibold text-white hover:bg-[#2554a3]">Create employee</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        @endif
     </div>
 
     <script>
@@ -294,7 +244,6 @@
         const editSelectedButton = document.getElementById('editSelectedButton');
         const editModal = document.getElementById('editModal');
         const editForm = document.getElementById('editForm');
-        const addModal = document.getElementById('addModal');
         const getRowCheckboxes = () => document.querySelectorAll('.row-checkbox');
         const checkedRows = () => Array.from(getRowCheckboxes())
             .filter((checkbox) => checkbox.checked)
@@ -368,28 +317,11 @@
             if (event.target === editModal) closeEditModal();
         });
 
-        function openAddModal() {
-            addModal?.classList.remove('hidden');
-            addModal?.classList.add('flex');
-        }
-
-        function closeAddModal() {
-            addModal?.classList.add('hidden');
-            addModal?.classList.remove('flex');
-        }
-
         document.getElementById('addEntityButton')?.addEventListener('click', () => {
             if (portal === 'admin') {
                 window.location.href = @json(route('admin.itsm.registration'));
                 return;
             }
-
-            openAddModal();
-        });
-        document.getElementById('closeAddModal')?.addEventListener('click', closeAddModal);
-        document.getElementById('cancelAddModal')?.addEventListener('click', closeAddModal);
-        addModal?.addEventListener('click', (event) => {
-            if (event.target === addModal) closeAddModal();
         });
 
         if (searchInput && tableBody) {

@@ -37,14 +37,24 @@ class AuthController extends Controller
             return redirect()->intended($destination);
         }
 
+        if ($this->hrEmployeeProfileProvisioner->attemptHrLogin($credentials['username'], $credentials['password'])) {
+            $request->session()->regenerate();
+
+            return redirect(config('services.hr.dashboard_url') ?: route('login'));
+        }
+
         // 3. If it fails, send them back
         return back()->withErrors(['username' => 'Invalid credentials.']);
     }
 
     private function companyAdminDestination($user): string
     {
-        $this->hrEmployeeProfileProvisioner->putHrSessionFor($user);
+        $company = $user->company_id ? \App\Models\Company::find($user->company_id) : null;
 
-        return config('services.hr.dashboard_url') ?: route('client.itsm.employees');
+        if ($company && ! $company->setup_completed_at) {
+            return route('newuser.show');
+        }
+
+        return route('client.itsm.employees');
     }
 }

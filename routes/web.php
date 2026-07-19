@@ -13,6 +13,7 @@ use App\Http\Controllers\AuditController;
 use App\Http\Controllers\PermitController;
 use App\Http\Controllers\RiskAssController;
 use App\Http\Controllers\DocumentController; // Imported DocumentController
+use App\Http\Controllers\NewUserSetupController;
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -21,6 +22,11 @@ Route::get('/login', function () {
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth')->group(function () {
+
+    Route::get('/newuser', [NewUserSetupController::class, 'show'])->name('newuser.show');
+    Route::post('/newuser/password', [NewUserSetupController::class, 'storePassword'])->name('newuser.password');
+    Route::post('/newuser/logo', [NewUserSetupController::class, 'storeLogo'])->name('newuser.logo');
+    Route::post('/newuser/hr-manager', [NewUserSetupController::class, 'storeHrManager'])->name('newuser.hr-manager');
 
     Route::get('/dashboard', function () {
         return redirect()->route('admin.itsm.registration');
@@ -57,7 +63,6 @@ Route::middleware('auth')->group(function () {
         })->name('dashboard');
 
         Route::get('/employees', [UserController::class, 'employees'])->name('employees');
-        Route::post('/employees', [UserController::class, 'storeEmployee'])->name('employees.store');
         Route::patch('/employees/{employee}', [UserController::class, 'updateEmployee'])->name('employees.update');
 
         Route::get('/service-desk', function () {
@@ -113,8 +118,4 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/', function () {
     return view('welcome');
-});
-
-Route::get('/newuser', function () {
-    return view('newuser');
 });

@@ -335,7 +335,7 @@
 </style>
 
 @php
-    $stage = request()->query('stage', '1');
+    $stage = $stage ?? request()->query('stage', '1');
     if (!in_array((string)$stage, ['1','2','3','4'], true)) {
         $stage = '1';
     }
@@ -351,8 +351,8 @@
     <div class="page">
         <div class="container">
             <div class="left-section">
-                <h1 class="welcome-text">Welcome, <User>!</h1>
-                <p class="date-text">Monday | July 07, 2026 | TechForge</p>
+                <h1 class="welcome-text">Welcome, {{ $admin->name ?? 'User' }}!</h1>
+                <p class="date-text">{{ now()->format('l | F d, Y') }} | {{ $company->company_name ?? 'Nexora Client' }}</p>
             </div>
 
             <div class="right-section">
@@ -408,8 +408,14 @@
                     <div class="form-container">
                         <h2 class="form-title">Set a new password</h2>
 
-                        <form action="/newuser" method="GET">
-                            <input type="hidden" name="stage" value="2">
+                        @if ($errors->any())
+                            <div style="margin-bottom: 16px; color: #B91C1C; font-weight: 700;">
+                                {{ $errors->first() }}
+                            </div>
+                        @endif
+
+                        <form action="{{ route('newuser.password') }}" method="POST">
+                            @csrf
 
                             <div class="input-group">
                                 <label for="new_password">New password</label>
@@ -418,7 +424,7 @@
 
                             <div class="input-group">
                                 <label for="confirm_password">Re-enter password</label>
-                                <input type="password" id="confirm_password" name="confirm_password" placeholder="Re-enter new password" required>
+                                <input type="password" id="confirm_password" name="new_password_confirmation" placeholder="Re-enter new password" required>
                             </div>
 
                             <div class="button-container">
@@ -443,8 +449,13 @@
                     <div class="form-container">
                         <h2 class="form-title">Upload your company logo</h2>
 
-                        <form action="/newuser" method="GET" id="uploadForm">
-                            <input type="hidden" name="stage" value="3">
+                        @if ($errors->any())
+                            <div style="margin-bottom: 16px; color: #B91C1C; font-weight: 700;">
+                                {{ $errors->first() }}
+                            </div>
+                        @endif
+
+                        <form action="{{ route('newuser.logo') }}" method="POST" id="uploadForm" enctype="multipart/form-data">
                             @csrf
                             <div class="upload-wrapper">
                                 <input type="file" id="logo_input" name="logo" style="display: none;" accept="image/png, image/jpeg, image/jpg">
@@ -513,27 +524,32 @@
                     <div class="form-container">
                         <h2 class="form-title">Add HR manager</h2>
 
-                        <form action="/newuser" method="GET">
-                            <input type="hidden" name="stage" value="4">
+                        @if ($errors->any())
+                            <div style="margin-bottom: 16px; color: #B91C1C; font-weight: 700;">
+                                {{ $errors->first() }}
+                            </div>
+                        @endif
+
+                        <form action="{{ route('newuser.hr-manager') }}" method="POST">
                             @csrf
                             <div class="input-group">
                                 <label for="first_name">First Name</label>
-                                <input type="text" id="first_name" name="first_name" placeholder="Type here..." required>
+                                <input type="text" id="first_name" name="first_name" value="{{ old('first_name') }}" placeholder="Type here..." required>
                             </div>
 
                             <div class="input-group">
                                 <label for="last_name">Last Name</label>
-                                <input type="text" id="last_name" name="last_name" placeholder="Type here..." required>
+                                <input type="text" id="last_name" name="last_name" value="{{ old('last_name') }}" placeholder="Type here..." required>
                             </div>
 
                             <div class="input-group">
                                 <label for="email">Email</label>
-                                <input type="email" id="email" name="email" placeholder="Type here..." required>
+                                <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="Type here..." required>
                             </div>
 
                             <div class="input-group">
                                 <label for="employee_id">Employee ID</label>
-                                <input type="text" id="employee_id" name="employee_id" placeholder="Type here..." required>
+                                <input type="text" id="employee_id" name="employee_id" value="{{ old('employee_id') }}" placeholder="Type here..." required>
                             </div>
 
                             <div class="button-container">
@@ -548,6 +564,13 @@
 
                         <p class="form-text">Your ERP workspace has been successfully configured.</p>
                         <p class="form-text">Your organization is now ready to start managing employees and business operations.</p>
+
+                        @if (session('hr_credentials'))
+                            <p class="form-text">
+                                HR login: <strong>{{ session('hr_credentials.company_email') }}</strong><br>
+                                Password: <strong>{{ session('hr_credentials.password') }}</strong>
+                            </p>
+                        @endif
 
                         <div class="button-container stage4">
                             <a href="{{ route('login') }}" class="submit-btn" role="button" aria-label="Done">Done</a>
