@@ -16,13 +16,18 @@ class AuthController extends Controller
     {
         // 1. Validate the inputs
         $credentials = $request->validate([
-            'username' => 'required',
+            'username' => 'required|string',
             'password' => 'required'
         ]);
 
         // 2. Use Auth::attempt() instead of manual plain-text comparison
         // This automatically hashes the input and checks it against the database
-        if (Auth::attempt($credentials)) {
+        $itsmCredentials = ['username' => $credentials['username'], 'password' => $credentials['password']];
+        if (str_contains($credentials['username'], '@')) {
+            $itsmCredentials = ['email' => $credentials['username'], 'password' => $credentials['password']];
+        }
+
+        if (Auth::attempt($itsmCredentials)) {
             
             // Regenerate session to prevent session fixation attacks (Best Practice)
             $request->session()->regenerate();
@@ -39,14 +44,41 @@ class AuthController extends Controller
             return redirect()->to($destination);
         }
 
-        if ($this->hrEmployeeProfileProvisioner->attemptHrLogin($credentials['username'], $credentials['password'])) {
+        $hrLogin = $this->hrEmployeeProfileProvisioner->authenticateHrAccount($credentials['username'], $credentials['password']);
+
+        if ($hrLogin['success']) {
             $request->session()->regenerate();
+
+            if ($hrLogin['requires_password_change']) {
+                return redirect()->route('hr.first-login.password');
+            }
 
             return redirect()->route('hr.dashboard');
         }
 
-        // 3. If it fails, send them back
-        return back()->withErrors(['username' => 'Invalid credentials.']);
+        return back()->withErrors(['username' => $hrLogin['message']]);
+    }
+
+    public function showHrFirstLoginPassword()
+    {
+        abort_unless(session('hr_password_change_employee_id'), 403);
+
+        return view('auth.first-login-password');
+    }
+
+    public function storeHrFirstLoginPassword(Request $request)
+    {
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])\S+$/'],
+        ], [
+            'password.regex' => 'Password must include uppercase, lowercase, number, special character, and no spaces.',
+        ]);
+
+        abort_unless($this->hrEmployeeProfileProvisioner->completeFirstHrLogin($validated['password']), 403);
+
+        $request->session()->regenerate();
+
+        return redirect()->route('hr.dashboard');
     }
 
     private function companyAdminDestination($user): string

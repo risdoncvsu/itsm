@@ -287,8 +287,8 @@
                         @csrf
 
                         <div class="input-group">
-                            <label for="username">Username</label>
-                            <input id="username" type="text" name="username" placeholder="Enter Username" required>
+                            <label for="username">Username/Email</label>
+                            <input id="username" type="text" name="username" value="{{ old('username') }}" placeholder="Enter Username or Email" required>
                             @error('username')
                                 <p style="color: #DC2626; font-size: 12px; margin-top: 4px; font-weight: 600;">{{ $message }}</p>
                             @enderror

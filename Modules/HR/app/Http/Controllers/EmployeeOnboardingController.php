@@ -197,6 +197,8 @@ class EmployeeOnboardingController extends Controller
         'medical_certificate' => $step3['medical_certificate'] ?? null,
         'company_email' => $companyEmail,
         'temporary_password' => $password,
+        'must_change_password' => true,
+        'approval_status' => 'Pending',
     ]);
 
     // Ngayon meron na tayong auto-increment id, gamitin natin siya

@@ -36,6 +36,7 @@ class HrEmployeeProfileProvisioner
             'email' => $manager['personal_email'],
             'company_email' => null,
             'temporary_password' => null,
+            'must_change_password' => false,
             'client_id' => $company->id,
             'approval_status' => 'Pending',
             'phone' => $company->phone_no,
@@ -63,6 +64,7 @@ class HrEmployeeProfileProvisioner
             'email' => $manager->email,
             'company_email' => $hrEmail,
             'temporary_password' => Hash::make($plainPassword),
+            'must_change_password' => true,
             'client_id' => $company->id,
             'approval_status' => 'Active',
             'phone' => $company->phone_no,
@@ -75,22 +77,25 @@ class HrEmployeeProfileProvisioner
         return ['employee_id' => $employeeId, 'email' => $hrEmail];
     }
 
-    public function attemptHrLogin(string $companyEmail, string $password): bool
+    public function authenticateHrAccount(string $usernameOrEmail, string $password): array
     {
         if (
             ! $this->hrSchema()->hasTable('employees') ||
             ! $this->hrSchema()->hasColumn('employees', 'company_email') ||
             ! $this->hrSchema()->hasColumn('employees', 'temporary_password')
         ) {
-            return false;
+            return ['success' => false, 'message' => 'HR sign-in is temporarily unavailable.'];
         }
 
         $employee = $this->hrDb()->table('employees')
-            ->where('company_email', $companyEmail)
+            ->where(function ($query) use ($usernameOrEmail): void {
+                $query->where('company_email', $usernameOrEmail)
+                    ->orWhere('email', $usernameOrEmail);
+            })
             ->first();
 
-        if (! $employee || ! $employee->temporary_password || ! $employee->client_id || ($employee->approval_status ?? 'Active') !== 'Active') {
-            return false;
+        if (! $employee || ! $employee->temporary_password || ! $employee->client_id) {
+            return ['success' => false, 'message' => 'Invalid username/email or password.'];
         }
 
         $storedPassword = (string) $employee->temporary_password;
@@ -99,7 +104,19 @@ class HrEmployeeProfileProvisioner
             : hash_equals($storedPassword, $password);
 
         if (! $passwordMatches) {
-            return false;
+            return ['success' => false, 'message' => 'Invalid username/email or password.'];
+        }
+
+        $status = strtolower((string) ($employee->approval_status ?? 'Active'));
+        $statusMessage = match ($status) {
+            'pending' => 'Your account is pending ITSM approval.',
+            'inactive' => 'Your account is inactive. Please contact your system administrator.',
+            'suspended' => 'Your account has been suspended. Please contact your system administrator.',
+            default => null,
+        };
+
+        if ($status !== 'active') {
+            return ['success' => false, 'message' => $statusMessage ?? 'Your account is not currently active.'];
         }
 
         // Existing HR records used plaintext temporary passwords. Upgrade a
@@ -111,6 +128,46 @@ class HrEmployeeProfileProvisioner
             ]);
         }
 
+        if (($employee->must_change_password ?? false)) {
+            session([
+                'hr_password_change_employee_id' => (int) $employee->id,
+                'hr_password_change_client_id' => (int) $employee->client_id,
+            ]);
+
+            return ['success' => true, 'requires_password_change' => true];
+        }
+
+        $this->putEmployeeSession($employee);
+
+        return ['success' => true, 'requires_password_change' => false];
+    }
+
+    public function completeFirstHrLogin(string $password): bool
+    {
+        $employeeId = session('hr_password_change_employee_id');
+        $clientId = session('hr_password_change_client_id');
+
+        if (! $employeeId || ! $clientId) {
+            return false;
+        }
+
+        $employee = $this->hrDb()->table('employees')
+            ->where('id', $employeeId)
+            ->where('client_id', $clientId)
+            ->where('approval_status', 'Active')
+            ->first();
+
+        if (! $employee) {
+            return false;
+        }
+
+        $this->hrDb()->table('employees')->where('id', $employee->id)->update([
+            'temporary_password' => Hash::make($password),
+            'must_change_password' => false,
+            'updated_at' => now(),
+        ]);
+
+        session()->forget(['hr_password_change_employee_id', 'hr_password_change_client_id']);
         $this->putEmployeeSession($employee);
 
         return true;
@@ -180,6 +237,17 @@ class HrEmployeeProfileProvisioner
         }
     }
 
+    public function approveEmployeeForCompany(Company $company, int $employeeId): void
+    {
+        $employee = $this->findEmployeeForCompany($company, $employeeId);
+        abort_unless($employee && $employee->status === 'Pending', 404);
+
+        $this->hrDb()->table('employees')->where('id', $employeeId)->update([
+            'approval_status' => 'Active',
+            'updated_at' => now(),
+        ]);
+    }
+
     private function upsertEmployee(array $attributes): int
     {
         $companyEmail = $attributes['company_email'];
@@ -192,6 +260,7 @@ class HrEmployeeProfileProvisioner
             'email' => $email,
             'company_email' => $companyEmail,
             'temporary_password' => $attributes['temporary_password'],
+            'must_change_password' => $attributes['must_change_password'] ?? false,
             'client_id' => $attributes['client_id'],
             'approval_status' => $attributes['approval_status'],
             'phone' => $attributes['phone'],

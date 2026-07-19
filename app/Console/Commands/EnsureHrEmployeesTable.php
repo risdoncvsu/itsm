@@ -38,6 +38,7 @@ class EnsureHrEmployeesTable extends Command
                 $table->string('email')->nullable()->unique();
                 $table->string('company_email')->nullable()->unique();
                 $table->string('temporary_password')->nullable();
+                $table->boolean('must_change_password')->default(false);
                 $table->string('birth_certificate')->nullable();
                 $table->string('curriculum_vitae')->nullable();
                 $table->string('valid_id')->nullable();
@@ -59,6 +60,9 @@ class EnsureHrEmployeesTable extends Command
             }
             if (! $schema->hasColumn('employees', 'temporary_password')) {
                 $table->string('temporary_password')->nullable();
+            }
+            if (! $schema->hasColumn('employees', 'must_change_password')) {
+                $table->boolean('must_change_password')->default(false);
             }
             if (! $hasEmployeeClientColumn) {
                 if ($hasLegacyEmployeeClientColumn) {

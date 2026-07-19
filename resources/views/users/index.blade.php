@@ -114,7 +114,7 @@
                         @endif
 
                         <div class="mb-6 flex items-center justify-between">
-                            <h2 class="text-xl font-semibold">{{ $active === 'pending-approvals' ? 'HR manager requests awaiting your approval' : 'All ' . $entityLabelPlural }}</h2>
+                            <h2 class="text-xl font-semibold">{{ $active === 'pending-approvals' ? 'Employee accounts awaiting your approval' : 'All ' . $entityLabelPlural }}</h2>
                             @if ($active !== 'pending-approvals')
                                 <label class="flex items-center gap-2 text-base">
                                     <input type="checkbox" id="selectAllCheckbox" class="h-5 w-5 accent-[#346DCB]">

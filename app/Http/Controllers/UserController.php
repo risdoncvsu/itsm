@@ -58,7 +58,7 @@ class UserController extends Controller
         $company = $this->clientCompany();
         $employees = $company
             ? $this->hrEmployeeProfileProvisioner->employeesForCompany($company)
-                ->filter(fn (object $employee): bool => $employee->status === 'Pending' && $employee->department === 'Human Resources')
+                ->filter(fn (object $employee): bool => $employee->status === 'Pending')
                 ->values()
             : collect();
 
@@ -88,11 +88,7 @@ class UserController extends Controller
         $currentEmployee = $this->hrEmployeeProfileProvisioner->findEmployeeForCompany($company, $employee);
         abort_unless($currentEmployee, 404);
 
-        if (
-            $currentEmployee->status === 'Pending'
-            && $validated['status'] === 'Active'
-            && $currentEmployee->department === 'Human Resources'
-        ) {
+        if ($currentEmployee->status === 'Pending' && $validated['status'] === 'Active') {
             return redirect()
                 ->route('client.itsm.pending-approvals')
                 ->withErrors(['status' => 'Approve the HR manager from Pending Approvals to create their login credentials.']);
@@ -112,9 +108,17 @@ class UserController extends Controller
 
         $manager = $this->hrEmployeeProfileProvisioner->findEmployeeForCompany($company, $employee);
         abort_unless(
-            $manager && $manager->status === 'Pending' && $manager->department === 'Human Resources',
+            $manager && $manager->status === 'Pending',
             404
         );
+
+        if ($manager->department !== 'Human Resources' || $manager->username) {
+            $this->hrEmployeeProfileProvisioner->approveEmployeeForCompany($company, $employee);
+
+            return redirect()
+                ->route('client.itsm.pending-approvals')
+                ->with('success', 'Employee approved. They will be required to change their password on first sign-in.');
+        }
 
         $password = Str::password(16, symbols: true);
         $provisioned = $this->hrEmployeeProfileProvisioner->provisionApprovedHrManager($company, $manager, $password);

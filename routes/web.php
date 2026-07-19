@@ -21,6 +21,8 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/first-login/password', [AuthController::class, 'showHrFirstLoginPassword'])->name('hr.first-login.password');
+Route::post('/first-login/password', [AuthController::class, 'storeHrFirstLoginPassword'])->name('hr.first-login.password.store');
 
 Route::middleware('auth')->group(function () {
 
