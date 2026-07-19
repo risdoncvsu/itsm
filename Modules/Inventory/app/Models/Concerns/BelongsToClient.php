@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait BelongsToClient
 {
-    protected $connection = 'inventory';
+    public function getConnectionName(): ?string
+    {
+        return 'inventory';
+    }
 
     protected static function bootBelongsToClient(): void
     {
