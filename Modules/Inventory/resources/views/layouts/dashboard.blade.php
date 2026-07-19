@@ -159,15 +159,15 @@
         @stack('styles')
     </head>
     <body>
-        @include('partials.header')
+        @include('inventory::partials.header')
         <div id="main">
             <div class="sidebar-overlay" onclick="closeSidebarMobile()"></div>
-            @include('partials.sidebar')
+            @include('inventory::partials.sidebar')
             <div id="page-content">
                 @yield('content')
             </div>
         </div>
-        @include('partials.sidebar-scripts')
+        @include('inventory::partials.sidebar-scripts')
         @stack('scripts')
         <script>
             // Auto-submit search/filter forms after the user stops typing
@@ -183,4 +183,3 @@
         </script>
     </body>
 </html>
-

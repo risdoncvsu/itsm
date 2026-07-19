@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends('inventory::layouts.dashboard')
 
 @section('title', 'Stock Movement')
 
@@ -147,5 +147,4 @@
         {{ $movements->links() }}
     </div>
 @endsection
-
 

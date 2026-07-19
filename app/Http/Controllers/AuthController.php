@@ -47,6 +47,10 @@ class AuthController extends Controller
         $hrLogin = $this->hrEmployeeProfileProvisioner->authenticateHrAccount($credentials['username'], $credentials['password']);
 
         if ($hrLogin['success']) {
+            // HR employees use their own session identity. A previously
+            // authenticated ITSM account in the same browser must never carry
+            // into a module session or remain usable through a direct URL.
+            Auth::logout();
             $request->session()->regenerate();
 
             if ($hrLogin['requires_password_change']) {

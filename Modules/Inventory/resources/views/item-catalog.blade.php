@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends('inventory::layouts.dashboard')
 
 @section('title', 'Item Catalog')
 
@@ -252,5 +252,4 @@
     }
 </script>
 @endpush
-
 
