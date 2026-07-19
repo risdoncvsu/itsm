@@ -258,7 +258,7 @@
     });
 
     document.getElementById('trendPeriod').addEventListener('change', function() {
-        fetch('{{ route("index.trend-data") }}?period=' + this.value)
+        fetch('{{ route("inventory.index.trend-data") }}?period=' + this.value)
             .then(r => r.json())
             .then(data => {
                 trendChart.data.labels = data.labels;
@@ -307,5 +307,4 @@
     });
 </script>
 @endpush
-
 

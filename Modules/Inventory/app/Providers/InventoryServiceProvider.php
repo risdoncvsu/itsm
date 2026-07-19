@@ -12,8 +12,6 @@ class InventoryServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'inventory');
         View::addLocation(__DIR__.'/../../resources/views');
-        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
-
         Route::middleware('web')
             ->prefix('inventory')
             ->group(__DIR__.'/../../routes/web.php');
