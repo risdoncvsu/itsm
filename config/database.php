@@ -99,6 +99,21 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
+        'hr' => [
+            'driver' => env('HR_DB_CONNECTION') ?: env('DB_CONNECTION', 'pgsql'),
+            'url' => env('HR_DB_URL') ?: null,
+            'host' => env('HR_DB_HOST') ?: env('DB_HOST', '127.0.0.1'),
+            'port' => env('HR_DB_PORT') ?: env('DB_PORT', '5432'),
+            'database' => env('HR_DB_DATABASE') ?: env('DB_DATABASE', 'laravel'),
+            'username' => env('HR_DB_USERNAME') ?: env('DB_USERNAME', 'root'),
+            'password' => env('HR_DB_PASSWORD') ?: env('DB_PASSWORD', ''),
+            'charset' => env('HR_DB_CHARSET') ?: env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => env('HR_DB_SEARCH_PATH') ?: 'public',
+            'sslmode' => env('HR_DB_SSLMODE') ?: env('DB_SSLMODE', 'prefer'),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

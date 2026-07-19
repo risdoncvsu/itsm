@@ -73,6 +73,12 @@
                             <button type="button" id="editSelectedButton" disabled class="rounded-full bg-slate-500 px-6 py-3 text-xl font-semibold text-white opacity-50 transition enabled:bg-[#0B1E3D] enabled:opacity-100 enabled:hover:bg-[#132B52]">
                                 Edit selected
                             </button>
+
+                            @if ($portal === 'admin')
+                                <button type="button" id="deleteSelectedButton" disabled class="rounded-full bg-red-500 px-6 py-3 text-xl font-semibold text-white opacity-50 transition enabled:opacity-100 enabled:hover:bg-red-600">
+                                    Delete selected
+                                </button>
+                            @endif
                         </div>
                     </div>
 
@@ -191,6 +197,16 @@
                             <span class="mb-2 block text-sm font-semibold">Industry</span>
                             <input type="text" name="industry" id="edit_industry" class="h-11 w-full rounded border border-slate-300 px-3">
                         </label>
+
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-semibold">New Password</span>
+                            <input type="password" name="admin_password" id="edit_admin_password" class="h-11 w-full rounded border border-slate-300 px-3" autocomplete="new-password">
+                        </label>
+
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-semibold">Confirm Password</span>
+                            <input type="password" name="admin_password_confirmation" id="edit_admin_password_confirmation" class="h-11 w-full rounded border border-slate-300 px-3" autocomplete="new-password">
+                        </label>
                     @else
                         <label class="block">
                             <span class="mb-2 block text-sm font-semibold">Username</span>
@@ -231,6 +247,40 @@
             </div>
         </div>
 
+        @if ($portal === 'admin')
+            <div id="deleteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-6">
+                <div class="w-full max-w-xl rounded-2xl bg-white p-8 text-slate-950 shadow-2xl">
+                    <div class="mb-6 flex items-center justify-between">
+                        <h2 class="text-2xl font-bold text-red-700">Delete client</h2>
+                        <button type="button" id="closeDeleteModal" class="text-2xl font-bold text-slate-500 hover:text-slate-950">&times;</button>
+                    </div>
+
+                    <p class="mb-4 text-base text-slate-700">
+                        This will delete <strong id="deleteCompanyName"></strong>, its generated system admin login, and its ITSM employee table.
+                    </p>
+                    <p class="mb-5 text-base text-slate-700">
+                        To confirm, type the system admin name:
+                        <strong id="deleteAdminName"></strong>
+                    </p>
+
+                    <form id="deleteForm" method="POST" action="#" class="space-y-5">
+                        @csrf
+                        @method('DELETE')
+
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-semibold">System admin name</span>
+                            <input type="text" name="admin_name_confirmation" id="delete_admin_name_confirmation" class="h-11 w-full rounded border border-slate-300 px-3" autocomplete="off">
+                        </label>
+
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button type="button" id="cancelDeleteModal" class="rounded-md border border-slate-300 px-5 py-2 font-semibold text-slate-700 hover:bg-slate-100">Cancel</button>
+                            <button type="submit" id="confirmDeleteButton" disabled class="rounded-md bg-red-600 px-5 py-2 font-semibold text-white opacity-50 transition enabled:opacity-100 enabled:hover:bg-red-700">Delete client</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endif
+
     </div>
 
     <script>
@@ -238,12 +288,21 @@
         const updateUrlTemplate = @json($portal === 'admin'
             ? route('admin.itsm.clients.update', ['company' => '__ID__'])
             : route('client.itsm.employees.update', ['employee' => '__ID__']));
+        const deleteUrlTemplate = @json($portal === 'admin'
+            ? route('admin.itsm.clients.destroy', ['company' => '__ID__'])
+            : null);
         const selectAllCheckbox = document.getElementById('selectAllCheckbox');
         const searchInput = document.getElementById('tableSearch');
         const tableBody = document.querySelector('#usersTable tbody');
         const editSelectedButton = document.getElementById('editSelectedButton');
+        const deleteSelectedButton = document.getElementById('deleteSelectedButton');
         const editModal = document.getElementById('editModal');
         const editForm = document.getElementById('editForm');
+        const deleteModal = document.getElementById('deleteModal');
+        const deleteForm = document.getElementById('deleteForm');
+        const deleteAdminInput = document.getElementById('delete_admin_name_confirmation');
+        const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+        let expectedDeleteAdminName = '';
         const getRowCheckboxes = () => document.querySelectorAll('.row-checkbox');
         const checkedRows = () => Array.from(getRowCheckboxes())
             .filter((checkbox) => checkbox.checked)
@@ -251,7 +310,9 @@
 
         function updateEditButtonState() {
             if (!editSelectedButton) return;
-            editSelectedButton.disabled = checkedRows().length !== 1;
+            const hasOneSelected = checkedRows().length === 1;
+            editSelectedButton.disabled = !hasOneSelected;
+            if (deleteSelectedButton) deleteSelectedButton.disabled = !hasOneSelected;
         }
 
         function setField(id, value) {
@@ -269,6 +330,8 @@
                 setField('edit_company_email', row.dataset.companyEmail);
                 setField('edit_phone_no', row.dataset.phoneNo);
                 setField('edit_industry', row.dataset.industry);
+                setField('edit_admin_password', '');
+                setField('edit_admin_password_confirmation', '');
             } else {
                 setField('edit_username', row.dataset.username);
                 setField('edit_name', row.dataset.name);
@@ -281,9 +344,31 @@
             editModal.classList.add('flex');
         }
 
+        function openDeleteModal(row) {
+            if (!deleteModal || !deleteForm) return;
+
+            const id = row.dataset.rowId;
+            expectedDeleteAdminName = row.dataset.adminName || '';
+
+            deleteForm.action = deleteUrlTemplate.replace('__ID__', id);
+            document.getElementById('deleteCompanyName').textContent = row.dataset.companyName || 'this client';
+            document.getElementById('deleteAdminName').textContent = expectedDeleteAdminName;
+            if (deleteAdminInput) deleteAdminInput.value = '';
+            if (confirmDeleteButton) confirmDeleteButton.disabled = true;
+
+            deleteModal.classList.remove('hidden');
+            deleteModal.classList.add('flex');
+            deleteAdminInput?.focus();
+        }
+
         function closeEditModal() {
             editModal.classList.add('hidden');
             editModal.classList.remove('flex');
+        }
+
+        function closeDeleteModal() {
+            deleteModal?.classList.add('hidden');
+            deleteModal?.classList.remove('flex');
         }
 
         if (selectAllCheckbox) {
@@ -311,10 +396,26 @@
             if (row) openEditModal(row);
         });
 
+        deleteSelectedButton?.addEventListener('click', () => {
+            const row = checkedRows()[0];
+            if (row) openDeleteModal(row);
+        });
+
         document.getElementById('closeEditModal')?.addEventListener('click', closeEditModal);
         document.getElementById('cancelEditModal')?.addEventListener('click', closeEditModal);
         editModal?.addEventListener('click', (event) => {
             if (event.target === editModal) closeEditModal();
+        });
+
+        document.getElementById('closeDeleteModal')?.addEventListener('click', closeDeleteModal);
+        document.getElementById('cancelDeleteModal')?.addEventListener('click', closeDeleteModal);
+        deleteModal?.addEventListener('click', (event) => {
+            if (event.target === deleteModal) closeDeleteModal();
+        });
+        deleteAdminInput?.addEventListener('input', () => {
+            if (confirmDeleteButton) {
+                confirmDeleteButton.disabled = deleteAdminInput.value !== expectedDeleteAdminName;
+            }
         });
 
         document.getElementById('addEntityButton')?.addEventListener('click', () => {

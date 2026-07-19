@@ -14,6 +14,7 @@ use App\Http\Controllers\PermitController;
 use App\Http\Controllers\RiskAssController;
 use App\Http\Controllers\DocumentController; // Imported DocumentController
 use App\Http\Controllers\NewUserSetupController;
+use App\Http\Controllers\TicketController;
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -43,15 +44,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/registration', [CompanyController::class, 'store'])->name('registration.store');
         Route::get('/clients', [UserController::class, 'clients'])->name('clients');
         Route::patch('/clients/{company}', [CompanyController::class, 'update'])->name('clients.update');
+        Route::delete('/clients/{company}', [CompanyController::class, 'destroy'])->name('clients.destroy');
 
-        Route::get('/service-desk', function () {
-            return view('service.service', [
-                'portal' => 'admin',
-                'active' => 'service-desk',
-                'title' => 'Client Service Desk',
-                'subtitle' => 'Requests from client companies using Nexora ERP',
-            ]);
-        })->name('service-desk');
+        Route::get('/service-desk', [TicketController::class, 'index'])->defaults('portal', 'admin')->name('service-desk');
+        Route::patch('/service-desk/{ticket}', [TicketController::class, 'update'])->name('service-desk.update');
     });
 
     // ==========================================
@@ -65,14 +61,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/employees', [UserController::class, 'employees'])->name('employees');
         Route::patch('/employees/{employee}', [UserController::class, 'updateEmployee'])->name('employees.update');
 
-        Route::get('/service-desk', function () {
-            return view('service.service', [
-                'portal' => 'client',
-                'active' => 'service-desk',
-                'title' => 'Company Service Desk',
-                'subtitle' => 'Internal ITSM requests for your company users',
-            ]);
-        })->name('service-desk');
+        Route::get('/service-desk', [TicketController::class, 'index'])->name('service-desk');
+        Route::post('/service-desk', [TicketController::class, 'store'])->name('service-desk.store');
+        Route::patch('/service-desk/{ticket}', [TicketController::class, 'update'])->name('service-desk.update');
+        Route::get('/service-desk/support', [TicketController::class, 'supportIndex'])->name('service-desk.support');
+        Route::post('/service-desk/support', [TicketController::class, 'store'])->name('service-desk.support.store');
         
         // ==========================================
         // COMPLIANCE MODULE ROUTES

@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Services\HrEmployeeProfileProvisioner;
+use App\Services\TenantEmployeeTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class NewUserSetupController extends Controller
 {
-    public function __construct(private readonly HrEmployeeProfileProvisioner $hrEmployeeProfileProvisioner)
+    public function __construct(
+        private readonly HrEmployeeProfileProvisioner $hrEmployeeProfileProvisioner,
+        private readonly TenantEmployeeTable $tenantEmployeeTable,
+    )
     {
     }
 
@@ -52,8 +57,6 @@ class NewUserSetupController extends Controller
             'password' => Hash::make($validated['new_password']),
         ])->save();
 
-        $request->session()->put('newuser.hr_password', $validated['new_password']);
-
         return redirect()->route('newuser.show', ['stage' => 2]);
     }
 
@@ -86,26 +89,29 @@ class NewUserSetupController extends Controller
             'employee_id' => ['required', 'string', 'max:255'],
         ]);
 
-        $password = $request->session()->get('newuser.hr_password');
-        if (! $password) {
-            return redirect()
-                ->route('newuser.show', ['stage' => 1])
-                ->withErrors(['new_password' => 'Set a password before creating the HR manager account.']);
-        }
+        $hrEmail = $this->hrEmployeeProfileProvisioner->generateHrEmail($company, $validated);
+        $password = Str::random(14);
 
-        $employeeId = $this->hrEmployeeProfileProvisioner->provisionHrManager($company, $validated, $password);
+        $employeeId = $this->hrEmployeeProfileProvisioner->provisionHrManager(
+            $company,
+            $validated + [
+                'personal_email' => $validated['email'],
+                'email' => $hrEmail,
+            ],
+            $password
+        );
+        $this->tenantEmployeeTable->queueHrManagerApproval($company, $validated, $hrEmail);
 
         $company->update([
             'hr_employee_id' => $employeeId,
             'setup_completed_at' => now(),
         ]);
 
-        $request->session()->forget('newuser.hr_password');
-
         return redirect()
             ->route('newuser.show', ['stage' => 4, 'review' => 1])
             ->with('hr_credentials', [
-                'company_email' => $validated['email'],
+                'company_email' => $hrEmail,
+                'personal_email' => $validated['email'],
                 'password' => $password,
             ]);
     }

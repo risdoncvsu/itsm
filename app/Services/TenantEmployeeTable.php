@@ -86,4 +86,21 @@ class TenantEmployeeTable
             'updated_at' => now(),
         ]);
     }
+
+    public function queueHrManagerApproval(Company $company, array $manager, string $hrEmail): void
+    {
+        $tableName = $this->ensure($company);
+
+        DB::table($tableName)->updateOrInsert([
+            'username' => $hrEmail,
+        ], [
+            'employee_code' => $manager['employee_id'],
+            'name' => trim($manager['first_name'] . ' ' . $manager['last_name']),
+            'email' => $manager['email'],
+            'department' => 'Human Resources',
+            'status' => 'Pending',
+            'updated_at' => now(),
+            'created_at' => now(),
+        ]);
+    }
 }

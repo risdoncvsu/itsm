@@ -351,7 +351,7 @@
     <div class="page">
         <div class="container">
             <div class="left-section">
-                <h1 class="welcome-text">Welcome, {{ $admin->name ?? 'User' }}!</h1>
+                <h1 class="welcome-text">Welcome, {{ $company->company_name ?? 'Nexora Client' }}!</h1>
                 <p class="date-text">{{ now()->format('l | F d, Y') }} | {{ $company->company_name ?? 'Nexora Client' }}</p>
             </div>
 
@@ -406,7 +406,7 @@
                 @if ($stage === '1')
                     {{-- Stage 1: Set New Password --}}
                     <div class="form-container">
-                        <h2 class="form-title">Set a new password</h2>
+                        <h2 class="form-title">Set system admin password</h2>
 
                         @if ($errors->any())
                             <div style="margin-bottom: 16px; color: #B91C1C; font-weight: 700;">
@@ -543,7 +543,7 @@
                             </div>
 
                             <div class="input-group">
-                                <label for="email">Email</label>
+                                <label for="email">Personal Email</label>
                                 <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="Type here..." required>
                             </div>
 
@@ -567,6 +567,7 @@
 
                         @if (session('hr_credentials'))
                             <p class="form-text">
+                                Personal email: <strong>{{ session('hr_credentials.personal_email') }}</strong><br>
                                 HR login: <strong>{{ session('hr_credentials.company_email') }}</strong><br>
                                 Password: <strong>{{ session('hr_credentials.password') }}</strong>
                             </p>

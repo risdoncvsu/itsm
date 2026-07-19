@@ -4,14 +4,25 @@ namespace App\Services;
 
 use App\Models\Company;
 use App\Models\User;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class HrEmployeeProfileProvisioner
 {
+    public function generateHrEmail(Company $company, array $manager): string
+    {
+        $companySegment = $this->credentialSegment($company->company_name, 'company');
+        $nameSegment = $this->credentialSegment($manager['first_name'] . ' ' . $manager['last_name'], 'hrmanager');
+        $baseEmail = "{$companySegment}.{$nameSegment}@nexora.hr";
+
+        return $this->uniqueHrEmail($baseEmail);
+    }
+
     public function provisionHrManager(Company $company, array $manager, string $plainPassword): int
     {
-        if (! Schema::hasTable('employees')) {
+        if (! $this->hrSchema()->hasTable('employees')) {
             return 0;
         }
 
@@ -19,7 +30,7 @@ class HrEmployeeProfileProvisioner
             'employee_id' => $manager['employee_id'],
             'first_name' => $manager['first_name'],
             'last_name' => $manager['last_name'],
-            'email' => $manager['email'],
+            'email' => $manager['personal_email'],
             'company_email' => $manager['email'],
             'temporary_password' => $plainPassword,
             'phone' => $company->phone_no,
@@ -33,14 +44,14 @@ class HrEmployeeProfileProvisioner
     public function attemptHrLogin(string $companyEmail, string $password): bool
     {
         if (
-            ! Schema::hasTable('employees') ||
-            ! Schema::hasColumn('employees', 'company_email') ||
-            ! Schema::hasColumn('employees', 'temporary_password')
+            ! $this->hrSchema()->hasTable('employees') ||
+            ! $this->hrSchema()->hasColumn('employees', 'company_email') ||
+            ! $this->hrSchema()->hasColumn('employees', 'temporary_password')
         ) {
             return false;
         }
 
-        $employee = DB::table('employees')
+        $employee = $this->hrDb()->table('employees')
             ->where('company_email', $companyEmail)
             ->where('temporary_password', $password)
             ->first();
@@ -52,6 +63,15 @@ class HrEmployeeProfileProvisioner
         $this->putEmployeeSession($employee);
 
         return true;
+    }
+
+    public function deleteHrEmployee(int $employeeId): void
+    {
+        if (! $this->hrSchema()->hasTable('employees')) {
+            return;
+        }
+
+        $this->hrDb()->table('employees')->where('id', $employeeId)->delete();
     }
 
     private function upsertEmployee(array $attributes): int
@@ -74,31 +94,31 @@ class HrEmployeeProfileProvisioner
             'updated_at' => now(),
         ]);
 
-        $existing = DB::table('employees')
-            ->when(Schema::hasColumn('employees', 'company_email'), function ($query) use ($companyEmail) {
+        $existing = $this->hrDb()->table('employees')
+            ->when($this->hrSchema()->hasColumn('employees', 'company_email'), function ($query) use ($companyEmail) {
                 $query->where('company_email', $companyEmail);
             })
-            ->when(Schema::hasColumn('employees', 'email'), function ($query) use ($email) {
+            ->when($this->hrSchema()->hasColumn('employees', 'email'), function ($query) use ($email) {
                 $query->orWhere('email', $email);
             })
             ->first();
 
         if ($existing) {
-            DB::table('employees')->where('id', $existing->id)->update($values);
+            $this->hrDb()->table('employees')->where('id', $existing->id)->update($values);
 
             return (int) $existing->id;
         }
 
-        return (int) DB::table('employees')->insertGetId($values + ['created_at' => now()]);
+        return (int) $this->hrDb()->table('employees')->insertGetId($values + ['created_at' => now()]);
     }
 
     public function putHrSessionFor(User $admin): void
     {
-        if (! Schema::hasTable('employees') || ! Schema::hasColumn('employees', 'company_email')) {
+        if (! $this->hrSchema()->hasTable('employees') || ! $this->hrSchema()->hasColumn('employees', 'company_email')) {
             return;
         }
 
-        $employee = DB::table('employees')->where('company_email', $admin->username)->first();
+        $employee = $this->hrDb()->table('employees')->where('company_email', $admin->username)->first();
 
         if (! $employee) {
             return;
@@ -110,7 +130,7 @@ class HrEmployeeProfileProvisioner
     private function onlyExistingEmployeeColumns(array $values): array
     {
         return collect($values)
-            ->filter(fn ($value, string $column): bool => Schema::hasColumn('employees', $column))
+            ->filter(fn ($value, string $column): bool => $this->hrSchema()->hasColumn('employees', $column))
             ->all();
     }
 
@@ -124,5 +144,49 @@ class HrEmployeeProfileProvisioner
             'employee_email' => $employee->company_email,
             'employee_department' => $employee->department ?? 'Human Resources',
         ]);
+    }
+
+    private function uniqueHrEmail(string $email): string
+    {
+        if (
+            ! $this->hrSchema()->hasTable('employees') ||
+            ! $this->hrSchema()->hasColumn('employees', 'company_email')
+        ) {
+            return $email;
+        }
+
+        if (! $this->hrDb()->table('employees')->where('company_email', $email)->exists()) {
+            return $email;
+        }
+
+        [$local, $domain] = explode('@', $email, 2);
+        $counter = 2;
+
+        do {
+            $candidate = "{$local}{$counter}@{$domain}";
+            $counter++;
+        } while ($this->hrDb()->table('employees')->where('company_email', $candidate)->exists());
+
+        return $candidate;
+    }
+
+    private function credentialSegment(string $value, string $fallback): string
+    {
+        $segment = Str::of($value)
+            ->lower()
+            ->replaceMatches('/[^a-z0-9]+/', '')
+            ->toString();
+
+        return $segment !== '' ? $segment : $fallback;
+    }
+
+    private function hrDb(): ConnectionInterface
+    {
+        return DB::connection('hr');
+    }
+
+    private function hrSchema()
+    {
+        return Schema::connection('hr');
     }
 }
