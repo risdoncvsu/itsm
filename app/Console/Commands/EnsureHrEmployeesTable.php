@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class EnsureHrEmployeesTable extends Command
+{
+    protected $signature = 'hr:ensure-employees-table';
+
+    protected $description = 'Create or repair the HR employees table on the dedicated HR database connection';
+
+    public function handle(): int
+    {
+        $schema = Schema::connection('hr');
+
+        if (! $schema->hasTable('employees')) {
+            $schema->create('employees', function (Blueprint $table): void {
+                $table->id();
+                $table->string('employee_id')->nullable();
+                $table->string('first_name');
+                $table->string('middle_name')->nullable();
+                $table->string('last_name')->nullable();
+                $table->string('suffix')->nullable();
+                $table->string('gender')->nullable();
+                $table->string('marital_status')->nullable();
+                $table->string('nationality')->nullable();
+                $table->string('profile_picture')->nullable();
+                $table->text('address')->nullable();
+                $table->string('phone')->nullable();
+                $table->string('department')->nullable();
+                $table->string('position')->nullable();
+                $table->date('hire_date')->nullable();
+                $table->string('work_schedule')->nullable();
+                $table->string('email')->nullable()->unique();
+                $table->string('company_email')->nullable()->unique();
+                $table->string('temporary_password')->nullable();
+                $table->string('birth_certificate')->nullable();
+                $table->string('curriculum_vitae')->nullable();
+                $table->string('valid_id')->nullable();
+                $table->string('medical_certificate')->nullable();
+                $table->string('signature')->nullable();
+                $table->unsignedBigInteger('itsm_company_id')->nullable()->index();
+                $table->string('approval_status')->default('Active');
+                $table->timestamps();
+            });
+
+            $this->info('Created the HR employees table.');
+
+            return self::SUCCESS;
+        }
+
+        $schema->table('employees', function (Blueprint $table) use ($schema): void {
+            if (! $schema->hasColumn('employees', 'company_email')) {
+                $table->string('company_email')->nullable()->unique();
+            }
+            if (! $schema->hasColumn('employees', 'temporary_password')) {
+                $table->string('temporary_password')->nullable();
+            }
+            if (! $schema->hasColumn('employees', 'itsm_company_id')) {
+                $table->unsignedBigInteger('itsm_company_id')->nullable()->index();
+            }
+            if (! $schema->hasColumn('employees', 'approval_status')) {
+                $table->string('approval_status')->default('Active');
+            }
+        });
+
+        $this->info('Verified the HR employees table.');
+
+        return self::SUCCESS;
+    }
+}
