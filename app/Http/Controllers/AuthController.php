@@ -42,15 +42,7 @@ class AuthController extends Controller
         if ($this->hrEmployeeProfileProvisioner->attemptHrLogin($credentials['username'], $credentials['password'])) {
             $request->session()->regenerate();
 
-            $hrDashboardUrl = config('services.hr.dashboard_url');
-
-            if (! $hrDashboardUrl) {
-                return back()->withErrors([
-                    'username' => 'The HR module URL has not been configured.',
-                ]);
-            }
-
-            return redirect()->away($hrDashboardUrl);
+            return redirect()->route('hr.dashboard');
         }
 
         // 3. If it fails, send them back

@@ -3,6 +3,7 @@
 namespace Modules\HR\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Route;
 
 class HRServiceProvider extends ServiceProvider
 {
@@ -11,13 +12,14 @@ class HRServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Tell Laravel where to find the HR web routes
-        // __DIR__ is app/Providers, so ../../ steps out to the HR root
-        $this->loadRoutesFrom(__DIR__ . '/../../Routes/web.php');
-        
-        // Tell Laravel where to find the HR blade files
-        // The 'hr' alias means you can call views like: view('hr::dashboard')
-        $this->loadViewsFrom(__DIR__ . '/../../Resources/views', 'hr');
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'hr');
+
+        // Keep HR routes and names isolated from ITSM while making the module
+        // available from the same application at /hr.
+        Route::middleware('web')
+            ->prefix('hr')
+            ->as('hr.')
+            ->group(__DIR__ . '/../../routes/web.php');
     }
 
     /**

@@ -77,7 +77,7 @@
 </head>
 <body class="w-full min-h-screen bg-navy-bg text-white font-sans opacity-0 animate-pageFade">
 
-  @include('partials.navbar')
+  @include('hr::partials.navbar')
 
 
   <!-- =====================================================
