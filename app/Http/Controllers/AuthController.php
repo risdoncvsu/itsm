@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use App\Services\HrEmployeeProfileProvisioner;
 
 class AuthController extends Controller
 {
+    public function __construct(private readonly HrEmployeeProfileProvisioner $hrEmployeeProfileProvisioner)
+    {
+    }
+
     public function login(Request $request)
     {
         // 1. Validate the inputs
@@ -24,9 +28,10 @@ class AuthController extends Controller
             $request->session()->regenerate();
             
             // TODO: Fire a 'UserLoggedIn' event for the ITSM audit trail
-            
-            $destination = Auth::user()->role === 'company_admin'
-                ? route('client.itsm.employees')
+
+            $user = Auth::user();
+            $destination = $user->role === 'company_admin'
+                ? $this->companyAdminDestination($user)
                 : route('admin.itsm.registration');
 
             return redirect()->intended($destination);
@@ -34,5 +39,12 @@ class AuthController extends Controller
 
         // 3. If it fails, send them back
         return back()->withErrors(['username' => 'Invalid credentials.']);
+    }
+
+    private function companyAdminDestination($user): string
+    {
+        $this->hrEmployeeProfileProvisioner->putHrSessionFor($user);
+
+        return config('services.hr.dashboard_url') ?: route('client.itsm.employees');
     }
 }

@@ -3,15 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\ComplianceItemController;
-use App\Http\Controllers\RiskAssessmentController;
-use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
-
-// Public Routes
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+use App\Http\Controllers\RiskController;
+use App\Http\Controllers\RiskMitigationController;
+use App\Http\Controllers\IncidentController; 
+use App\Http\Controllers\RiskAnalyticsController;
+use App\Http\Controllers\ComplianceController;
+use App\Http\Controllers\AuditController; 
+use App\Http\Controllers\PermitController;
+use App\Http\Controllers\RiskAssController;
+use App\Http\Controllers\DocumentController; // Imported DocumentController
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -19,17 +20,16 @@ Route::get('/login', function () {
 
 Route::post('/login', [AuthController::class, 'login']);
 
-// Protected Routes (Require Authentication)
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
 
-    // Global Dashboard Redirect
     Route::get('/dashboard', function () {
         return redirect()->route('admin.itsm.registration');
     })->name('dashboard');
 
-    // Admin ITSM Portal
+    // ==========================================
+    // ADMIN ITSM ROUTES
+    // ==========================================
     Route::prefix('admin/itsm')->name('admin.itsm.')->group(function () {
-        
         Route::get('/registration', function () {
             return view('dashboard');
         })->name('registration');
@@ -38,14 +38,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/clients', [UserController::class, 'clients'])->name('clients');
         Route::patch('/clients/{company}', [CompanyController::class, 'update'])->name('clients.update');
 
-        Route::get('/service-desk', [TicketController::class, 'index'])->defaults('portal', 'admin')->name('service-desk');
-        Route::post('/service-desk', [TicketController::class, 'store'])->name('service-desk.store');
-        Route::patch('/service-desk/{ticket}', [TicketController::class, 'update'])->name('service-desk.update');
+        Route::get('/service-desk', function () {
+            return view('service.service', [
+                'portal' => 'admin',
+                'active' => 'service-desk',
+                'title' => 'Client Service Desk',
+                'subtitle' => 'Requests from client companies using Nexora ERP',
+            ]);
+        })->name('service-desk');
     });
 
-    // Client ITSM Portal
+    // ==========================================
+    // CLIENT ITSM ROUTES
+    // ==========================================
     Route::prefix('client/itsm')->name('client.itsm.')->group(function () {
-        
         Route::get('/', function () {
             return redirect()->route('client.itsm.employees');
         })->name('dashboard');
@@ -54,24 +60,61 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/employees', [UserController::class, 'storeEmployee'])->name('employees.store');
         Route::patch('/employees/{employee}', [UserController::class, 'updateEmployee'])->name('employees.update');
 
-        Route::get('/service-desk', [TicketController::class, 'index'])->defaults('portal', 'client')->name('service-desk');
-        Route::post('/service-desk', [TicketController::class, 'store'])->name('service-desk.store');
-        Route::patch('/service-desk/{ticket}', [TicketController::class, 'update'])->name('service-desk.update');
-        Route::get('/service-desk/nexora-support', [TicketController::class, 'supportIndex'])->name('service-desk.support');
-        Route::post('/service-desk/nexora-support', [TicketController::class, 'store'])->name('service-desk.support.store');
+        Route::get('/service-desk', function () {
+            return view('service.service', [
+                'portal' => 'client',
+                'active' => 'service-desk',
+                'title' => 'Company Service Desk',
+                'subtitle' => 'Internal ITSM requests for your company users',
+            ]);
+        })->name('service-desk');
+        
+        // ==========================================
+        // COMPLIANCE MODULE ROUTES
+        // ==========================================
+        Route::get('/compliance', [ComplianceController::class, 'index'])->name('compliance');
+        Route::post('/compliance/store', [ComplianceController::class, 'store'])->name('compliance.store');
+        
+        Route::get('/audit', [AuditController::class, 'index'])->name('audit');
+        Route::post('/audit', [AuditController::class, 'index'])->name('audit.store');
+        
+        Route::get('/permit', [PermitController::class, 'index'])->name('permit');
+        Route::post('/permit', [PermitController::class, 'index'])->name('permit.store');
+        
+        Route::get('/risk-assessment', [RiskAssController::class, 'index'])->name('risk.assessment');
+        Route::post('/risk-assessment/store', [RiskAssController::class, 'store'])->name('risk.assessment.store');
+        
+        // BOUND TO CONTROLLER: Connected to DocumentController for functional filtering, search, and dynamic layout
+        Route::get('/documents', [DocumentController::class, 'index'])->name('document');
+        Route::post('/documents/store', [DocumentController::class, 'store'])->name('document.store');
 
-        Route::get('/compliance', [ComplianceItemController::class, 'index'])->name('compliance');
-        Route::post('/compliance', [ComplianceItemController::class, 'store'])->name('compliance.store');
-        Route::patch('/compliance/{compliance}', [ComplianceItemController::class, 'update'])->name('compliance.update');
-
-        Route::get('/risk', [RiskAssessmentController::class, 'index'])->name('risk');
-        Route::post('/risk', [RiskAssessmentController::class, 'store'])->name('risk.store');
-        Route::patch('/risk/{risk}', [RiskAssessmentController::class, 'update'])->name('risk.update');
+        // Risk Management (Risk Register)
+        Route::get('/risk', [RiskController::class, 'index'])->name('risk');
+        Route::post('/risk/store', [RiskController::class, 'store'])->name('risk.store');
+        Route::post('/risk/update', [RiskController::class, 'update'])->name('risk.update');
+        Route::get('/risk/{id}/manage', [RiskController::class, 'manage'])->name('risk.manage');
+        
+        // Risk Management (Mitigation Plans)
+        Route::get('/risk/mitigation', [RiskMitigationController::class, 'index'])->name('risk.mitigation');
+        Route::post('/risk/mitigation/store', [RiskMitigationController::class, 'store'])->name('risk.mitigation.store');
+        
+        // Risk Management (Incident Reports)
+        Route::get('/risk/incident', [IncidentController::class, 'index'])->name('risk.incident');
+        Route::post('/risk/incident/store', [IncidentController::class, 'store'])->name('risk.incident.store');
+        Route::post('/risk/incident/{id}/status', [IncidentController::class, 'updateStatus'])->name('risk.incident.status');
+        
+        // Risk Management Analytics Console Engine
+        Route::get('/risk/analytics', [RiskAnalyticsController::class, 'index'])->name('risk.analytics');
+        Route::get('/risk/analytics/export', [RiskAnalyticsController::class, 'export'])->name('risk.analytics.export');
     });
 
-    // Global User Management
     Route::get('/users', [UserController::class, 'employees'])->name('users.index');
+});
 
-    // Logout Action
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/newuser', function () {
+    return view('newuser');
 });

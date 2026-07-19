@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'hr' => [
+        'dashboard_url' => env('HR_MODULE_URL'),
+    ],
+
 ];

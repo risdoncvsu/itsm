@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\User;
+use App\Services\HrEmployeeProfileProvisioner;
 use App\Services\TenantEmployeeTable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +14,10 @@ use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
-    public function __construct(private readonly TenantEmployeeTable $tenantEmployeeTable)
+    public function __construct(
+        private readonly TenantEmployeeTable $tenantEmployeeTable,
+        private readonly HrEmployeeProfileProvisioner $hrEmployeeProfileProvisioner,
+    )
     {
     }
 
@@ -48,6 +52,7 @@ class CompanyController extends Controller
 
             $this->tenantEmployeeTable->ensure($company);
             $this->tenantEmployeeTable->seedCompanyAdmin($company);
+            $this->hrEmployeeProfileProvisioner->provisionCompanyAdmin($company, $admin, $password);
         });
 
         return redirect()

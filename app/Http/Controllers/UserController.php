@@ -3,14 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Services\HrEmployeeProfileProvisioner;
 use App\Services\TenantEmployeeTable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Models\User;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function __construct(private readonly TenantEmployeeTable $tenantEmployeeTable)
+    public function __construct(
+        private readonly TenantEmployeeTable $tenantEmployeeTable,
+        private readonly HrEmployeeProfileProvisioner $hrEmployeeProfileProvisioner,
+    )
     {
     }
 
@@ -66,14 +70,29 @@ class UserController extends Controller
             'status' => ['required', 'string', 'max:50'],
         ]);
 
+        if (empty($validated['username']) && empty($validated['email'])) {
+            return back()
+                ->withErrors(['email' => 'Enter either a username or an email so this employee can sign in.'])
+                ->withInput();
+        }
+
+        $temporaryPassword = Str::random(14);
         $employeeId = $this->tenantEmployeeTable->createEmployee($company, $validated);
+        $employeeCode = 'EMP-' . str_pad((string) $employeeId, 5, '0', STR_PAD_LEFT);
         $this->tenantEmployeeTable->updateEmployee($company, $employeeId, [
-            'employee_code' => 'EMP-' . str_pad((string) $employeeId, 5, '0', STR_PAD_LEFT),
+            'employee_code' => $employeeCode,
         ]);
+        $this->hrEmployeeProfileProvisioner->provisionItsmEmployee($company, $validated + [
+            'employee_code' => $employeeCode,
+        ], $temporaryPassword);
 
         return redirect()
             ->route('client.itsm.employees')
-            ->with('success', 'Employee created successfully.');
+            ->with('success', 'Employee created successfully.')
+            ->with('generated_employee_credentials', [
+                'username' => $validated['username'] ?: $validated['email'],
+                'password' => $temporaryPassword,
+            ]);
     }
 
     public function updateEmployee(Request $request, int $employee): \Illuminate\Http\RedirectResponse

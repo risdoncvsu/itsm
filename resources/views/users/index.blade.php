@@ -90,6 +90,14 @@
                             </div>
                         @endif
 
+                        @if (session('generated_employee_credentials'))
+                            <div class="mb-6 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                                <p class="font-bold">HR profile credentials</p>
+                                <p class="mt-2">Company email: <span class="font-mono">{{ session('generated_employee_credentials.username') }}</span></p>
+                                <p>Password: <span class="font-mono">{{ session('generated_employee_credentials.password') }}</span></p>
+                            </div>
+                        @endif
+
                         <div class="mb-6 flex items-center justify-between">
                             <h2 class="text-xl font-semibold">All {{ $entityLabelPlural }}</h2>
                             <label class="flex items-center gap-2 text-base">

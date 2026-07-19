@@ -1,0 +1,142 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (! Schema::hasTable('employees')) {
+            Schema::create('employees', function (Blueprint $table): void {
+                $table->id();
+                $table->string('employee_id')->nullable();
+                $table->string('first_name');
+                $table->string('middle_name')->nullable();
+                $table->string('last_name');
+                $table->string('suffix')->nullable();
+                $table->string('gender')->nullable();
+                $table->string('marital_status')->nullable();
+                $table->string('nationality')->nullable();
+                $table->string('profile_picture')->nullable();
+                $table->text('address')->nullable();
+                $table->string('phone')->nullable();
+                $table->string('department')->nullable();
+                $table->string('position')->nullable();
+                $table->date('hire_date')->nullable();
+                $table->string('work_schedule')->nullable();
+                $table->string('email')->unique();
+                $table->string('company_email')->nullable()->unique();
+                $table->string('temporary_password')->nullable();
+                $table->string('birth_certificate')->nullable();
+                $table->string('curriculum_vitae')->nullable();
+                $table->string('valid_id')->nullable();
+                $table->string('medical_certificate')->nullable();
+                $table->string('signature')->nullable();
+                $table->timestamps();
+            });
+
+            return;
+        }
+
+        Schema::table('employees', function (Blueprint $table): void {
+            if (! Schema::hasColumn('employees', 'employee_id')) {
+                $table->string('employee_id')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'first_name')) {
+                $table->string('first_name')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'middle_name')) {
+                $table->string('middle_name')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'last_name')) {
+                $table->string('last_name')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'suffix')) {
+                $table->string('suffix')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'gender')) {
+                $table->string('gender')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'marital_status')) {
+                $table->string('marital_status')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'nationality')) {
+                $table->string('nationality')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'profile_picture')) {
+                $table->string('profile_picture')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'address')) {
+                $table->text('address')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'phone')) {
+                $table->string('phone')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'department')) {
+                $table->string('department')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'position')) {
+                $table->string('position')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'hire_date')) {
+                $table->date('hire_date')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'work_schedule')) {
+                $table->string('work_schedule')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'email')) {
+                $table->string('email')->nullable()->unique();
+            }
+
+            if (! Schema::hasColumn('employees', 'company_email')) {
+                $table->string('company_email')->nullable()->unique();
+            }
+
+            if (! Schema::hasColumn('employees', 'temporary_password')) {
+                $table->string('temporary_password')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'birth_certificate')) {
+                $table->string('birth_certificate')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'curriculum_vitae')) {
+                $table->string('curriculum_vitae')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'valid_id')) {
+                $table->string('valid_id')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'medical_certificate')) {
+                $table->string('medical_certificate')->nullable();
+            }
+
+            if (! Schema::hasColumn('employees', 'signature')) {
+                $table->string('signature')->nullable();
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        // Intentionally non-destructive because this table is owned by the HR module.
+    }
+};
