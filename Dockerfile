@@ -30,4 +30,4 @@ RUN npm install && npm run build
 
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-CMD ["sh", "-c", "php artisan hr:ensure-employees-table --no-interaction && php artisan migrate --force --no-interaction && php artisan serve --host=0.0.0.0 --port=$PORT"]
+CMD ["sh", "-c", "php artisan hr:ensure-employees-table --no-interaction && php artisan inventory:ensure-client-columns --no-interaction && php artisan migrate --force --no-interaction && php artisan migrate --path=Modules/Inventory/database/migrations --force --no-interaction && php artisan serve --host=0.0.0.0 --port=$PORT"]
