@@ -45,7 +45,7 @@ class AuthController extends Controller
             // Deployments can point this to the standalone HR app. The local
             // fallback keeps the portal hand-off on the HR route rather than
             // sending an approved manager back to the ITSM sign-in screen.
-            return redirect(config('services.hr.dashboard_url') ?: url('/hr/dashboard'));
+            return redirect(config('services.hr.dashboard_url') ?: route('hr.dashboard'));
         }
 
         // 3. If it fails, send them back
@@ -56,7 +56,11 @@ class AuthController extends Controller
     {
         $company = $user->company_id ? \App\Models\Company::find($user->company_id) : null;
 
-        if ($company && (! $company->setup_completed_at || ! $company->hr_employee_id || ! $this->hrEmployeeProfileProvisioner->hasEmployeeForCompany($company, (int) $company->hr_employee_id))) {
+        if ($company && ! $company->setup_completed_at) {
+            return route('newuser.show');
+        }
+
+        if ($company && (! $company->hr_employee_id || ! $this->hrEmployeeProfileProvisioner->hasEmployeeForCompany($company, (int) $company->hr_employee_id))) {
             return route('newuser.show', ['stage' => 3]);
         }
 

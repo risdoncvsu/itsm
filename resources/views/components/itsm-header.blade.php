@@ -12,7 +12,11 @@
     <div class="flex items-center gap-16">
         <nav class="flex items-center gap-8 text-base font-medium">
             @foreach ($navItems as $item)
-                <a href="{{ $item['route'] }}" class="{{ $active === $item['key'] ? 'font-bold text-[#60A5FA]' : 'text-white/70 transition hover:text-white' }}">
+                @php
+                    $isActive = $active === $item['key']
+                        || ($item['key'] === 'employees' && request()->routeIs('client.itsm.employees'));
+                @endphp
+                <a href="{{ $item['route'] }}" @if ($isActive) aria-current="page" @endif class="{{ $isActive ? 'font-bold text-[#60A5FA]' : 'text-white/70 transition hover:text-white' }}">
                     {{ $item['label'] }}
                 </a>
             @endforeach

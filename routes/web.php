@@ -15,12 +15,15 @@ use App\Http\Controllers\RiskAssController;
 use App\Http\Controllers\DocumentController; // Imported DocumentController
 use App\Http\Controllers\NewUserSetupController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\HrPortalController;
 
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/hr/dashboard', [HrPortalController::class, 'dashboard'])->name('hr.dashboard');
 
 Route::middleware('auth')->group(function () {
 
