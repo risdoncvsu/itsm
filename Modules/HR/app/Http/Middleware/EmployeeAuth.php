@@ -19,6 +19,14 @@ class EmployeeAuth
             return redirect()->route('login');
         }
 
+        if (! session('employee_client_id')) {
+            session()->forget(['employee_logged_in', 'employee_role', 'employee_id', 'employee_name', 'employee_email', 'employee_department', 'employee_client_id']);
+
+            return redirect()->route('login')->withErrors([
+                'username' => 'This HR account is not linked to a client company.',
+            ]);
+        }
+
         $role = session('employee_role');
         $department = strtolower(trim(session('employee_department', '')));
 

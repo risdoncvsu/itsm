@@ -25,7 +25,7 @@ return new class extends Migration
                 $table->string('position')->nullable();
                 $table->date('hire_date')->nullable();
                 $table->string('work_schedule')->nullable();
-                $table->unsignedBigInteger('itsm_company_id')->nullable()->index();
+                $table->unsignedBigInteger('client_id')->nullable()->index();
                 $table->string('approval_status')->default('Active');
                 $table->timestamps();
             });
@@ -40,8 +40,8 @@ return new class extends Migration
                 if (! $hrSchema->hasColumn('employees', 'temporary_password')) {
                     $table->string('temporary_password')->nullable();
                 }
-                if (! $hrSchema->hasColumn('employees', 'itsm_company_id')) {
-                    $table->unsignedBigInteger('itsm_company_id')->nullable()->index();
+                if (! $hrSchema->hasColumn('employees', 'client_id')) {
+                    $table->unsignedBigInteger('client_id')->nullable()->index();
                 }
                 if (! $hrSchema->hasColumn('employees', 'approval_status')) {
                     $table->string('approval_status')->default('Active');
@@ -66,7 +66,7 @@ return new class extends Migration
                 }
 
                 $existing = DB::connection('hr')->table('employees')
-                    ->where('itsm_company_id', $company->id)
+                    ->where('client_id', $company->id)
                     ->where('email', $employee->email)
                     ->first();
 
@@ -82,7 +82,7 @@ return new class extends Migration
                     'position' => $employee->position ?? 'HR Manager',
                     'hire_date' => $employee->hire_date ?? null,
                     'work_schedule' => $employee->work_schedule ?? null,
-                    'itsm_company_id' => $company->id,
+                    'client_id' => $company->id,
                     'approval_status' => empty($employee->company_email) ? 'Pending' : 'Active',
                     'updated_at' => now(),
                 ];
@@ -116,13 +116,13 @@ return new class extends Migration
                     'email' => $employee->email,
                     'company_email' => $employee->username,
                     'department' => $employee->department,
-                    'itsm_company_id' => $company->id,
+                    'client_id' => $company->id,
                     'approval_status' => $employee->status ?? 'Active',
                     'updated_at' => now(),
                 ];
 
                 $existing = DB::connection('hr')->table('employees')
-                    ->where('itsm_company_id', $company->id)
+                    ->where('client_id', $company->id)
                     ->where(function ($query) use ($employee): void {
                         $query->where('employee_id', $employee->employee_code)
                             ->orWhere('email', $employee->email);

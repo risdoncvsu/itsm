@@ -36,7 +36,7 @@ class HrEmployeeProfileProvisioner
             'email' => $manager['personal_email'],
             'company_email' => null,
             'temporary_password' => null,
-            'itsm_company_id' => $company->id,
+            'client_id' => $company->id,
             'approval_status' => 'Pending',
             'phone' => $company->phone_no,
             'department' => 'Human Resources',
@@ -63,7 +63,7 @@ class HrEmployeeProfileProvisioner
             'email' => $manager->email,
             'company_email' => $hrEmail,
             'temporary_password' => Hash::make($plainPassword),
-            'itsm_company_id' => $company->id,
+            'client_id' => $company->id,
             'approval_status' => 'Active',
             'phone' => $company->phone_no,
             'department' => 'Human Resources',
@@ -89,7 +89,7 @@ class HrEmployeeProfileProvisioner
             ->where('company_email', $companyEmail)
             ->first();
 
-        if (! $employee || ! $employee->temporary_password || ($employee->approval_status ?? 'Active') !== 'Active') {
+        if (! $employee || ! $employee->temporary_password || ! $employee->client_id || ($employee->approval_status ?? 'Active') !== 'Active') {
             return false;
         }
 
@@ -127,12 +127,12 @@ class HrEmployeeProfileProvisioner
 
     public function employeesForCompany(Company $company): Collection
     {
-        if (! $this->hrSchema()->hasTable('employees') || ! $this->hrSchema()->hasColumn('employees', 'itsm_company_id')) {
+        if (! $this->hrSchema()->hasTable('employees') || ! $this->hrSchema()->hasColumn('employees', 'client_id')) {
             return collect();
         }
 
         return $this->hrDb()->table('employees')
-            ->where('itsm_company_id', $company->id)
+            ->where('client_id', $company->id)
             ->orderBy('id')
             ->get()
             ->map(fn (object $employee): object => $this->employeeForItsm($employee));
@@ -140,12 +140,12 @@ class HrEmployeeProfileProvisioner
 
     public function findEmployeeForCompany(Company $company, int $employeeId): ?object
     {
-        if (! $this->hrSchema()->hasTable('employees') || ! $this->hrSchema()->hasColumn('employees', 'itsm_company_id')) {
+        if (! $this->hrSchema()->hasTable('employees') || ! $this->hrSchema()->hasColumn('employees', 'client_id')) {
             return null;
         }
 
         $employee = $this->hrDb()->table('employees')
-            ->where('itsm_company_id', $company->id)
+            ->where('client_id', $company->id)
             ->where('id', $employeeId)
             ->first();
 
@@ -175,8 +175,8 @@ class HrEmployeeProfileProvisioner
 
     public function deleteEmployeesForCompany(Company $company): void
     {
-        if ($this->hrSchema()->hasTable('employees') && $this->hrSchema()->hasColumn('employees', 'itsm_company_id')) {
-            $this->hrDb()->table('employees')->where('itsm_company_id', $company->id)->delete();
+        if ($this->hrSchema()->hasTable('employees') && $this->hrSchema()->hasColumn('employees', 'client_id')) {
+            $this->hrDb()->table('employees')->where('client_id', $company->id)->delete();
         }
     }
 
@@ -192,7 +192,7 @@ class HrEmployeeProfileProvisioner
             'email' => $email,
             'company_email' => $companyEmail,
             'temporary_password' => $attributes['temporary_password'],
-            'itsm_company_id' => $attributes['itsm_company_id'],
+            'client_id' => $attributes['client_id'],
             'approval_status' => $attributes['approval_status'],
             'phone' => $attributes['phone'],
             'department' => $attributes['department'],
@@ -203,8 +203,8 @@ class HrEmployeeProfileProvisioner
         ]);
 
         $existing = $this->hrDb()->table('employees')
-            ->when($this->hrSchema()->hasColumn('employees', 'itsm_company_id'), function ($query) use ($attributes) {
-                $query->where('itsm_company_id', $attributes['itsm_company_id']);
+            ->when($this->hrSchema()->hasColumn('employees', 'client_id'), function ($query) use ($attributes) {
+                $query->where('client_id', $attributes['client_id']);
             })
             ->where(function ($query) use ($companyEmail, $email): void {
                 if ($companyEmail && $this->hrSchema()->hasColumn('employees', 'company_email')) {
@@ -257,6 +257,7 @@ class HrEmployeeProfileProvisioner
             'employee_name' => $employee->first_name ?? 'HR Manager',
             'employee_email' => $employee->company_email,
             'employee_department' => $employee->department ?? 'Human Resources',
+            'employee_client_id' => (int) $employee->client_id,
         ]);
     }
 

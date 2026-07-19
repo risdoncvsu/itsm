@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class EnsureHrEmployeesTable extends Command
@@ -42,27 +43,41 @@ class EnsureHrEmployeesTable extends Command
                 $table->string('valid_id')->nullable();
                 $table->string('medical_certificate')->nullable();
                 $table->string('signature')->nullable();
-                $table->unsignedBigInteger('itsm_company_id')->nullable()->index();
+                $table->unsignedBigInteger('client_id')->nullable()->index();
                 $table->string('approval_status')->default('Active');
                 $table->timestamps();
             });
 
         }
 
-        $schema->table('employees', function (Blueprint $table) use ($schema): void {
+        $hasLegacyEmployeeClientColumn = $schema->hasColumn('employees', 'itsm_company_id');
+        $hasEmployeeClientColumn = $schema->hasColumn('employees', 'client_id');
+
+        $schema->table('employees', function (Blueprint $table) use ($schema, $hasLegacyEmployeeClientColumn, $hasEmployeeClientColumn): void {
             if (! $schema->hasColumn('employees', 'company_email')) {
                 $table->string('company_email')->nullable()->unique();
             }
             if (! $schema->hasColumn('employees', 'temporary_password')) {
                 $table->string('temporary_password')->nullable();
             }
-            if (! $schema->hasColumn('employees', 'itsm_company_id')) {
-                $table->unsignedBigInteger('itsm_company_id')->nullable()->index();
+            if (! $hasEmployeeClientColumn) {
+                if ($hasLegacyEmployeeClientColumn) {
+                    $table->renameColumn('itsm_company_id', 'client_id');
+                } else {
+                    $table->unsignedBigInteger('client_id')->nullable()->index();
+                }
             }
             if (! $schema->hasColumn('employees', 'approval_status')) {
                 $table->string('approval_status')->default('Active');
             }
         });
+
+        if ($hasLegacyEmployeeClientColumn && $hasEmployeeClientColumn) {
+            DB::connection('hr')->table('employees')
+                ->whereNull('client_id')
+                ->whereNotNull('itsm_company_id')
+                ->update(['client_id' => DB::raw('itsm_company_id')]);
+        }
 
         if (! $schema->hasTable('departments')) {
             $schema->create('departments', function (Blueprint $table): void {
@@ -84,9 +99,30 @@ class EnsureHrEmployeesTable extends Command
                 $table->time('time_out')->nullable();
                 $table->string('time_out_image')->nullable();
                 $table->string('status')->nullable();
+                $table->unsignedBigInteger('client_id')->nullable()->index();
                 $table->timestamps();
                 $table->unique(['employee_id', 'attendance_date']);
             });
+        }
+
+        $hasLegacyAttendanceClientColumn = $schema->hasColumn('attendances', 'itsm_company_id');
+        $hasAttendanceClientColumn = $schema->hasColumn('attendances', 'client_id');
+
+        if (! $hasAttendanceClientColumn) {
+            $schema->table('attendances', function (Blueprint $table) use ($hasLegacyAttendanceClientColumn): void {
+                if ($hasLegacyAttendanceClientColumn) {
+                    $table->renameColumn('itsm_company_id', 'client_id');
+                } else {
+                    $table->unsignedBigInteger('client_id')->nullable()->index();
+                }
+            });
+        }
+
+        if ($hasLegacyAttendanceClientColumn && $hasAttendanceClientColumn) {
+            DB::connection('hr')->table('attendances')
+                ->whereNull('client_id')
+                ->whereNotNull('itsm_company_id')
+                ->update(['client_id' => DB::raw('itsm_company_id')]);
         }
 
         $this->info('Verified the HR employees table.');

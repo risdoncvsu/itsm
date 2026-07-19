@@ -40,7 +40,7 @@ return new class extends Migration
                 'position' => $employee->position ?? null,
                 'hire_date' => $employee->hire_date ?? null,
                 'work_schedule' => $employee->work_schedule ?? null,
-                'itsm_company_id' => $companyId,
+                'client_id' => $companyId,
                 'approval_status' => empty($employee->company_email) ? 'Pending' : 'Active',
                 'updated_at' => now(),
             ];

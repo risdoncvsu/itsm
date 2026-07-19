@@ -31,7 +31,7 @@ return new class extends Migration
                 $table->string('email')->unique();
                 $table->string('company_email')->nullable()->unique();
                 $table->string('temporary_password')->nullable();
-                $table->unsignedBigInteger('itsm_company_id')->nullable()->index();
+                $table->unsignedBigInteger('client_id')->nullable()->index();
                 $table->string('approval_status')->default('Active');
                 $table->string('birth_certificate')->nullable();
                 $table->string('curriculum_vitae')->nullable();
@@ -117,8 +117,8 @@ return new class extends Migration
                 $table->string('temporary_password')->nullable();
             }
 
-            if (! $schema->hasColumn('employees', 'itsm_company_id')) {
-                $table->unsignedBigInteger('itsm_company_id')->nullable()->index();
+            if (! $schema->hasColumn('employees', 'client_id')) {
+                $table->unsignedBigInteger('client_id')->nullable()->index();
             }
 
             if (! $schema->hasColumn('employees', 'approval_status')) {
