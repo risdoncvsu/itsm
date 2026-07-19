@@ -53,6 +53,12 @@ class AuthController extends Controller
                 return redirect()->route('hr.first-login.password');
             }
 
+            $department = strtolower((string) session('employee_department', ''));
+
+            if (str_contains($department, 'inventory') || str_contains($department, 'warehouse')) {
+                return redirect()->route('inventory.index');
+            }
+
             return redirect()->route('hr.dashboard');
         }
 
@@ -78,7 +84,11 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('hr.dashboard');
+        $department = strtolower((string) session('employee_department', ''));
+
+        return (str_contains($department, 'inventory') || str_contains($department, 'warehouse'))
+            ? redirect()->route('inventory.index')
+            : redirect()->route('hr.dashboard');
     }
 
     private function companyAdminDestination($user): string

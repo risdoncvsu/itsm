@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->alias([
             'hr.access' => \Modules\HR\Http\Middleware\EmployeeAuth::class,
+            'inventory.access' => \Modules\Inventory\Http\Middleware\InventoryAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
