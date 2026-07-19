@@ -51,3 +51,10 @@ Route::middleware('inventory.access')->name('inventory.')->group(function (): vo
     Route::patch('/stock-transfers/{transfer}/reject', [StockTransferController::class, 'reject'])->name('stock-transfers.reject');
     Route::patch('/stock-transfers/{transfer}/cancel', [StockTransferController::class, 'cancel'])->name('stock-transfers.cancel');
 });
+
+// Compatibility for an already-compiled standalone Inventory dashboard view.
+// New code uses inventory.index.trend-data; this alias prevents stale Blade
+// caches from failing during a rolling deployment.
+Route::middleware('inventory.access')
+    ->get('/index/trend-data', [DashboardController::class, 'trendData'])
+    ->name('index.trend-data');

@@ -1,10 +1,10 @@
 <header style="background:#0b1e3d;height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,0.3);">
     <div style="display:flex;align-items:center;flex-shrink:0;">
-        <button type="button" onclick="toggleNav()" style="cursor:pointer;background:none;border:none;padding:0;"><img src="{{ asset('images/banner.png') }}" alt="Nexora logo" style="height:55px; width:auto;"></button>
+        <button type="button" onclick="toggleNav()" style="cursor:pointer;background:none;border:none;padding:0;"><img src="{{ asset('images/nexora-banner.png') }}" alt="Nexora logo" style="height:55px; width:auto;"></button>
     </div>
     <nav style="display:flex;align-items:center;gap:16px;margin-left:auto;">
         <button type="button" onclick="toggleProfileDropdown()" id="profileTrigger" style="width:34px;height:34px;border-radius:50%;background:rgba(74,158,232,.15);overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;border:none;padding:0;">
-            <img src="{{ asset('images/avatar.png') }}" alt="User avatar" style="width:100%;height:100%;object-fit:cover;display:block;">
+            <img src="{{ asset('images/icon.png') }}" alt="User avatar" style="width:100%;height:100%;object-fit:cover;display:block;">
         </button>
     </nav>
     <!-- Profile Dropdown -->
@@ -13,7 +13,7 @@
         <div class="profile-dropdown-email">{{ Auth::user()->email ?? '' }}</div>
         <div class="profile-dropdown-avatar-wrap">
             <div class="profile-dropdown-avatar">
-                <img src="{{ asset('images/avatar.png') }}" alt="User avatar">
+                <img src="{{ asset('images/icon.png') }}" alt="User avatar">
             </div>
         </div>
         <div class="profile-dropdown-greeting">Hi, {{ Auth::user()->name ?? 'User' }}!</div>
@@ -49,5 +49,4 @@
         </ul>
     </div>
 </header>
-
 
