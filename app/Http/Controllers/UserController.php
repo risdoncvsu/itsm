@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
-use App\Services\TenantEmployeeTable;
 use App\Services\HrEmployeeProfileProvisioner;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -13,7 +12,6 @@ use Illuminate\Http\RedirectResponse;
 class UserController extends Controller
 {
     public function __construct(
-        private readonly TenantEmployeeTable $tenantEmployeeTable,
         private readonly HrEmployeeProfileProvisioner $hrEmployeeProfileProvisioner,
     )
     {
@@ -41,13 +39,8 @@ class UserController extends Controller
 
     public function employees()
     {
-        $company = Company::find(Auth::user()->company_id);
-
-        if ($company) {
-            $this->tenantEmployeeTable->seedCompanyAdmin($company->fresh('adminUser'));
-        }
-
-        $employees = $company ? $this->tenantEmployeeTable->employeesFor($company) : collect();
+        $company = $this->clientCompany();
+        $employees = $company ? $this->hrEmployeeProfileProvisioner->employeesForCompany($company) : collect();
 
         return view('users.index', [
             'users' => $employees,
@@ -64,7 +57,7 @@ class UserController extends Controller
     {
         $company = $this->clientCompany();
         $employees = $company
-            ? $this->tenantEmployeeTable->employeesFor($company)
+            ? $this->hrEmployeeProfileProvisioner->employeesForCompany($company)
                 ->filter(fn (object $employee): bool => $employee->status === 'Pending' && $employee->department === 'Human Resources')
                 ->values()
             : collect();
@@ -92,7 +85,7 @@ class UserController extends Controller
             'status' => ['required', 'in:Active,Inactive,Pending,Suspended'],
         ]);
 
-        $currentEmployee = $this->tenantEmployeeTable->find($company, $employee);
+        $currentEmployee = $this->hrEmployeeProfileProvisioner->findEmployeeForCompany($company, $employee);
         abort_unless($currentEmployee, 404);
 
         if (
@@ -105,7 +98,7 @@ class UserController extends Controller
                 ->withErrors(['status' => 'Approve the HR manager from Pending Approvals to create their login credentials.']);
         }
 
-        $this->tenantEmployeeTable->updateEmployee($company, $employee, $validated);
+        $this->hrEmployeeProfileProvisioner->updateEmployeeForCompany($company, $employee, $validated);
 
         return redirect()
             ->route('client.itsm.employees')
@@ -117,7 +110,7 @@ class UserController extends Controller
         $company = $this->clientCompany();
         abort_unless($company, 403);
 
-        $manager = $this->tenantEmployeeTable->find($company, $employee);
+        $manager = $this->hrEmployeeProfileProvisioner->findEmployeeForCompany($company, $employee);
         abort_unless(
             $manager && $manager->status === 'Pending' && $manager->department === 'Human Resources',
             404
@@ -126,10 +119,6 @@ class UserController extends Controller
         $password = Str::password(16, symbols: true);
         $provisioned = $this->hrEmployeeProfileProvisioner->provisionApprovedHrManager($company, $manager, $password);
 
-        $this->tenantEmployeeTable->updateEmployee($company, $employee, [
-            'username' => $provisioned['email'],
-            'status' => 'Active',
-        ]);
         $company->update(['hr_employee_id' => $provisioned['employee_id']]);
 
         return redirect()

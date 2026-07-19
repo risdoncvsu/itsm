@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Services\HrEmployeeProfileProvisioner;
-use App\Services\TenantEmployeeTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +14,6 @@ class NewUserSetupController extends Controller
 {
     public function __construct(
         private readonly HrEmployeeProfileProvisioner $hrEmployeeProfileProvisioner,
-        private readonly TenantEmployeeTable $tenantEmployeeTable,
     )
     {
     }
@@ -88,14 +86,12 @@ class NewUserSetupController extends Controller
             'employee_id' => ['required', 'string', 'max:255'],
         ]);
 
-        // The HR module owns the manager profile. Staging receives a pending
-        // approval record, but no login can exist until ITSM approves it.
+        // The HR module owns the profile and its approval state. ITSM keeps
+        // no employee record; it reads this record directly from HR.
         $employeeId = $this->hrEmployeeProfileProvisioner->recordPendingHrManager(
             $company,
             $validated + ['personal_email' => $validated['email']]
         );
-        $this->tenantEmployeeTable->queueHrManagerApproval($company, $validated);
-
         $company->update([
             'hr_employee_id' => $employeeId,
             'setup_completed_at' => now(),

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 
 class HrEmployeeProfileProvisioner
 {
@@ -34,6 +35,8 @@ class HrEmployeeProfileProvisioner
             'email' => $manager['personal_email'],
             'company_email' => null,
             'temporary_password' => null,
+            'itsm_company_id' => $company->id,
+            'approval_status' => 'Pending',
             'phone' => $company->phone_no,
             'department' => 'Human Resources',
             'position' => 'HR Manager',
@@ -59,6 +62,8 @@ class HrEmployeeProfileProvisioner
             'email' => $manager->email,
             'company_email' => $hrEmail,
             'temporary_password' => Hash::make($plainPassword),
+            'itsm_company_id' => $company->id,
+            'approval_status' => 'Active',
             'phone' => $company->phone_no,
             'department' => 'Human Resources',
             'position' => 'HR Manager',
@@ -101,6 +106,56 @@ class HrEmployeeProfileProvisioner
         $this->hrDb()->table('employees')->where('id', $employeeId)->delete();
     }
 
+    public function employeesForCompany(Company $company): Collection
+    {
+        if (! $this->hrSchema()->hasTable('employees') || ! $this->hrSchema()->hasColumn('employees', 'itsm_company_id')) {
+            return collect();
+        }
+
+        return $this->hrDb()->table('employees')
+            ->where('itsm_company_id', $company->id)
+            ->orderBy('id')
+            ->get()
+            ->map(fn (object $employee): object => $this->employeeForItsm($employee));
+    }
+
+    public function findEmployeeForCompany(Company $company, int $employeeId): ?object
+    {
+        if (! $this->hrSchema()->hasTable('employees') || ! $this->hrSchema()->hasColumn('employees', 'itsm_company_id')) {
+            return null;
+        }
+
+        $employee = $this->hrDb()->table('employees')
+            ->where('itsm_company_id', $company->id)
+            ->where('id', $employeeId)
+            ->first();
+
+        return $employee ? $this->employeeForItsm($employee) : null;
+    }
+
+    public function updateEmployeeForCompany(Company $company, int $employeeId, array $values): void
+    {
+        $employee = $this->findEmployeeForCompany($company, $employeeId);
+        abort_unless($employee, 404);
+
+        $names = preg_split('/\s+/', trim($values['name']), 2);
+        $this->hrDb()->table('employees')->where('id', $employeeId)->update($this->onlyExistingEmployeeColumns([
+            'first_name' => $names[0] ?: 'Employee',
+            'last_name' => $names[1] ?? '',
+            'email' => $values['email'],
+            'department' => $values['department'],
+            'approval_status' => $values['status'],
+            'updated_at' => now(),
+        ]));
+    }
+
+    public function deleteEmployeesForCompany(Company $company): void
+    {
+        if ($this->hrSchema()->hasTable('employees') && $this->hrSchema()->hasColumn('employees', 'itsm_company_id')) {
+            $this->hrDb()->table('employees')->where('itsm_company_id', $company->id)->delete();
+        }
+    }
+
     private function upsertEmployee(array $attributes): int
     {
         $companyEmail = $attributes['company_email'];
@@ -113,6 +168,8 @@ class HrEmployeeProfileProvisioner
             'email' => $email,
             'company_email' => $companyEmail,
             'temporary_password' => $attributes['temporary_password'],
+            'itsm_company_id' => $attributes['itsm_company_id'],
+            'approval_status' => $attributes['approval_status'],
             'phone' => $attributes['phone'],
             'department' => $attributes['department'],
             'position' => $attributes['position'],
@@ -122,11 +179,17 @@ class HrEmployeeProfileProvisioner
         ]);
 
         $existing = $this->hrDb()->table('employees')
-            ->when($companyEmail && $this->hrSchema()->hasColumn('employees', 'company_email'), function ($query) use ($companyEmail) {
-                $query->where('company_email', $companyEmail);
+            ->when($this->hrSchema()->hasColumn('employees', 'itsm_company_id'), function ($query) use ($attributes) {
+                $query->where('itsm_company_id', $attributes['itsm_company_id']);
             })
-            ->when($this->hrSchema()->hasColumn('employees', 'email'), function ($query) use ($email) {
-                $query->orWhere('email', $email);
+            ->where(function ($query) use ($companyEmail, $email): void {
+                if ($companyEmail && $this->hrSchema()->hasColumn('employees', 'company_email')) {
+                    $query->where('company_email', $companyEmail);
+                }
+
+                if ($this->hrSchema()->hasColumn('employees', 'email')) {
+                    $companyEmail ? $query->orWhere('email', $email) : $query->where('email', $email);
+                }
             })
             ->first();
 
@@ -173,6 +236,19 @@ class HrEmployeeProfileProvisioner
         ]);
     }
 
+    private function employeeForItsm(object $employee): object
+    {
+        return (object) [
+            'id' => $employee->id,
+            'employee_code' => $employee->employee_id ?? null,
+            'username' => $employee->company_email ?? null,
+            'name' => trim(($employee->first_name ?? '') . ' ' . ($employee->last_name ?? '')),
+            'email' => $employee->email ?? null,
+            'department' => $employee->department ?? null,
+            'status' => $employee->approval_status ?? 'Active',
+        ];
+    }
+
     private function uniqueHrEmail(string $email): string
     {
         if (
@@ -209,11 +285,11 @@ class HrEmployeeProfileProvisioner
 
     private function hrDb(): ConnectionInterface
     {
-        return DB::connection('modules');
+        return DB::connection('hr');
     }
 
     private function hrSchema()
     {
-        return Schema::connection('modules');
+        return Schema::connection('hr');
     }
 }

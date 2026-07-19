@@ -129,22 +129,21 @@ return [
             'sslmode' => env('HR_DB_SSLMODE') ?: env('MODULE_DB_SSLMODE') ?: env('DB_SSLMODE', 'prefer'),
         ],
 
-        // The staging database is the shared integration boundary between ITSM
-        // and product modules. Module-owned data stays in its module database;
-        // only records that ITSM needs to review or act on are copied here.
+        // Staging is optional. It must be configured explicitly: falling back
+        // to DB_* would silently put integration data into the ITSM database.
         'staging' => [
-            'driver' => env('STAGING_DB_CONNECTION') ?: env('DB_CONNECTION', 'pgsql'),
+            'driver' => env('STAGING_DB_CONNECTION', 'pgsql'),
             'url' => env('STAGING_DB_URL') ?: null,
-            'host' => env('STAGING_DB_HOST') ?: env('DB_HOST', '127.0.0.1'),
-            'port' => env('STAGING_DB_PORT') ?: env('DB_PORT', '5432'),
-            'database' => env('STAGING_DB_DATABASE') ?: env('DB_DATABASE', 'laravel'),
-            'username' => env('STAGING_DB_USERNAME') ?: env('DB_USERNAME', 'root'),
-            'password' => env('STAGING_DB_PASSWORD') ?: env('DB_PASSWORD', ''),
-            'charset' => env('STAGING_DB_CHARSET') ?: env('DB_CHARSET', 'utf8'),
+            'host' => env('STAGING_DB_HOST'),
+            'port' => env('STAGING_DB_PORT'),
+            'database' => env('STAGING_DB_DATABASE'),
+            'username' => env('STAGING_DB_USERNAME'),
+            'password' => env('STAGING_DB_PASSWORD'),
+            'charset' => env('STAGING_DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            'search_path' => env('STAGING_DB_SEARCH_PATH') ?: 'public',
-            'sslmode' => env('STAGING_DB_SSLMODE') ?: env('DB_SSLMODE', 'prefer'),
+            'search_path' => env('STAGING_DB_SEARCH_PATH', 'public'),
+            'sslmode' => env('STAGING_DB_SSLMODE', 'prefer'),
         ],
 
         'sqlsrv' => [

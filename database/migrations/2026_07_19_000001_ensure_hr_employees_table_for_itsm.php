@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $schema = Schema::connection('modules');
+        $schema = Schema::connection('hr');
 
         if (! $schema->hasTable('employees')) {
             $schema->create('employees', function (Blueprint $table): void {
@@ -31,6 +31,8 @@ return new class extends Migration
                 $table->string('email')->unique();
                 $table->string('company_email')->nullable()->unique();
                 $table->string('temporary_password')->nullable();
+                $table->unsignedBigInteger('itsm_company_id')->nullable()->index();
+                $table->string('approval_status')->default('Active');
                 $table->string('birth_certificate')->nullable();
                 $table->string('curriculum_vitae')->nullable();
                 $table->string('valid_id')->nullable();
@@ -113,6 +115,14 @@ return new class extends Migration
 
             if (! $schema->hasColumn('employees', 'temporary_password')) {
                 $table->string('temporary_password')->nullable();
+            }
+
+            if (! $schema->hasColumn('employees', 'itsm_company_id')) {
+                $table->unsignedBigInteger('itsm_company_id')->nullable()->index();
+            }
+
+            if (! $schema->hasColumn('employees', 'approval_status')) {
+                $table->string('approval_status')->default('Active');
             }
 
             if (! $schema->hasColumn('employees', 'birth_certificate')) {

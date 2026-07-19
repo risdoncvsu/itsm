@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\User;
 use App\Services\HrEmployeeProfileProvisioner;
-use App\Services\TenantEmployeeTable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -16,7 +14,6 @@ use Illuminate\Support\Str;
 class CompanyController extends Controller
 {
     public function __construct(
-        private readonly TenantEmployeeTable $tenantEmployeeTable,
         private readonly HrEmployeeProfileProvisioner $hrEmployeeProfileProvisioner,
     )
     {
@@ -49,10 +46,6 @@ class CompanyController extends Controller
             ]);
 
             $company->update(['admin_user_id' => $admin->id]);
-            $company->refresh();
-
-            $this->tenantEmployeeTable->ensure($company);
-            $this->tenantEmployeeTable->seedCompanyAdmin($company);
         });
 
         return redirect()
@@ -90,7 +83,6 @@ class CompanyController extends Controller
                 $company->adminUser->update(['password' => Hash::make($validated['admin_password'])]);
             }
 
-            $this->tenantEmployeeTable->seedCompanyAdmin($company->fresh('adminUser'));
         }
 
         return redirect()
@@ -112,22 +104,13 @@ class CompanyController extends Controller
 
         DB::transaction(function () use ($company): void {
             $adminUser = $company->adminUser;
-            $employeeTableName = $company->employee_table_name;
-            $hrEmployeeId = $company->hr_employee_id;
-
             $company->delete();
 
             if ($adminUser) {
                 $adminUser->delete();
             }
 
-            if ($employeeTableName && Schema::hasTable($employeeTableName)) {
-                Schema::drop($employeeTableName);
-            }
-
-            if ($hrEmployeeId) {
-                $this->hrEmployeeProfileProvisioner->deleteHrEmployee((int) $hrEmployeeId);
-            }
+            $this->hrEmployeeProfileProvisioner->deleteEmployeesForCompany($company);
         });
 
         return redirect()
