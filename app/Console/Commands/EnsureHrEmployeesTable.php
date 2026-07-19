@@ -47,9 +47,6 @@ class EnsureHrEmployeesTable extends Command
                 $table->timestamps();
             });
 
-            $this->info('Created the HR employees table.');
-
-            return self::SUCCESS;
         }
 
         $schema->table('employees', function (Blueprint $table) use ($schema): void {
@@ -66,6 +63,31 @@ class EnsureHrEmployeesTable extends Command
                 $table->string('approval_status')->default('Active');
             }
         });
+
+        if (! $schema->hasTable('departments')) {
+            $schema->create('departments', function (Blueprint $table): void {
+                $table->id();
+                $table->string('department_name')->unique();
+                $table->string('department_code')->nullable();
+                $table->string('slug')->nullable()->unique();
+                $table->timestamps();
+            });
+        }
+
+        if (! $schema->hasTable('attendances')) {
+            $schema->create('attendances', function (Blueprint $table): void {
+                $table->id();
+                $table->unsignedBigInteger('employee_id');
+                $table->date('attendance_date');
+                $table->time('time_in')->nullable();
+                $table->string('time_in_image')->nullable();
+                $table->time('time_out')->nullable();
+                $table->string('time_out_image')->nullable();
+                $table->string('status')->nullable();
+                $table->timestamps();
+                $table->unique(['employee_id', 'attendance_date']);
+            });
+        }
 
         $this->info('Verified the HR employees table.');
 

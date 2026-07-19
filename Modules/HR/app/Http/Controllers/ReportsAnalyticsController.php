@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
-use App\Http\Controllers\Concerns\ResolvesPerPage;
-use App\Http\Controllers\Concerns\RespondsWithAjaxList;
-use App\Models\Attendance;
-use App\Models\Employee;
+use Modules\HR\Http\Controllers\Concerns\ResolvesPerPage;
+use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
+use Modules\HR\Models\Attendance;
+use Modules\HR\Models\Employee;
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 
 class ReportsAnalyticsController extends Controller

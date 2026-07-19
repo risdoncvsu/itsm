@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
-use App\Models\Attendance;
-use App\Models\Employee;
+use Modules\HR\Models\Attendance;
+use Modules\HR\Models\Employee;
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -14,7 +15,7 @@ class AttendanceController extends Controller
     public function clockIn(Request $request)
     {
         $request->validate([
-            'employee_id' => 'required|string|exists:employees,employee_id',
+            'employee_id' => 'required|string|exists:hr.employees,employee_id',
             'action' => 'nullable|in:clock_in,clock_out',
             'photo' => 'required|string',
         ]);

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Modules\HR\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Attendance extends Model
 {
+    protected $connection = 'hr';
     /** Fallback allotted work time when employee schedule is missing. */
     public const ALLOTTED_WORK_MINUTES = 9 * 60;
 

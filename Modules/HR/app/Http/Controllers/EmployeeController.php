@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
-use App\Http\Controllers\Concerns\ResolvesPerPage;
-use App\Http\Controllers\Concerns\RespondsWithAjaxList;
-use App\Models\Employee;
+use Modules\HR\Http\Controllers\Concerns\ResolvesPerPage;
+use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
+use Modules\HR\Models\Employee;
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -57,7 +58,7 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        return view('employees.create');
+        return redirect()->route('onboarding.step1');
     }
 
     public function store(Request $request)
@@ -65,7 +66,7 @@ class EmployeeController extends Controller
         $request->validate([
             'first_name'      => 'required',
             'last_name'       => 'required',
-            'email'           => 'required|email|unique:employees,email',
+            'email'           => 'required|email|unique:hr.employees,email',
             'phone'           => 'nullable',
     'position'        => 'nullable',
     'department'      => 'required',
@@ -102,7 +103,7 @@ Employee::create([
     'address' => $request->address,
     'profile_picture' => $imageName,
 ]);
-        return redirect()->route('dashboard')
+        return redirect()->route('hr.dashboard')
             ->with('success', 'Employee added successfully!');
     }
 
@@ -115,7 +116,7 @@ Employee::create([
 public function update(Request $request, Employee $employee)
 {
     $request->validate([
-        'email'           => 'required|email|unique:employees,email,' . $employee->id,
+        'email'           => 'required|email|unique:hr.employees,email,' . $employee->id,
         'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 2MB
     ]);
 
@@ -152,7 +153,7 @@ public function destroy($id)
 
     $employee->delete();
 
-    return redirect('/employees')
+    return redirect()->route('employees.index')
     ->with('success','Employee deleted successfully!');
 }
 }

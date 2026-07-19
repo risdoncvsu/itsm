@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
-use App\Models\Employee;
-use App\Models\Attendance;
+use Modules\HR\Models\Employee;
+use Modules\HR\Models\Attendance;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class DashboardController extends Controller
 {
@@ -15,7 +16,7 @@ class DashboardController extends Controller
         $department = strtolower(trim(session('employee_department', '')));
 
         if ($role !== 'admin' && $department !== 'human resources') {
-            return redirect()->route('employee.dashboard');
+            return redirect()->route('hr.employee.dashboard');
         }
 
         $employeeCount = Employee::count();
@@ -60,7 +61,7 @@ class DashboardController extends Controller
         $department = strtolower(trim(session('employee_department', '')));
 
         if ($role === 'admin' || $department === 'human resources') {
-            return redirect()->route('dashboard');
+            return redirect()->route('hr.dashboard');
         }
 
         $employeeCount = Employee::count();

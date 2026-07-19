@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Employee;
+use Modules\HR\Models\Employee;
 use Illuminate\Support\Str;
+use Illuminate\Routing\Controller;
 
 class EmployeeOnboardingController extends Controller
 {
@@ -19,7 +20,7 @@ class EmployeeOnboardingController extends Controller
     $request->validate([
         'first_name' => 'required',
         'last_name' => 'required',
-        'email' => 'required|email|unique:employees,email',
+        'email' => 'required|email|unique:hr.employees,email',
         'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
     ]);
 
