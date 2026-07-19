@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Services\TenantEmployeeTable;
+use App\Services\HrEmployeeProfileProvisioner;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function __construct(private readonly TenantEmployeeTable $tenantEmployeeTable)
+    public function __construct(
+        private readonly TenantEmployeeTable $tenantEmployeeTable,
+        private readonly HrEmployeeProfileProvisioner $hrEmployeeProfileProvisioner,
+    )
     {
     }
 
@@ -62,13 +67,35 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
             'department' => ['nullable', 'string', 'max:255'],
-            'status' => ['required', 'string', 'max:50'],
+            'status' => ['required', 'in:Active,Inactive,Pending,Suspended'],
         ]);
+
+        $currentEmployee = $this->tenantEmployeeTable->find($company, $employee);
+        abort_unless($currentEmployee, 404);
+
+        $credentials = null;
+        if (
+            $currentEmployee->status === 'Pending'
+            && $validated['status'] === 'Active'
+            && $currentEmployee->department === 'Human Resources'
+        ) {
+            $password = Str::password(16, symbols: true);
+            $provisioned = $this->hrEmployeeProfileProvisioner->provisionApprovedHrManager($company, $currentEmployee, $password);
+            $validated['username'] = $provisioned['email'];
+            $credentials = [
+                'username' => $provisioned['email'],
+                'password' => $password,
+            ];
+
+            $company->update(['hr_employee_id' => $provisioned['employee_id']]);
+        }
 
         $this->tenantEmployeeTable->updateEmployee($company, $employee, $validated);
 
-        return redirect()
+        $response = redirect()
             ->route('client.itsm.employees')
-            ->with('success', 'Employee updated successfully.');
+            ->with('success', $credentials ? 'HR manager approved and login credentials generated.' : 'Employee updated successfully.');
+
+        return $credentials ? $response->with('hr_credentials', $credentials) : $response;
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\User;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -20,7 +21,7 @@ class HrEmployeeProfileProvisioner
         return $this->uniqueHrEmail($baseEmail);
     }
 
-    public function provisionHrManager(Company $company, array $manager, string $plainPassword): int
+    public function recordPendingHrManager(Company $company, array $manager): int
     {
         if (! $this->hrSchema()->hasTable('employees')) {
             return 0;
@@ -31,14 +32,41 @@ class HrEmployeeProfileProvisioner
             'first_name' => $manager['first_name'],
             'last_name' => $manager['last_name'],
             'email' => $manager['personal_email'],
-            'company_email' => $manager['email'],
-            'temporary_password' => $plainPassword,
+            'company_email' => null,
+            'temporary_password' => null,
             'phone' => $company->phone_no,
             'department' => 'Human Resources',
             'position' => 'HR Manager',
             'hire_date' => now()->toDateString(),
             'work_schedule' => '08:00-17:00',
         ]);
+    }
+
+    public function provisionApprovedHrManager(Company $company, object $manager, string $plainPassword): array
+    {
+        $names = preg_split('/\s+/', trim($manager->name), 2);
+        $firstName = $names[0] ?: 'HR';
+        $lastName = $names[1] ?? 'Manager';
+        $hrEmail = $this->generateHrEmail($company, [
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+        ]);
+
+        $employeeId = $this->upsertEmployee([
+            'employee_id' => $manager->employee_code,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $manager->email,
+            'company_email' => $hrEmail,
+            'temporary_password' => Hash::make($plainPassword),
+            'phone' => $company->phone_no,
+            'department' => 'Human Resources',
+            'position' => 'HR Manager',
+            'hire_date' => now()->toDateString(),
+            'work_schedule' => '08:00-17:00',
+        ]);
+
+        return ['employee_id' => $employeeId, 'email' => $hrEmail];
     }
 
     public function attemptHrLogin(string $companyEmail, string $password): bool
@@ -53,10 +81,9 @@ class HrEmployeeProfileProvisioner
 
         $employee = $this->hrDb()->table('employees')
             ->where('company_email', $companyEmail)
-            ->where('temporary_password', $password)
             ->first();
 
-        if (! $employee) {
+        if (! $employee || ! $employee->temporary_password || ! Hash::check($password, $employee->temporary_password)) {
             return false;
         }
 
@@ -95,7 +122,7 @@ class HrEmployeeProfileProvisioner
         ]);
 
         $existing = $this->hrDb()->table('employees')
-            ->when($this->hrSchema()->hasColumn('employees', 'company_email'), function ($query) use ($companyEmail) {
+            ->when($companyEmail && $this->hrSchema()->hasColumn('employees', 'company_email'), function ($query) use ($companyEmail) {
                 $query->where('company_email', $companyEmail);
             })
             ->when($this->hrSchema()->hasColumn('employees', 'email'), function ($query) use ($email) {
@@ -182,11 +209,11 @@ class HrEmployeeProfileProvisioner
 
     private function hrDb(): ConnectionInterface
     {
-        return DB::connection('hr');
+        return DB::connection('modules');
     }
 
     private function hrSchema()
     {
-        return Schema::connection('hr');
+        return Schema::connection('modules');
     }
 }

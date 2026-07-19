@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Company;
 use Illuminate\Support\Collection;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
@@ -19,8 +20,8 @@ class TenantEmployeeTable
     {
         $tableName = $company->employee_table_name ?: $this->tableName($company);
 
-        if (! Schema::hasTable($tableName)) {
-            Schema::create($tableName, function (Blueprint $table): void {
+        if (! $this->schema()->hasTable($tableName)) {
+            $this->schema()->create($tableName, function (Blueprint $table): void {
                 $table->id();
                 $table->string('employee_code')->nullable();
                 $table->string('username')->nullable();
@@ -48,7 +49,7 @@ class TenantEmployeeTable
             return;
         }
 
-        DB::table($tableName)->updateOrInsert([
+        $this->stagingDb()->table($tableName)->updateOrInsert([
             'email' => $admin->email,
         ], [
             'employee_code' => 'EMP-' . str_pad((string) $admin->id, 5, '0', STR_PAD_LEFT),
@@ -65,14 +66,14 @@ class TenantEmployeeTable
     {
         $tableName = $this->ensure($company);
 
-        return DB::table($tableName)->orderBy('id')->get();
+        return $this->stagingDb()->table($tableName)->orderBy('id')->get();
     }
 
     public function updateEmployee(Company $company, int $employeeId, array $values): void
     {
         $tableName = $this->ensure($company);
 
-        DB::table($tableName)
+        $this->stagingDb()->table($tableName)
             ->where('id', $employeeId)
             ->update($values + ['updated_at' => now()]);
     }
@@ -81,26 +82,42 @@ class TenantEmployeeTable
     {
         $tableName = $this->ensure($company);
 
-        return DB::table($tableName)->insertGetId($values + [
+        return $this->stagingDb()->table($tableName)->insertGetId($values + [
             'created_at' => now(),
             'updated_at' => now(),
         ]);
     }
 
-    public function queueHrManagerApproval(Company $company, array $manager, string $hrEmail): void
+    public function queueHrManagerApproval(Company $company, array $manager): void
     {
         $tableName = $this->ensure($company);
 
-        DB::table($tableName)->updateOrInsert([
-            'username' => $hrEmail,
+        $this->stagingDb()->table($tableName)->updateOrInsert([
+            'employee_code' => $manager['employee_id'],
         ], [
             'employee_code' => $manager['employee_id'],
             'name' => trim($manager['first_name'] . ' ' . $manager['last_name']),
             'email' => $manager['email'],
             'department' => 'Human Resources',
+            'username' => null,
             'status' => 'Pending',
             'updated_at' => now(),
             'created_at' => now(),
         ]);
+    }
+
+    public function find(Company $company, int $employeeId): ?object
+    {
+        return $this->stagingDb()->table($this->ensure($company))->find($employeeId);
+    }
+
+    private function stagingDb(): ConnectionInterface
+    {
+        return DB::connection('staging');
+    }
+
+    private function schema()
+    {
+        return Schema::connection('staging');
     }
 }

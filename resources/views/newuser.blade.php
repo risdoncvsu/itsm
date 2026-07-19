@@ -565,13 +565,7 @@
                         <p class="form-text">Your ERP workspace has been successfully configured.</p>
                         <p class="form-text">Your organization is now ready to start managing employees and business operations.</p>
 
-                        @if (session('hr_credentials'))
-                            <p class="form-text">
-                                Personal email: <strong>{{ session('hr_credentials.personal_email') }}</strong><br>
-                                HR login: <strong>{{ session('hr_credentials.company_email') }}</strong><br>
-                                Password: <strong>{{ session('hr_credentials.password') }}</strong>
-                            </p>
-                        @endif
+                        <p class="form-text">The HR manager profile is now listed in Employee Management for approval. Login credentials will be generated only after the client system admin approves it.</p>
 
                         <div class="button-container stage4">
                             <a href="{{ route('login') }}" class="submit-btn" role="button" aria-label="Done">Done</a>

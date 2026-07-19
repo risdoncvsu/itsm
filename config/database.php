@@ -99,19 +99,52 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
-        'hr' => [
-            'driver' => env('HR_DB_CONNECTION') ?: env('DB_CONNECTION', 'pgsql'),
-            'url' => env('HR_DB_URL') ?: null,
-            'host' => env('HR_DB_HOST') ?: env('DB_HOST', '127.0.0.1'),
-            'port' => env('HR_DB_PORT') ?: env('DB_PORT', '5432'),
-            'database' => env('HR_DB_DATABASE') ?: env('DB_DATABASE', 'laravel'),
-            'username' => env('HR_DB_USERNAME') ?: env('DB_USERNAME', 'root'),
-            'password' => env('HR_DB_PASSWORD') ?: env('DB_PASSWORD', ''),
-            'charset' => env('HR_DB_CHARSET') ?: env('DB_CHARSET', 'utf8'),
+        'modules' => [
+            'driver' => env('MODULE_DB_CONNECTION') ?: env('DB_CONNECTION', 'pgsql'),
+            'url' => env('MODULE_DB_URL') ?: env('HR_DB_URL') ?: null,
+            'host' => env('MODULE_DB_HOST') ?: env('DB_HOST', '127.0.0.1'),
+            'port' => env('MODULE_DB_PORT') ?: env('DB_PORT', '5432'),
+            'database' => env('MODULE_DB_DATABASE') ?: env('DB_DATABASE', 'laravel'),
+            'username' => env('MODULE_DB_USERNAME') ?: env('DB_USERNAME', 'root'),
+            'password' => env('MODULE_DB_PASSWORD') ?: env('DB_PASSWORD', ''),
+            'charset' => env('MODULE_DB_CHARSET') ?: env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            'search_path' => env('HR_DB_SEARCH_PATH') ?: 'public',
-            'sslmode' => env('HR_DB_SSLMODE') ?: env('DB_SSLMODE', 'prefer'),
+            'search_path' => env('MODULE_DB_SEARCH_PATH') ?: 'public',
+            'sslmode' => env('MODULE_DB_SSLMODE') ?: env('DB_SSLMODE', 'prefer'),
+        ],
+
+        'hr' => [
+            'driver' => env('HR_DB_CONNECTION') ?: env('MODULE_DB_CONNECTION') ?: env('DB_CONNECTION', 'pgsql'),
+            'url' => env('HR_DB_URL') ?: env('MODULE_DB_URL') ?: null,
+            'host' => env('HR_DB_HOST') ?: env('MODULE_DB_HOST') ?: env('DB_HOST', '127.0.0.1'),
+            'port' => env('HR_DB_PORT') ?: env('MODULE_DB_PORT') ?: env('DB_PORT', '5432'),
+            'database' => env('HR_DB_DATABASE') ?: env('MODULE_DB_DATABASE') ?: env('DB_DATABASE', 'laravel'),
+            'username' => env('HR_DB_USERNAME') ?: env('MODULE_DB_USERNAME') ?: env('DB_USERNAME', 'root'),
+            'password' => env('HR_DB_PASSWORD') ?: env('MODULE_DB_PASSWORD') ?: env('DB_PASSWORD', ''),
+            'charset' => env('HR_DB_CHARSET') ?: env('MODULE_DB_CHARSET') ?: env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => env('HR_DB_SEARCH_PATH') ?: env('MODULE_DB_SEARCH_PATH') ?: 'public',
+            'sslmode' => env('HR_DB_SSLMODE') ?: env('MODULE_DB_SSLMODE') ?: env('DB_SSLMODE', 'prefer'),
+        ],
+
+        // The staging database is the shared integration boundary between ITSM
+        // and product modules. Module-owned data stays in its module database;
+        // only records that ITSM needs to review or act on are copied here.
+        'staging' => [
+            'driver' => env('STAGING_DB_CONNECTION') ?: env('DB_CONNECTION', 'pgsql'),
+            'url' => env('STAGING_DB_URL') ?: null,
+            'host' => env('STAGING_DB_HOST') ?: env('DB_HOST', '127.0.0.1'),
+            'port' => env('STAGING_DB_PORT') ?: env('DB_PORT', '5432'),
+            'database' => env('STAGING_DB_DATABASE') ?: env('DB_DATABASE', 'laravel'),
+            'username' => env('STAGING_DB_USERNAME') ?: env('DB_USERNAME', 'root'),
+            'password' => env('STAGING_DB_PASSWORD') ?: env('DB_PASSWORD', ''),
+            'charset' => env('STAGING_DB_CHARSET') ?: env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => env('STAGING_DB_SEARCH_PATH') ?: 'public',
+            'sslmode' => env('STAGING_DB_SSLMODE') ?: env('DB_SSLMODE', 'prefer'),
         ],
 
         'sqlsrv' => [

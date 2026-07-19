@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Employee;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -36,7 +37,7 @@ class AuthController extends Controller
             return back()->with('error', 'Invalid email or password. Please try again.');
         }
 
-        if ($employee->temporary_password !== $request->password) {
+        if (! $employee->temporary_password || ! Hash::check($request->password, $employee->temporary_password)) {
             return back()->with('error', 'Invalid email or password. Please try again.');
         }
 

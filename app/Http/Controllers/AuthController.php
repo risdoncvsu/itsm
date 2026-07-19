@@ -40,7 +40,10 @@ class AuthController extends Controller
         if ($this->hrEmployeeProfileProvisioner->attemptHrLogin($credentials['username'], $credentials['password'])) {
             $request->session()->regenerate();
 
-            return redirect(config('services.hr.dashboard_url') ?: route('login'));
+            // Deployments can point this to the standalone HR app. The local
+            // fallback keeps the portal hand-off on the HR route rather than
+            // sending an approved manager back to the ITSM sign-in screen.
+            return redirect(config('services.hr.dashboard_url') ?: url('/hr/dashboard'));
         }
 
         // 3. If it fails, send them back

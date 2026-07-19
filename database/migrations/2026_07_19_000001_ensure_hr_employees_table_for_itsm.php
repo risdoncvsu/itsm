@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $schema = Schema::connection('hr');
+        $schema = Schema::connection('modules');
 
         if (! $schema->hasTable('employees')) {
             $schema->create('employees', function (Blueprint $table): void {

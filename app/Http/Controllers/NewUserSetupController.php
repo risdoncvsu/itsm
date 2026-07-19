@@ -9,7 +9,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class NewUserSetupController extends Controller
@@ -89,18 +88,13 @@ class NewUserSetupController extends Controller
             'employee_id' => ['required', 'string', 'max:255'],
         ]);
 
-        $hrEmail = $this->hrEmployeeProfileProvisioner->generateHrEmail($company, $validated);
-        $password = Str::random(14);
-
-        $employeeId = $this->hrEmployeeProfileProvisioner->provisionHrManager(
+        // The HR module owns the manager profile. Staging receives a pending
+        // approval record, but no login can exist until ITSM approves it.
+        $employeeId = $this->hrEmployeeProfileProvisioner->recordPendingHrManager(
             $company,
-            $validated + [
-                'personal_email' => $validated['email'],
-                'email' => $hrEmail,
-            ],
-            $password
+            $validated + ['personal_email' => $validated['email']]
         );
-        $this->tenantEmployeeTable->queueHrManagerApproval($company, $validated, $hrEmail);
+        $this->tenantEmployeeTable->queueHrManagerApproval($company, $validated);
 
         $company->update([
             'hr_employee_id' => $employeeId,
@@ -109,11 +103,7 @@ class NewUserSetupController extends Controller
 
         return redirect()
             ->route('newuser.show', ['stage' => 4, 'review' => 1])
-            ->with('hr_credentials', [
-                'company_email' => $hrEmail,
-                'personal_email' => $validated['email'],
-                'password' => $password,
-            ]);
+            ->with('success', 'The HR manager profile is awaiting approval in Employee Management.');
     }
 
     private function company(): ?Company
