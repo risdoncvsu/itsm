@@ -5,6 +5,8 @@
     $dropActive = 'bg-[#f3f6fb] text-[#2D7EFF]';
 
     $isDashboard = request()->routeIs('hr.dashboard');
+    $isWorkforce = false;
+    $isReports = false;
 @endphp
 
 <header class="w-full h-[150px] bg-[#132B52] flex items-center justify-between pl-[1px] pr-[5px] border-b border-white/5 shadow-[0_1px_0_rgba(255,255,255,.03)_inset] sticky top-0 z-[1000]">
