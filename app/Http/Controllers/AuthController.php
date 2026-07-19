@@ -34,7 +34,9 @@ class AuthController extends Controller
                 ? $this->companyAdminDestination($user)
                 : route('admin.itsm.registration');
 
-            return redirect()->intended($destination);
+            // Do not allow a stale intended URL (for example, an admin page
+            // visited before login) to override the portal assigned by role.
+            return redirect()->to($destination);
         }
 
         if ($this->hrEmployeeProfileProvisioner->attemptHrLogin($credentials['username'], $credentials['password'])) {
