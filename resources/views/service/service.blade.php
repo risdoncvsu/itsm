@@ -5,6 +5,7 @@
     $subtitle = $subtitle ?? 'Track and manage ITSM tickets';
     $tickets = $tickets ?? collect();
     $ticketType = $ticketType ?? 'erp_module';
+    $canProcessPasswordResets = $canProcessPasswordResets ?? false;
     $canCreateTicket = $canCreateTicket ?? ($portal === 'client' && $ticketType === 'nexora_support');
     $canUpdateTicket = $canUpdateTicket ?? ($portal === 'admin' || ($portal === 'client' && $ticketType === 'erp_module'));
     $updateMode = $updateMode ?? 'full';
@@ -89,6 +90,15 @@
                         </div>
                     @endif
 
+                    @if (session('reset_credentials'))
+                        <div class="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                            <p class="font-bold">One-time reset credentials</p>
+                            <p class="mt-2">Username: <span class="font-mono">{{ session('reset_credentials.username') }}</span></p>
+                            <p>Password: <span class="font-mono">{{ session('reset_credentials.password') }}</span></p>
+                            <p class="mt-2">Provide these securely. The user must change the password on their next sign-in.</p>
+                        </div>
+                    @endif
+
                     <div class="grid gap-6 xl:grid-cols-4">
                         <div class="rounded-2xl bg-white p-6 text-slate-950">
                             <p class="text-sm font-semibold text-slate-500">Open Tickets</p>
@@ -152,6 +162,12 @@
                                             <td class="py-4">{{ $ticket->status }}</td>
                                             @if ($canUpdateTicket)
                                                 <td class="py-4 text-right">
+                                                    @if ($canProcessPasswordResets && $ticket->category === 'Password Reset' && $ticket->status !== 'Resolved')
+                                                        <form method="POST" action="{{ route('client.itsm.service-desk.support.reset-password', $ticket) }}" class="mb-2" onsubmit="return confirm('Generate a one-time password for this account?')">
+                                                            @csrf
+                                                            <button type="submit" class="rounded-md bg-[#346DCB] px-3 py-1 font-semibold text-white hover:bg-[#2554a3]">Reset password</button>
+                                                        </form>
+                                                    @endif
                                                     <button type="button" class="edit-ticket rounded-md border border-slate-300 px-3 py-1 font-semibold hover:bg-slate-100">
                                                         {{ $updateMode === 'status_only' ? 'Resolve' : 'Edit' }}
                                                     </button>

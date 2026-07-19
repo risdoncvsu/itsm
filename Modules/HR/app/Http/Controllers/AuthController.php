@@ -15,19 +15,6 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (
-    $request->company_email === 'admin@nexora.com' &&
-    $request->password === 'Admin123'
-) {
-    session([
-        'employee_logged_in' => true,
-        'employee_role' => 'admin',
-        'employee_name' => 'Administrator',
-    ]);
-
-    return redirect()->route('dashboard');
-}
-
         $employee = Employee::where(
             'company_email',
             $request->company_email

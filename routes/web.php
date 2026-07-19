@@ -15,30 +15,35 @@ use App\Http\Controllers\RiskAssController;
 use App\Http\Controllers\DocumentController; // Imported DocumentController
 use App\Http\Controllers\NewUserSetupController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\PasswordResetController;
 
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/forgot-password', [PasswordResetController::class, 'create'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'store'])->name('password.email');
 Route::get('/first-login/password', [AuthController::class, 'showHrFirstLoginPassword'])->name('hr.first-login.password');
 Route::post('/first-login/password', [AuthController::class, 'storeHrFirstLoginPassword'])->name('hr.first-login.password.store');
 
 Route::middleware('auth')->group(function () {
 
-    Route::get('/newuser', [NewUserSetupController::class, 'show'])->name('newuser.show');
-    Route::post('/newuser/password', [NewUserSetupController::class, 'storePassword'])->name('newuser.password');
-    Route::post('/newuser/logo', [NewUserSetupController::class, 'storeLogo'])->name('newuser.logo');
-    Route::post('/newuser/hr-manager', [NewUserSetupController::class, 'storeHrManager'])->name('newuser.hr-manager');
+    Route::middleware('client.admin')->group(function () {
+        Route::get('/newuser', [NewUserSetupController::class, 'show'])->name('newuser.show');
+        Route::post('/newuser/password', [NewUserSetupController::class, 'storePassword'])->name('newuser.password');
+        Route::post('/newuser/logo', [NewUserSetupController::class, 'storeLogo'])->name('newuser.logo');
+        Route::post('/newuser/hr-manager', [NewUserSetupController::class, 'storeHrManager'])->name('newuser.hr-manager');
+    });
 
     Route::get('/dashboard', function () {
         return redirect()->route('admin.itsm.registration');
-    })->name('dashboard');
+    })->middleware('root.admin')->name('dashboard');
 
     // ==========================================
     // ADMIN ITSM ROUTES
     // ==========================================
-    Route::prefix('admin/itsm')->name('admin.itsm.')->group(function () {
+    Route::middleware('root.admin')->prefix('admin/itsm')->name('admin.itsm.')->group(function () {
         Route::get('/registration', function () {
             return view('dashboard');
         })->name('registration');
@@ -55,7 +60,7 @@ Route::middleware('auth')->group(function () {
     // ==========================================
     // CLIENT ITSM ROUTES
     // ==========================================
-    Route::prefix('client/itsm')->name('client.itsm.')->group(function () {
+    Route::middleware('client.admin')->prefix('client/itsm')->name('client.itsm.')->group(function () {
         Route::get('/', function () {
             return redirect()->route('client.itsm.employees');
         })->name('dashboard');
@@ -70,6 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/service-desk/{ticket}', [TicketController::class, 'update'])->name('service-desk.update');
         Route::get('/service-desk/support', [TicketController::class, 'supportIndex'])->name('service-desk.support');
         Route::post('/service-desk/support', [TicketController::class, 'store'])->name('service-desk.support.store');
+        Route::post('/service-desk/support/{ticket}/reset-password', [PasswordResetController::class, 'process'])->name('service-desk.support.reset-password');
         
         // ==========================================
         // COMPLIANCE MODULE ROUTES

@@ -28,6 +28,7 @@ class TicketController extends Controller
             'ticketType' => $portal === 'admin' ? 'nexora_support' : $ticketType,
             'canCreateTicket' => $portal === 'client' && $ticketType === 'nexora_support',
             'canUpdateTicket' => $portal === 'admin' || ($portal === 'client' && $ticketType === 'erp_module'),
+            'canProcessPasswordResets' => $portal === 'client' && $ticketType === 'nexora_support',
             'updateMode' => $portal === 'client' && $ticketType === 'erp_module' ? 'status_only' : 'full',
             'title' => $this->titleFor($portal, $ticketType),
             'subtitle' => $this->subtitleFor($portal, $ticketType),
