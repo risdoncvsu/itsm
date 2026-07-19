@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'hr.access' => \Modules\HR\Http\Middleware\EmployeeAuth::class,
             'inventory.access' => \Modules\Inventory\Http\Middleware\InventoryAccess::class,
+            'procurement.access' => \Modules\Procurement\Http\Middleware\ProcurementAccess::class,
             'root.admin' => \App\Http\Middleware\EnsureRootAdmin::class,
             'client.admin' => \App\Http\Middleware\EnsureClientAdmin::class,
         ]);

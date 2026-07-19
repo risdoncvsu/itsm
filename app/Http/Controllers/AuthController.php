@@ -63,6 +63,10 @@ class AuthController extends Controller
                 return redirect()->route('inventory.index');
             }
 
+            if (str_contains($department, 'procurement') || str_contains($department, 'purchasing')) {
+                return redirect()->route('procurement.dashboard');
+            }
+
             return redirect()->route('hr.dashboard');
         }
 
@@ -90,9 +94,15 @@ class AuthController extends Controller
 
         $department = strtolower((string) session('employee_department', ''));
 
-        return (str_contains($department, 'inventory') || str_contains($department, 'warehouse'))
-            ? redirect()->route('inventory.index')
-            : redirect()->route('hr.dashboard');
+        if (str_contains($department, 'inventory') || str_contains($department, 'warehouse')) {
+            return redirect()->route('inventory.index');
+        }
+
+        if (str_contains($department, 'procurement') || str_contains($department, 'purchasing')) {
+            return redirect()->route('procurement.dashboard');
+        }
+
+        return redirect()->route('hr.dashboard');
     }
 
     private function companyAdminDestination($user): string

@@ -148,6 +148,23 @@ return [
             'sslmode' => env('INVENTORY_DB_SSLMODE', 'prefer'),
         ],
 
+        // Procurement owns suppliers, requisitions, purchase orders, and
+        // delivery records. It must never fall back to the ITSM database.
+        'procurement' => [
+            'driver' => env('PROCUREMENT_DB_CONNECTION', 'pgsql'),
+            'url' => env('PROCUREMENT_DB_URL'),
+            'host' => env('PROCUREMENT_DB_HOST'),
+            'port' => env('PROCUREMENT_DB_PORT', '5432'),
+            'database' => env('PROCUREMENT_DB_DATABASE'),
+            'username' => env('PROCUREMENT_DB_USERNAME'),
+            'password' => env('PROCUREMENT_DB_PASSWORD'),
+            'charset' => env('PROCUREMENT_DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => env('PROCUREMENT_DB_SEARCH_PATH', 'public'),
+            'sslmode' => env('PROCUREMENT_DB_SSLMODE', 'prefer'),
+        ],
+
         // Staging is optional. It must be configured explicitly: falling back
         // to DB_* would silently put integration data into the ITSM database.
         'staging' => [
