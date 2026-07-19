@@ -56,8 +56,8 @@ class AuthController extends Controller
     {
         $company = $user->company_id ? \App\Models\Company::find($user->company_id) : null;
 
-        if ($company && ! $company->setup_completed_at) {
-            return route('newuser.show');
+        if ($company && (! $company->setup_completed_at || ! $company->hr_employee_id || ! $this->hrEmployeeProfileProvisioner->hasEmployeeForCompany($company, (int) $company->hr_employee_id))) {
+            return route('newuser.show', ['stage' => 3]);
         }
 
         return route('client.itsm.employees');

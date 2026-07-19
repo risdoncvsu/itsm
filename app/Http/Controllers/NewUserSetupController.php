@@ -26,11 +26,14 @@ class NewUserSetupController extends Controller
             return redirect()->route('admin.itsm.registration');
         }
 
-        if ($company->setup_completed_at && ! $request->boolean('review')) {
+        $needsHrManager = $company->setup_completed_at
+            && (! $company->hr_employee_id || ! $this->hrEmployeeProfileProvisioner->hasEmployeeForCompany($company, (int) $company->hr_employee_id));
+
+        if ($company->setup_completed_at && ! $needsHrManager && ! $request->boolean('review')) {
             return redirect()->route('client.itsm.employees');
         }
 
-        $stage = (string) $request->query('stage', '1');
+        $stage = (string) $request->query('stage', $needsHrManager ? '3' : '1');
         if (! in_array($stage, ['1', '2', '3', '4'], true)) {
             $stage = '1';
         }

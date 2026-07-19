@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use RuntimeException;
 
 class HrEmployeeProfileProvisioner
 {
@@ -25,7 +26,7 @@ class HrEmployeeProfileProvisioner
     public function recordPendingHrManager(Company $company, array $manager): int
     {
         if (! $this->hrSchema()->hasTable('employees')) {
-            return 0;
+            throw new RuntimeException('The HR employee database is unavailable. The HR manager was not created.');
         }
 
         return $this->upsertEmployee([
@@ -88,8 +89,26 @@ class HrEmployeeProfileProvisioner
             ->where('company_email', $companyEmail)
             ->first();
 
-        if (! $employee || ! $employee->temporary_password || ! Hash::check($password, $employee->temporary_password)) {
+        if (! $employee || ! $employee->temporary_password || ($employee->approval_status ?? 'Active') !== 'Active') {
             return false;
+        }
+
+        $storedPassword = (string) $employee->temporary_password;
+        $passwordMatches = str_starts_with($storedPassword, '$')
+            ? Hash::check($password, $storedPassword)
+            : hash_equals($storedPassword, $password);
+
+        if (! $passwordMatches) {
+            return false;
+        }
+
+        // Existing HR records used plaintext temporary passwords. Upgrade a
+        // valid legacy login immediately so future checks use a password hash.
+        if (! str_starts_with($storedPassword, '$')) {
+            $this->hrDb()->table('employees')->where('id', $employee->id)->update([
+                'temporary_password' => Hash::make($password),
+                'updated_at' => now(),
+            ]);
         }
 
         $this->putEmployeeSession($employee);
@@ -131,6 +150,11 @@ class HrEmployeeProfileProvisioner
             ->first();
 
         return $employee ? $this->employeeForItsm($employee) : null;
+    }
+
+    public function hasEmployeeForCompany(Company $company, int $employeeId): bool
+    {
+        return $this->findEmployeeForCompany($company, $employeeId) !== null;
     }
 
     public function updateEmployeeForCompany(Company $company, int $employeeId, array $values): void
