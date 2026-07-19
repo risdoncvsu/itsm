@@ -6,12 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
     public function up(): void
     {
-        Schema::create('requisition_items', function (Blueprint $table) {
+        if (Schema::connection('procurement')->hasTable('requisition_items')) {
+            return;
+        }
+
+        Schema::connection('procurement')->create('requisition_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('requisition_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('supplier_product_id')->nullable()->constrained('supplier_products')->nullOnDelete();
+            $table->unsignedBigInteger('requisition_id');
+            $table->unsignedBigInteger('supplier_product_id')->nullable();
             $table->string('name');
             $table->unsignedInteger('qty')->default(1);
             $table->string('uom')->nullable();
@@ -23,6 +28,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('requisition_items');
+        Schema::connection('procurement')->dropIfExists('requisition_items');
     }
 };
+
+

@@ -6,11 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
     public function up(): void
     {
-        Schema::create('supplier_products', function (Blueprint $table) {
+        if (Schema::connection('procurement')->hasTable('supplier_products')) {
+            return;
+        }
+
+        Schema::connection('procurement')->create('supplier_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('supplier_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('supplier_id');
             $table->string('name');
             $table->string('sku')->nullable();
             $table->decimal('unit_price', 14, 2)->default(0);
@@ -22,6 +27,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('supplier_products');
+        Schema::connection('procurement')->dropIfExists('supplier_products');
     }
 };
+
+

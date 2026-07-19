@@ -6,13 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
     public function up(): void
     {
-        Schema::create('deliveries', function (Blueprint $table) {
+        if (Schema::connection('procurement')->hasTable('deliveries')) {
+            return;
+        }
+
+        Schema::connection('procurement')->create('deliveries', function (Blueprint $table) {
             $table->id();
-            $table->string('shipment_number')->unique();
-            $table->foreignId('purchase_order_id')->nullable()->constrained('purchase_orders')->nullOnDelete();
-            $table->foreignId('supplier_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('shipment_number');
+            $table->unsignedBigInteger('purchase_order_id')->nullable();
+            $table->unsignedBigInteger('supplier_id')->nullable();
             $table->unsignedTinyInteger('stage')->default(0); // 0..4 progress steps
             $table->string('status')->default('shipment'); // shipment|intransit|delivered|delayed|cancel|complete
             $table->string('received_by')->nullable();
@@ -27,6 +32,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('deliveries');
+        Schema::connection('procurement')->dropIfExists('deliveries');
     }
 };
+
+

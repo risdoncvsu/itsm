@@ -6,10 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
     public function up(): void
     {
-        Schema::table('purchase_orders', function (Blueprint $table) {
-            if (! Schema::hasColumn('purchase_orders', 'expected_delivery_date')) {
+        Schema::connection('procurement')->table('purchase_orders', function (Blueprint $table) {
+            if (! Schema::connection('procurement')->hasColumn('purchase_orders', 'expected_delivery_date')) {
                 $table->date('expected_delivery_date')->nullable()->after('order_date');
             }
         });
@@ -17,10 +18,12 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('purchase_orders', function (Blueprint $table) {
-            if (Schema::hasColumn('purchase_orders', 'expected_delivery_date')) {
+        Schema::connection('procurement')->table('purchase_orders', function (Blueprint $table) {
+            if (Schema::connection('procurement')->hasColumn('purchase_orders', 'expected_delivery_date')) {
                 $table->dropColumn('expected_delivery_date');
             }
         });
     }
 };
+
+

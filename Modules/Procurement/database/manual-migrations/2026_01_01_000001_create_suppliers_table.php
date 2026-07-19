@@ -6,9 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
     public function up(): void
     {
-        Schema::create('suppliers', function (Blueprint $table) {
+        if (Schema::connection('procurement')->hasTable('suppliers')) {
+            return;
+        }
+
+        Schema::connection('procurement')->create('suppliers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('contact_person')->nullable();
@@ -24,6 +29,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('suppliers');
+        Schema::connection('procurement')->dropIfExists('suppliers');
     }
 };
+
+

@@ -6,11 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
     public function up(): void
     {
-        Schema::create('requisitions', function (Blueprint $table) {
+        if (Schema::connection('procurement')->hasTable('requisitions')) {
+            return;
+        }
+
+        Schema::connection('procurement')->create('requisitions', function (Blueprint $table) {
             $table->id();
-            $table->string('req_number')->unique();
+            $table->string('req_number');
             $table->string('item');
             $table->unsignedInteger('qty')->default(1);
             $table->string('uom')->nullable();
@@ -26,6 +31,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('requisitions');
+        Schema::connection('procurement')->dropIfExists('requisitions');
     }
 };
+
+

@@ -15,7 +15,7 @@ PROCUREMENT_DB_SSLMODE=require
 Then run this **once**, with the owner role for the Procurement database:
 
 ```sh
-php artisan module:migrate Procurement --database=procurement --force
+php artisan procurement:install-schema --force
 ```
 
 For an existing Procurement database whose original tables are already

@@ -6,9 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
     public function up(): void
     {
-        Schema::table('deliveries', function (Blueprint $table) {
+        Schema::connection('procurement')->table('deliveries', function (Blueprint $table) {
             $table->string('received_at')->nullable()->after('received_by');
             $table->string('condition')->default('good')->after('received_at');
         });
@@ -16,8 +17,10 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('deliveries', function (Blueprint $table) {
+        Schema::connection('procurement')->table('deliveries', function (Blueprint $table) {
             $table->dropColumn(['received_at', 'condition']);
         });
     }
 };
+
+

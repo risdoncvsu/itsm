@@ -6,17 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
     public function up(): void
     {
-        Schema::table('purchase_orders', function (Blueprint $table) {
+        Schema::connection('procurement')->table('purchase_orders', function (Blueprint $table) {
             $table->string('requisition_reference')->nullable()->after('remarks');
         });
     }
 
     public function down(): void
     {
-        Schema::table('purchase_orders', function (Blueprint $table) {
+        Schema::connection('procurement')->table('purchase_orders', function (Blueprint $table) {
             $table->dropColumn('requisition_reference');
         });
     }
 };
+
+

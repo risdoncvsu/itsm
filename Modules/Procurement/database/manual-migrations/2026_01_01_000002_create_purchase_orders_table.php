@@ -6,12 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
     public function up(): void
     {
-        Schema::create('purchase_orders', function (Blueprint $table) {
+        if (Schema::connection('procurement')->hasTable('purchase_orders')) {
+            return;
+        }
+
+        Schema::connection('procurement')->create('purchase_orders', function (Blueprint $table) {
             $table->id();
-            $table->string('po_number')->unique();
-            $table->foreignId('supplier_id')->constrained()->cascadeOnDelete();
+            $table->string('po_number');
+            $table->unsignedBigInteger('supplier_id');
             $table->string('category')->nullable();
             $table->unsignedInteger('qty')->default(1);
             $table->decimal('amount', 14, 2)->default(0);
@@ -26,6 +31,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('purchase_orders');
+        Schema::connection('procurement')->dropIfExists('purchase_orders');
     }
 };
+
+

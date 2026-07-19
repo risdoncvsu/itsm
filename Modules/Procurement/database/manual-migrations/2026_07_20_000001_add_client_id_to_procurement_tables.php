@@ -6,17 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
     public function up(): void
     {
         foreach ([
             'suppliers', 'supplier_products', 'requisitions', 'requisition_items',
             'purchase_orders', 'purchase_order_items', 'deliveries',
         ] as $tableName) {
-            if (! Schema::hasTable($tableName) || Schema::hasColumn($tableName, 'client_id')) {
+            if (! Schema::connection('procurement')->hasTable($tableName) || Schema::connection('procurement')->hasColumn($tableName, 'client_id')) {
                 continue;
             }
 
-            Schema::table($tableName, function (Blueprint $table): void {
+            Schema::connection('procurement')->table($tableName, function (Blueprint $table): void {
                 $table->unsignedBigInteger('client_id')->nullable()->index();
             });
         }
@@ -28,3 +29,5 @@ return new class extends Migration
         // routine rollback.
     }
 };
+
+
