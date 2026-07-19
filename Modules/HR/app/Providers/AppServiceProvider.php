@@ -1,23 +1,10 @@
-<?php
-
-namespace App\Providers;
-
-use Illuminate\Support\ServiceProvider;
-
-class AppServiceProvider extends ServiceProvider
-{
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
+loadRoutesFrom(__DIR__ . '/../Routes/web.php');
+        
+        // Tell Laravel where to find the HR blade files
+        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'hr');
     }
 
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
+    public function register()
     {
         //
     }

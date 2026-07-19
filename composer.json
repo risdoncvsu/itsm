@@ -89,5 +89,10 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true
-}
+},
+    "config": {
+        "allow-plugins": {
+            "wikimedia/composer-merge-plugin": true
+        }
+    }
 }
