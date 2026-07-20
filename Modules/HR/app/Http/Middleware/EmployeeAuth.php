@@ -15,6 +15,10 @@ class EmployeeAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (config('nexora.root_admin_module_testing') && $request->user()?->role === 'root_admin') {
+            return $next($request);
+        }
+
         if (! session('employee_logged_in')) {
             return redirect()->route('login');
         }
