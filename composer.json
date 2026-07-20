@@ -29,7 +29,8 @@
             "Modules\\Inventory\\": "Modules/Inventory/app/",
             "Modules\\Procurement\\": "Modules/Procurement/app/",
             "Modules\\OrderFulfillment\\": "Modules/OrderFulfillment/app/",
-            "Modules\\Ecommerce\\": "Modules/Ecommerce/app/"
+            "Modules\\Ecommerce\\": "Modules/Ecommerce/app/",
+            "Modules\\Manufacturing\\": "Modules/Manufacturing/app/"
         }
     },
     "autoload-dev": {

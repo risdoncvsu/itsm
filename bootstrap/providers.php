@@ -10,6 +10,7 @@ spl_autoload_register(static function (string $class): void {
         'Modules\\Procurement\\' => __DIR__.'/../Modules/Procurement/app/',
         'Modules\\OrderFulfillment\\' => __DIR__.'/../Modules/OrderFulfillment/app/',
         'Modules\\Ecommerce\\' => __DIR__.'/../Modules/Ecommerce/app/',
+        'Modules\\Manufacturing\\' => __DIR__.'/../Modules/Manufacturing/app/',
     ];
 
     foreach ($prefixes as $prefix => $basePath) {
@@ -31,6 +32,7 @@ require_once __DIR__.'/../Modules/Inventory/app/Providers/InventoryServiceProvid
 require_once __DIR__.'/../Modules/Procurement/app/Providers/ProcurementServiceProvider.php';
 require_once __DIR__.'/../Modules/OrderFulfillment/app/Providers/OrderFulfillmentServiceProvider.php';
 require_once __DIR__.'/../Modules/Ecommerce/app/Providers/EcommerceServiceProvider.php';
+require_once __DIR__.'/../Modules/Manufacturing/app/Providers/ManufacturingServiceProvider.php';
 
 return [
     AppServiceProvider::class,
