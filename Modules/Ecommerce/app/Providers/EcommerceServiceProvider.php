@@ -23,7 +23,10 @@ class EcommerceServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'ecommerce');
-        Blade::anonymousComponentPath(__DIR__.'/../../resources/views/components', 'ecommerce');
+        // The standalone storefront uses <x-navbar>, <x-footer>, and related
+        // anonymous components directly, so retain those component names after
+        // moving its views into this module.
+        Blade::anonymousComponentPath(__DIR__.'/../../resources/views/components');
 
         Route::middleware('web')
             ->group(__DIR__.'/../../routes/web.php');

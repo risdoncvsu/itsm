@@ -6,6 +6,12 @@
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* The standalone storefront used a Vite-only preloader controller. In the
+ * unified app it must never cover the page while assets are loading. */
+#preloader {
+    display: none !important;
+}
+
 .liquid-glass-heavy {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
     backdrop-filter: blur(24px) saturate(200%);
