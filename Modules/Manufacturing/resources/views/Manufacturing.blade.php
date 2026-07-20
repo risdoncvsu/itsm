@@ -196,10 +196,10 @@
             <div class="flex-1 h-full p-4 bg-nexora-off-white border-[1px] border-nexora-corporate rounded-lg overflow-y-auto [&::-webkit-scrollbar]:hidden">
                 {{-- Dashboard --}}
                 @if($curPage === 'dashboard')
-                    @include('manufacturing::partials.dashboard')
+                    @include('manufacturing::dashboard')
                     {{-- Reports --}}
                 @elseif($curPage === 'reports')
-                    @include('manufacturing::partials.reports')
+                    @include('manufacturing::reports')
                 {{-- Work Orders --}}
                 @elseif($curPage === 'orders')
                 @php
@@ -214,29 +214,29 @@
                 @endphp
                     {{-- All Orders --}}
                     @if($curSub === 'all' || $curSub === '')
-                        @include('manufacturing::partials.workorder.allorder')
+                        @include('manufacturing::workorder.allorder')
                     {{-- Status --}}
                     @elseif ($curSub === 'status')
-                        @include('manufacturing::partials.workorder.status')
+                        @include('manufacturing::workorder.status')
                     {{-- Schedule --}}
                     @elseif($curSub === 'schedule')
-                        @include('manufacturing::partials.workorder.schedule')
+                        @include('manufacturing::workorder.schedule')
                     {{-- BOMs --}}
                     @elseif($curSub === 'boms')
-                            @include('manufacturing::partials.workorder.bom')
+                            @include('manufacturing::workorder.bom')
                     {{-- Assignment --}}
                     @elseif($curSub === 'assignment')
-                        @include('manufacturing::partials.workorder.assignment')
+                        @include('manufacturing::workorder.assignment')
                     @endif
 
                 {{-- Quality Check --}}
                 @elseif($curPage === 'qc')
                     @if($curSub === 'benchmark' || $curSub === '')
-                        @include('manufacturing::partials.Quality Check.benchmark')
+                        @include('manufacturing::Quality Check.benchmark')
                     @elseif($curSub === 'rework')
-                        @include('manufacturing::partials.Quality Check.rework')
+                        @include('manufacturing::Quality Check.rework')
                     @elseif($curSub === 'analytics')
-                        @include('manufacturing::partials.Quality Check.analytics')
+                        @include('manufacturing::Quality Check.analytics')
                     @endif
 
                 @endif
