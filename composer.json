@@ -27,7 +27,8 @@
             "Database\\Seeders\\": "database/seeders/",
             "Modules\\HR\\": "Modules/HR/app/",
             "Modules\\Inventory\\": "Modules/Inventory/app/",
-            "Modules\\Procurement\\": "Modules/Procurement/app/"
+            "Modules\\Procurement\\": "Modules/Procurement/app/",
+            "Modules\\OrderFulfillment\\": "Modules/OrderFulfillment/app/"
         }
     },
     "autoload-dev": {

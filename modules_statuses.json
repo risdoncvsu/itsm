@@ -1,5 +1,6 @@
 {
     "HR": true,
     "Inventory": true,
-    "Procurement": true
+    "Procurement": true,
+    "OrderFulfillment": true
 }
