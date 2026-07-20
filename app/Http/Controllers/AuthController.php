@@ -37,7 +37,9 @@ class AuthController extends Controller
             $user = Auth::user();
             $destination = $user->role === 'company_admin'
                 ? $this->companyAdminDestination($user)
-                : route('admin.itsm.registration');
+                // Keep the root-admin portal at the application root even
+                // when the preceding request came from a mounted module.
+                : $request->getSchemeAndHttpHost().'/admin/itsm/registration';
 
             // Do not allow a stale intended URL (for example, an admin page
             // visited before login) to override the portal assigned by role.
