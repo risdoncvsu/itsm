@@ -10,8 +10,8 @@
     <title>{{ config('app.name', 'TechForge') }} | Built for Performance</title>
     
     <!-- Tailwind CSS -->
-    <script src="/ecommerce/tailwind-config.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/ecommerce/tailwind-config.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -555,7 +555,7 @@
 
     <x-footer />
 
-        <script src="{{ asset('js/configurator-engine.js') }}"></script>
+        <script src="{{ asset('ecommerce/configurator-engine.js') }}"></script>
     <script>
         const allComponents = @json($allComponents);
         

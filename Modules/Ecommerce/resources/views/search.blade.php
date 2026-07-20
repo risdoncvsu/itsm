@@ -13,8 +13,8 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- Tailwind CSS -->
-    <script src="/ecommerce/tailwind-config.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/ecommerce/tailwind-config.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;

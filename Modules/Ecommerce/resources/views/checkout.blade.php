@@ -9,8 +9,8 @@
     <title>{{ config('app.name', 'TechForge') }} | Secure Checkout</title>
     
     <!-- Tailwind CSS -->
-    <script src="/ecommerce/tailwind-config.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/ecommerce/tailwind-config.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 

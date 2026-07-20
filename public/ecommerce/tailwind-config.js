@@ -1,5 +1,5 @@
 window.tailwind = window.tailwind || {};
-tailwind.config = {
+window.tailwind.config = {
     theme: {
         extend: {
             colors: {
