@@ -89,6 +89,7 @@
     <!-- Lenis Smooth Scrolling -->
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
     <link rel="stylesheet" href="/ecommerce/liquidglass.css">
+    <script defer src="/ecommerce/preloader.js"></script>
 </head>
 <body class="relative antialiased min-h-screen flex flex-col selection:bg-primary selection:text-white">
 

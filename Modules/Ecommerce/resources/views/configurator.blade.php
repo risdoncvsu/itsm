@@ -19,6 +19,7 @@
         }
     </style>
     <link rel="stylesheet" href="/ecommerce/liquidglass.css">
+    <script defer src="/ecommerce/preloader.js"></script>
 </head>
 <body class="antialiased min-h-screen flex flex-col items-center justify-center py-20 px-4">
 

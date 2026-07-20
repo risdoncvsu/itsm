@@ -2,7 +2,7 @@
 
 namespace Modules\Ecommerce\Http\Middleware;
 
-use Modules\Ecommerce\Models\Company;
+use App\Models\Company;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;

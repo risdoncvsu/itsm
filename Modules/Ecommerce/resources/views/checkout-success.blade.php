@@ -28,6 +28,7 @@
         }
     </style>
     <link rel="stylesheet" href="/ecommerce/liquidglass.css">
+    <script defer src="/ecommerce/preloader.js"></script>
 </head>
 <body class="relative antialiased selection:bg-primary selection:text-white min-h-screen flex flex-col items-center justify-center py-12">
 

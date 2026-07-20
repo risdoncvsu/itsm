@@ -60,6 +60,7 @@
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
     <link rel="stylesheet" href="/ecommerce/liquidglass.css">
+    <script defer src="/ecommerce/preloader.js"></script>
 </head>
 <body class="relative antialiased selection:bg-primary selection:text-white">
     <!-- Background Ambient Effects -->

@@ -165,6 +165,7 @@
         }
     </style>
     <link rel="stylesheet" href="/ecommerce/liquidglass.css">
+    <script defer src="/ecommerce/preloader.js"></script>
 </head>
 <body class="relative antialiased selection:bg-primary selection:text-white pb-20">
 
