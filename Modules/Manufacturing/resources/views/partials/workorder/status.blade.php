@@ -14,7 +14,7 @@ $selectedOrder = $workOrders[$selectedIndex] ?? $workOrders[0];
                 {{ strtoupper($subName) }}
             </h1>
             <div class="relative flex-1 max-w-[50%]">
-                <span${attrs} aria-hidden="true">&#8226;</span>
+                <span class="inline-block" aria-hidden="true">&#8226;</span>
                 <input type="text" placeholder="Search"
                         id="search-input"
                         oninput="filterOrders(currentFilter)"

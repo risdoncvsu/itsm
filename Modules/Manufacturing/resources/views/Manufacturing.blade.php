@@ -113,7 +113,7 @@
 
         {{-- Profile circle --}}
         <div class="flex items-center justify-end w-[5vw]">
-            <a href="/signin" class="p-1 w-9 h-9 rounded-full bg-white"><span${attrs} aria-hidden="true">&#8226;</span></a>
+            <a href="/signin" class="p-1 w-9 h-9 rounded-full bg-white"><span class="inline-block" aria-hidden="true">&#8226;</span></a>
         </div>
     </header>
 
@@ -140,11 +140,11 @@
                                       ? 'bg-nexora-sky text-white'
                                       : 'text-nexora-slate-500 hover:bg-nexora-light-blue hover:text-white hover:shadow-md hover:-translate-y-[1px]' }}">
                             @if ($tab['label'] === 'Benchmark')
-                                <span${attrs} aria-hidden="true">&#8226;</span>    
+                                <span class="inline-block" aria-hidden="true">&#8226;</span>
                             @elseif ($tab['label'] === 'Rework')
-                                <span${attrs} aria-hidden="true">&#8226;</span>
+                                <span class="inline-block" aria-hidden="true">&#8226;</span>
                             @elseif ($tab['label'] === 'Analytics')
-                                <span${attrs} aria-hidden="true">&#8226;</span>
+                                <span class="inline-block" aria-hidden="true">&#8226;</span>
                             @endif
                             {{ $tab['label'] }}
                         </a>
@@ -173,15 +173,15 @@
                                       ? 'bg-nexora-sky text-white'
                                       : 'text-nexora-slate-500 hover:bg-nexora-light-blue hover:text-white hover:shadow-md hover:-translate-y-[1px]' }}">
                             @if ($tab['label'] === 'All Orders')
-                                <span${attrs} aria-hidden="true">&#8226;</span>    
+                                <span class="inline-block" aria-hidden="true">&#8226;</span>
                             @elseif ($tab['label'] === 'Status')
-                                <span${attrs} aria-hidden="true">&#8226;</span>
+                                <span class="inline-block" aria-hidden="true">&#8226;</span>
                             @elseif ($tab['label'] === 'Schedule')
-                                <span${attrs} aria-hidden="true">&#8226;</span>
+                                <span class="inline-block" aria-hidden="true">&#8226;</span>
                             @elseif ($tab['label'] === 'BOMs')
-                                <span${attrs} aria-hidden="true">&#8226;</span>
+                                <span class="inline-block" aria-hidden="true">&#8226;</span>
                             @elseif ($tab['label'] === 'Assignment')
-                                <span${attrs} aria-hidden="true">&#8226;</span>
+                                <span class="inline-block" aria-hidden="true">&#8226;</span>
                             @endif
                             {{ $tab['label'] }}
                         </a>
@@ -199,7 +199,7 @@
                     @include('partials.dashboard')
                     {{-- Reports --}}
                 @elseif($curPage === 'reports')
-                    @include('partials.reports')            
+                    @include('partials.reports')
                 {{-- Work Orders --}}
                 @elseif($curPage === 'orders')
                 @php

@@ -79,7 +79,7 @@
     {{-- Active Orders --}}
     <div class="bg-nexora-slate-200 rounded-xl px-4 py-3 border border-nexora-corporate/50">
         <p class="text-xs text-nexora-navy-mid mb-1 flex items-center gap-1">
-            <span${attrs} aria-hidden="true">&#8226;</span>
+            <span class="inline-block" aria-hidden="true">&#8226;</span>
             Active Work Orders
         </p>
         <p class="text-3xl font-heading font-medium text-nexora-deep-navy">{{ $active }}</p>
@@ -89,7 +89,7 @@
     {{-- Completed --}}
     <div class="bg-nexora-slate-200 rounded-xl px-4 py-3 border border-nexora-corporate/50">
         <p class="text-xs text-nexora-navy-mid mb-1 flex items-center gap-1">
-           <span${attrs} aria-hidden="true">&#8226;</span>
+           <span class="inline-block" aria-hidden="true">&#8226;</span>
             Completed Builds
         </p>
         <p class="text-3xl font-heading font-medium text-nexora-success">{{ $finished }}</p>
@@ -99,7 +99,7 @@
     {{-- Overdue --}}
     <div class="bg-nexora-slate-200 rounded-xl px-4 py-3 border border-nexora-corporate/50">
         <p class="text-xs text-nexora-navy-mid mb-1 flex items-center gap-1">
-            <span${attrs} aria-hidden="true">&#8226;</span>
+            <span class="inline-block" aria-hidden="true">&#8226;</span>
             Cancelled / Overdue
         </p>
         <p class="text-3xl font-heading font-medium {{ $overdue > 0 ? 'text-nexora-danger' : 'text-nexora-deep-navy' }}">{{ $overdue }}</p>
@@ -111,7 +111,7 @@
     {{-- QC Pass Rate --}}
     <div class="bg-nexora-slate-200 rounded-xl px-4 py-3 border border-nexora-corporate/50">
         <p class="text-xs text-nexora-navy-mid mb-1 flex items-center gap-1">
-            <span${attrs} aria-hidden="true">&#8226;</span>
+            <span class="inline-block" aria-hidden="true">&#8226;</span>
             QC Pass rate
         </p>
         <p class="text-3xl font-heading font-medium {{ $qcRate >= 80 ? 'text-nexora-success' : 'text-nexora-warning' }}">{{ $qcRate }}%</p>
@@ -132,7 +132,7 @@
                 <div class="flex items-center gap-3 p-2.5 hover:bg-nexora-steel-blue transition duration-300">
                     {{-- Icon --}}
                     <div class="w-8 h-8 rounded-lg bg-nexora-slate-500/20 flex items-center justify-center flex-shrink-0">
-                        <span${attrs} aria-hidden="true">&#8226;</span>
+                        <span class="inline-block" aria-hidden="true">&#8226;</span>
                     </div>
                     {{-- Meta --}}
                     <div class="flex-1 min-w-0">
@@ -180,13 +180,13 @@
                 <div class="rounded-lg border px-3 py-2 {{ $alertBg }}">
                     <div class="flex items-start gap-2">
                         @if($alert['icon'] === 'alert-circle')
-                            <span${attrs} aria-hidden="true">&#8226;</span>
+                            <span class="inline-block" aria-hidden="true">&#8226;</span>
                         @elseif($alert['icon'] === 'clock')
-                            <span${attrs} aria-hidden="true">&#8226;</span>
+                            <span class="inline-block" aria-hidden="true">&#8226;</span>
                         @elseif($alert['icon'] === 'shield-x')
-                            <span${attrs} aria-hidden="true">&#8226;</span>
+                            <span class="inline-block" aria-hidden="true">&#8226;</span>
                         @else
-                            <span${attrs} aria-hidden="true">&#8226;</span>
+                            <span class="inline-block" aria-hidden="true">&#8226;</span>
                         @endif
                         <div>
                             <p class="text-xs font-medium text-nexora-deep-navy">{{ $alert['title'] }}</p>

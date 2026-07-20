@@ -66,7 +66,7 @@ $counts = [
         </div>
 
         <div class="relative w-full md:w-64">
-            <span${attrs} aria-hidden="true">&#8226;</span>
+            <span class="inline-block" aria-hidden="true">&#8226;</span>
             <input type="text" id="scheduleSearch" placeholder="Search projects..." oninput="filterScheduleSearch()"
                    class="w-full pl-8 pr-3 py-1.5 rounded-md bg-nexora-steel-blue/50 text-nexora-deep-navy text-xs placeholder-nexora-navy/50 border border-nexora-corporate focus:outline-none focus:border-nexora-deep-navy">
         </div>
