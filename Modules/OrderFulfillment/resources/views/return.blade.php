@@ -575,7 +575,7 @@
 
     <!-- Navbar -->
     <div class="navbar">
-      <a href="{{ route('logout') }}" class="brand logout-logo" title="Logout">
+      <a href="{{ route('order-fulfillment.logout') }}" class="brand logout-logo" title="Logout">
     <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
     <div class="brand-text">
         <div class="title">NEXORA</div>
@@ -583,11 +583,11 @@
     </div>
 </a>
       <div class="nav-links">
-      <a href="{{ route('dashboard') }}">Dashboard</a>
-      <a href="{{ route('orders') }}">Orders</a>
-      <a href="{{ route('packing') }}">Packing</a>
-      <a href="{{ route('shipping') }}">Shipping</a>
-      <a href="{{ route('return') }}" class="active">Returns</a>
+      <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
+      <a href="{{ route('order-fulfillment.orders') }}">Orders</a>
+      <a href="{{ route('order-fulfillment.packing') }}">Packing</a>
+      <a href="{{ route('order-fulfillment.shipping') }}">Shipping</a>
+      <a href="{{ route('order-fulfillment.return') }}" class="active">Returns</a>
       </div>
     </div>
 
@@ -614,15 +614,15 @@
 
       <div class="panel returns-queue">
         <div class="panel-header">
-          <div class="title">ðŸ“‹ Return requests</div>
+          <div class="title">Ã°Å¸â€œâ€¹ Return requests</div>
           <div class="actions">
             <div class="search-wrap">
-              <span class="search-icon">ðŸ”</span>
+              <span class="search-icon">Ã°Å¸â€Â</span>
               <input type="text" id="returnSearch" placeholder="Search..." autocomplete="off">
             </div>
 
             <button id="filterBtn" class="filter-btn">
-              Filter <span class="caret">â–¾</span>
+              Filter <span class="caret">Ã¢â€“Â¾</span>
               <span id="filterBadge" class="filter-badge">1</span>
             </button>
 
@@ -712,22 +712,22 @@
       <div class="side">
         <div class="panel">
           <div class="panel-header">
-            <div class="title">ðŸ“Š Return reasons</div>
+            <div class="title">Ã°Å¸â€œÅ  Return reasons</div>
           </div>
           <div class="reason-list">
-            <div class="reason-item"><span class="reason-icon">âš ï¸</span><span>Defective â€” 41%</span></div>
-            <div class="reason-item"><span class="reason-icon">ðŸ“¦</span><span>Wrong item â€” 24%</span></div>
-            <div class="reason-item"><span class="reason-icon">ðŸ‘¤</span><span>Changed mind â€” 18%</span></div>
+            <div class="reason-item"><span class="reason-icon">Ã¢Å¡Â Ã¯Â¸Â</span><span>Defective Ã¢â‚¬â€ 41%</span></div>
+            <div class="reason-item"><span class="reason-icon">Ã°Å¸â€œÂ¦</span><span>Wrong item Ã¢â‚¬â€ 24%</span></div>
+            <div class="reason-item"><span class="reason-icon">Ã°Å¸â€˜Â¤</span><span>Changed mind Ã¢â‚¬â€ 18%</span></div>
           </div>
         </div>
 
         <div class="panel">
           <div class="panel-header">
-            <div class="title">ðŸ“ˆ Refund activity</div>
+            <div class="title">Ã°Å¸â€œË† Refund activity</div>
           </div>
           <div class="refund-list">
-            <div class="refund-item"><span class="refund-icon">âœ”</span><span>#ORD-4821 refunded</span></div>
-            <div class="refund-item"><span class="refund-icon">âœ”</span><span>#ORD-4822 refunded</span></div>
+            <div class="refund-item"><span class="refund-icon">Ã¢Å“â€</span><span>#ORD-4821 refunded</span></div>
+            <div class="refund-item"><span class="refund-icon">Ã¢Å“â€</span><span>#ORD-4822 refunded</span></div>
             <div class="refund-item"></div>
             <div class="refund-item"></div>
             <div class="refund-item"></div>
@@ -748,7 +748,7 @@
     <div class="modal">
       <div class="modal-header">
         <h2>Return request <span id="modalOrderId">#ORD-4821</span></h2>
-        <p id="modalCustomerProduct">Maria Santos Â· Wireless Headphone</p>
+        <p id="modalCustomerProduct">Maria Santos Ã‚Â· Wireless Headphone</p>
       </div>
 
       <div class="modal-tags">
@@ -763,15 +763,15 @@
 
         <p class="field-label">Proof submitted</p>
         <div class="proof-row">
-          <div class="proof-thumb">ðŸ–¼ï¸</div>
-          <div class="proof-thumb">ðŸ–¼ï¸</div>
-          <div class="proof-thumb">ðŸŽ¥</div>
+          <div class="proof-thumb">Ã°Å¸â€“Â¼Ã¯Â¸Â</div>
+          <div class="proof-thumb">Ã°Å¸â€“Â¼Ã¯Â¸Â</div>
+          <div class="proof-thumb">Ã°Å¸Å½Â¥</div>
         </div>
 
         <div class="meta-row">
           <div>
             <p class="field-label">Order value</p>
-            <p class="field-value" id="modalValue">â‚±67.67</p>
+            <p class="field-value" id="modalValue">Ã¢â€šÂ±67.67</p>
           </div>
           <div>
             <p class="field-label">Requested on</p>
@@ -831,7 +831,7 @@
       const r = returns[returnId];
       if (r) {
         document.getElementById('modalOrderId').textContent = r.orderId;
-        document.getElementById('modalCustomerProduct').textContent = r.customer + ' Â· ' + r.product;
+        document.getElementById('modalCustomerProduct').textContent = r.customer + ' Ã‚Â· ' + r.product;
         document.getElementById('modalPriority').textContent = r.priority;
         document.getElementById('modalReviewStatus').textContent = r.review;
         document.getElementById('modalReasonTitle').textContent = r.reasonTitle;

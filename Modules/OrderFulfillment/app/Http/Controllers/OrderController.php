@@ -44,13 +44,13 @@ class OrderController extends Controller
                 $status = strtoupper($o->status);
 
                 if ($status === 'SHIPPED') {
-                    $o->activity_icon    = 'ðŸšš';
+                    $o->activity_icon    = 'Ã°Å¸Å¡Å¡';
                     $o->activity_message = "Order {$o->id} has been shipped";
                 } elseif ($status === 'CANCELLED') {
-                    $o->activity_icon    = 'âŒ';
+                    $o->activity_icon    = 'Ã¢ÂÅ’';
                     $o->activity_message = "Order {$o->id} has been cancelled";
                 } else {
-                    $o->activity_icon    = 'ðŸ“¦';
+                    $o->activity_icon    = 'Ã°Å¸â€œÂ¦';
                     $o->activity_message = "Order {$o->id} moved to packing";
                 }
 
@@ -72,7 +72,7 @@ class OrderController extends Controller
         $packingErrorToday = 0; // TODO: hook up to a packing_errors table once one exists
 
         // packing_materials lives on the separate "inventory" connection,
-        // not the default one â€” must go through the PackingMaterial model
+        // not the default one Ã¢â‚¬â€ must go through the PackingMaterial model
         // (which declares that connection) rather than DB::table(), or this
         // silently queries the wrong database and returns nothing.
         $materials = PackingMaterial::all();

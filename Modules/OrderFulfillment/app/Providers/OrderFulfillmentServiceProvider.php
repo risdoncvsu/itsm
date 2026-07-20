@@ -10,6 +10,7 @@ class OrderFulfillmentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'order-fulfillment');
+        $this->commands([\Modules\OrderFulfillment\Console\Commands\InstallOrderFulfillmentSchema::class]);
         Route::middleware('web')->group(__DIR__.'/../../routes/web.php');
     }
 }

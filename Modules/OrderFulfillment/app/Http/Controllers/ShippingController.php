@@ -72,7 +72,7 @@ class ShippingController extends Controller
     }
 
     /**
-     * Available drivers for this shipment's courier â€” feeds the
+     * Available drivers for this shipment's courier ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â feeds the
      * "Assign Driver" modal.
      *
      * GET /shipping/{shipmentId}/drivers
@@ -113,7 +113,7 @@ class ShippingController extends Controller
             ], 422);
         }
 
-        DB::transaction(function () use ($shipment, $driver) {
+        DB::connection('order_fulfillment')->transaction(function () use ($shipment, $driver) {
             $shipment->update([
                 'delivery_man_id' => $driver->id,
                 'status' => 'OUT_FOR_DELIVERY',

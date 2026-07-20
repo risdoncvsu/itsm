@@ -25,7 +25,7 @@ class PackingController extends Controller
         $ShippedCount   = Order::where('status', 'SHIPPED')->count();
 
 
-        $packingError = Schema::hasTable('packing_errors')
+        $packingError = Schema::connection('order_fulfillment')->hasTable('packing_errors')
             ? PackingError::count()
             : 0;
 
@@ -87,7 +87,7 @@ class PackingController extends Controller
 
         // Everything below is wrapped in a top-level try/catch. If ANYTHING
         // unexpected throws here (type errors, DB errors, etc.), we still
-        // want to return JSON â€” never let an exception fall through to
+        // want to return JSON ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â never let an exception fall through to
         // Laravel's HTML error page, since the frontend expects JSON.
         try {
             // Figure out which materials this shipment requires.
@@ -109,7 +109,7 @@ class PackingController extends Controller
             }
 
             // 3. Check stock BEFORE opening any transaction. This is
-            //    intentionally outside DB::transaction() â€” logging a packing
+            //    intentionally outside DB::connection('order_fulfillment')->transaction() ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â logging a packing
             //    error must never be rolled back by the same transaction
             //    that failed. packing_materials lives on the separate
             //    "inventory" Neon database, so this read goes through that
@@ -145,7 +145,7 @@ class PackingController extends Controller
                     }
                 }
 
-                // All materials confirmed in stock â€” safe to decrement.
+                // All materials confirmed in stock ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â safe to decrement.
                 foreach ($requiredMaterials as $materialName) {
                     PackingMaterial::where('name', $materialName)->decrement('stock_qty', 1);
                 }
@@ -155,7 +155,7 @@ class PackingController extends Controller
             //    Create the shipment + update the order on the default DB.
             //    If anything here fails, we must give the materials back.
             try {
-                $result = DB::transaction(function () use ($validated, $order, $id) {
+                $result = DB::connection('order_fulfillment')->transaction(function () use ($validated, $order, $id) {
 
                     $trackingNumber = strtoupper($validated['courier']) . '-' . time();
                     $shipmentId = $this->generateUniqueShipmentId();
@@ -227,7 +227,7 @@ class PackingController extends Controller
                 }
             });
         } catch (\Throwable $e) {
-            // If even the compensating restore fails, this needs a human â€”
+            // If even the compensating restore fails, this needs a human ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
             // log loudly rather than losing the discrepancy silently.
             report($e);
         }
@@ -236,14 +236,14 @@ class PackingController extends Controller
     /**
      * Log a packing error. Deliberately defensive: if the packing_errors
      * table doesn't exist yet (e.g. migration not run), this must NOT
-     * throw and take down the whole request â€” it falls back to the
+     * throw and take down the whole request ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â it falls back to the
      * application log instead so the real business response still reaches
      * the user.
      */
     private function logPackingError(string $orderId, string $material, string $reason): void
     {
-        if (!Schema::hasTable('packing_errors')) {
-            \Illuminate\Support\Facades\Log::warning('packing_errors table missing â€” could not log packing error', [
+        if (!Schema::connection('order_fulfillment')->hasTable('packing_errors')) {
+            \Illuminate\Support\Facades\Log::warning('packing_errors table missing ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â could not log packing error', [
                 'order_id' => $orderId,
                 'material' => $material,
                 'reason'   => $reason,

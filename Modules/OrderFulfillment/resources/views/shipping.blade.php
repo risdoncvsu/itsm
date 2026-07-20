@@ -640,7 +640,7 @@
 
     <!-- Navbar -->
     <div class="navbar">
-      <a href="{{ route('logout') }}" class="brand logout-logo" title="Logout">
+      <a href="{{ route('order-fulfillment.logout') }}" class="brand logout-logo" title="Logout">
     <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
     <div class="brand-text">
         <div class="title">NEXORA</div>
@@ -648,11 +648,11 @@
     </div>
 </a>
       <div class="nav-links">
-      <a href="{{ route('dashboard') }}">Dashboard</a>
-      <a href="{{ route('orders') }}">Orders</a>
-      <a href="{{ route('packing') }}">Packing</a>
-      <a href="{{ route('shipping') }}" class="active">Shipping</a>
-      <a href="{{ route('return') }}">Returns</a>
+      <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
+      <a href="{{ route('order-fulfillment.orders') }}">Orders</a>
+      <a href="{{ route('order-fulfillment.packing') }}">Packing</a>
+      <a href="{{ route('order-fulfillment.shipping') }}" class="active">Shipping</a>
+      <a href="{{ route('order-fulfillment.return') }}">Returns</a>
       </div>
     </div>
 
@@ -680,15 +680,15 @@
 
       <div class="panel order-queue">
         <div class="panel-header">
-          <div class="title">ðŸ“¦ Shipment tracking</div>
+          <div class="title">Ã°Å¸â€œÂ¦ Shipment tracking</div>
           <div class="actions">
             <div class="search-wrap">
-              <span class="search-icon">ðŸ”</span>
+              <span class="search-icon">Ã°Å¸â€Â</span>
               <input type="text" id="shippingSearch" placeholder="Search..." autocomplete="off">
             </div>
 
             <button id="filterBtn" class="filter-btn">
-              Filter <span class="caret">â–¾</span>
+              Filter <span class="caret">Ã¢â€“Â¾</span>
               <span id="filterBadge" class="filter-badge">1</span>
             </button>
 
@@ -801,7 +801,7 @@
 
       <div class="panel activity">
         <div class="panel-header">
-          <div class="title">ðŸ”” Delivery alerts</div>
+          <div class="title">Ã°Å¸â€â€ Delivery alerts</div>
         </div>
         <div class="activity-list">
           <div class="activity-item">
@@ -828,42 +828,42 @@
   <div class="overlay" id="packingOverlay">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="modalOrderId">â€”</h2>
+        <h2 id="modalOrderId">Ã¢â‚¬â€</h2>
         <p>Website order</p>
       </div>
 
       <div class="modal-body">
         <div>
           <p class="field-label">Customer</p>
-          <p class="field-value" id="modalCustomer">â€”</p>
+          <p class="field-value" id="modalCustomer">Ã¢â‚¬â€</p>
         </div>
         <div>
           <p class="field-label">Status</p>
-          <span class="status-pill tag-packing" id="modalStatus">â€”</span>
+          <span class="status-pill tag-packing" id="modalStatus">Ã¢â‚¬â€</span>
         </div>
         <div>
           <p class="field-label">Product</p>
-          <p class="field-value" id="modalItem">â€”</p>
+          <p class="field-value" id="modalItem">Ã¢â‚¬â€</p>
         </div>
         <div>
           <p class="field-label">Tracing no.</p>
-          <p class="field-value" id="modalTracking">â€”</p>
+          <p class="field-value" id="modalTracking">Ã¢â‚¬â€</p>
         </div>
         <div>
           <p class="field-label">Courier</p>
-          <p class="field-value" id="modalCourier">â€”</p>
+          <p class="field-value" id="modalCourier">Ã¢â‚¬â€</p>
         </div>
         <div>
           <p class="field-label">Amount</p>
-          <p class="field-value" id="modalAmount">â€”</p>
+          <p class="field-value" id="modalAmount">Ã¢â‚¬â€</p>
         </div>
         <div>
           <p class="field-label">Due date</p>
-          <p class="field-value" id="modalDue">â€”</p>
+          <p class="field-value" id="modalDue">Ã¢â‚¬â€</p>
         </div>
         <div style="grid-column: 1 / -1;">
           <p class="field-label">Delivery Address</p>
-          <p class="field-value" id="modalAddress">â€”</p>
+          <p class="field-value" id="modalAddress">Ã¢â‚¬â€</p>
         </div>
       </div>
 
@@ -910,7 +910,7 @@
     // works no matter where this app is actually mounted (e.g. served
     // from a subfolder like /dashboard/OrderFullfillment/public rather
     // than the domain root).
-    const SHIPPING_BASE_URL = "{{ url('/shipping') }}";
+    const SHIPPING_BASE_URL = "{{ url('/order-fulfillment/shipping') }}";
 
     const orders = @json($shipments->keyBy('shipment_id'));
     const statusLabels = {
@@ -952,11 +952,11 @@
         const rowEl = document.querySelector('.shipping-row[data-id="' + orderId + '"]');
         const rawAmount = order.amount ?? (rowEl ? rowEl.dataset.amount : null);
         document.getElementById('modalAmount').textContent =
-          rawAmount != null ? 'â‚±' + rawAmount : 'â€”';
+          rawAmount != null ? 'Ã¢â€šÂ±' + rawAmount : 'Ã¢â‚¬â€';
       }
 
       // Only reveal the yellow "assign a driver" banner when the modal was
-      // opened via the Assign Driver button â€” not from a plain row click.
+      // opened via the Assign Driver button Ã¢â‚¬â€ not from a plain row click.
       document.getElementById('assignBanner').classList.toggle('hidden', !showBanner);
 
       currentOrderId = orderId;
@@ -985,7 +985,7 @@
       const list = document.getElementById('driverList');
       selectedDriverId = null;
       document.getElementById('confirmAssignBtn').disabled = true;
-      list.innerHTML = '<p style="color: var(--text-muted); padding: 8px 4px;">Loading available driversâ€¦</p>';
+      list.innerHTML = '<p style="color: var(--text-muted); padding: 8px 4px;">Loading available driversÃ¢â‚¬Â¦</p>';
 
       try {
         const res = await fetch(`${SHIPPING_BASE_URL}/${orderId}/drivers`, {
@@ -1026,7 +1026,7 @@
         card.innerHTML = `
           <div>
             <div class="driver-name">${driver.name}</div>
-            <div class="driver-sub">${driver.vehicle_type} Â· Plate ${driver.plate_number}</div>
+            <div class="driver-sub">${driver.vehicle_type} Ã‚Â· Plate ${driver.plate_number}</div>
           </div>
           <span class="driver-avail">Available</span>
         `;
@@ -1052,7 +1052,7 @@
 
       const confirmBtn = document.getElementById('confirmAssignBtn');
       confirmBtn.disabled = true;
-      confirmBtn.textContent = 'Assigningâ€¦';
+      confirmBtn.textContent = 'AssigningÃ¢â‚¬Â¦';
 
       try {
         const res = await fetch(`${SHIPPING_BASE_URL}/${currentOrderId}/assign-driver`, {
@@ -1084,7 +1084,7 @@
         currentOrderId = null;
         selectedDriverId = null;
       } catch (err) {
-        showAssignToast('Network error â€” please try again.', true);
+        showAssignToast('Network error Ã¢â‚¬â€ please try again.', true);
       } finally {
         confirmBtn.disabled = false;
         confirmBtn.textContent = 'Confirm Assignment';

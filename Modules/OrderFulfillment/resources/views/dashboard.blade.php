@@ -432,7 +432,7 @@
 
   <!-- Navbar -->
   <div class="navbar">
-    <a href="{{ route('logout') }}" class="brand logout-logo" title="Logout">
+    <a href="{{ route('order-fulfillment.logout') }}" class="brand logout-logo" title="Logout">
     <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
     <div class="brand-text">
         <div class="title">NEXORA</div>
@@ -440,11 +440,11 @@
     </div>
   </a>
     <div class="nav-links">
-      <a href="{{ route('dashboard') }}" class="active">Dashboard</a>
-      <a href="{{ route('orders') }}">Orders</a>
-      <a href="{{ route('packing') }}">Packing</a>
-      <a href="{{ route('shipping') }}">Shipping</a>
-      <a href="{{ route('return') }}">Returns</a>
+      <a href="{{ route('order-fulfillment.dashboard') }}" class="active">Dashboard</a>
+      <a href="{{ route('order-fulfillment.orders') }}">Orders</a>
+      <a href="{{ route('order-fulfillment.packing') }}">Packing</a>
+      <a href="{{ route('order-fulfillment.shipping') }}">Shipping</a>
+      <a href="{{ route('order-fulfillment.return') }}">Returns</a>
     </div>
   </div>
 
@@ -496,7 +496,7 @@
           <div class="order-card">
             <div class="order-id">{{ $order->id }}</div>
             <div class="order-details">
-              <div class="order-item">{{ $order->product_name }} Ã—{{ $order->qty }}</div>
+              <div class="order-item">{{ $order->product_name }} Ãƒâ€”{{ $order->qty }}</div>
               <div class="tag-row">
                 <span class="tag {{ $status['class'] }}">{{ $status['label'] }}</span>
                 <span class="tag {{ $priority['class'] }}">{{ $priority['label'] }}</span>
@@ -580,14 +580,14 @@
     <div class="sidebar">
       <div class="side-panel">
         <div class="side-header">
-          <div class="side-title">ðŸ”” Alerts</div>
+          <div class="side-title">Ã°Å¸â€â€ Alerts</div>
         </div>
 
         <div class="side-list">
           @forelse ($alerts as $order)
             <div class="alert-row">
               <div class="alert-left">
-                <span>ðŸ“¦ New order {{ $order->id }} received</span>
+                <span>Ã°Å¸â€œÂ¦ New order {{ $order->id }} received</span>
               </div>
             </div>
           @empty
@@ -598,7 +598,7 @@
 
       <div class="side-panel">
         <div class="side-header">
-          <div class="side-title">ðŸ“ˆ Activity feed</div>
+          <div class="side-title">Ã°Å¸â€œË† Activity feed</div>
           <div class="live-badge"><span class="live-dot"></span> Live</div>
         </div>
 

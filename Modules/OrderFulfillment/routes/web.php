@@ -8,6 +8,7 @@ use Modules\OrderFulfillment\Http\Controllers\ShippingController;
 use Modules\OrderFulfillment\Http\Controllers\MaterialRequestController;
 
 Route::prefix('order-fulfillment')->name('order-fulfillment.')->middleware('order-fulfillment.access')->group(function (): void {
+    Route::post('/logout', function () { session()->forget(['employee_logged_in','employee_role','employee_id','employee_name','employee_email','employee_department','employee_client_id']); return redirect()->route('login'); })->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::post('/orders/{id}/prepare', [OrderController::class, 'prepare'])->name('orders.prepare');
@@ -18,4 +19,5 @@ Route::prefix('order-fulfillment')->name('order-fulfillment.')->middleware('orde
     Route::get('/shipping/{shipmentId}/drivers', [ShippingController::class, 'drivers'])->name('shipping.drivers');
     Route::post('/shipping/{shipmentId}/assign-driver', [ShippingController::class, 'assignDriver'])->name('shipping.assign-driver');
     Route::post('/material-requests', [MaterialRequestController::class, 'store'])->name('material-requests.store');
+    Route::view('/returns', 'order-fulfillment::return')->name('return');
 });

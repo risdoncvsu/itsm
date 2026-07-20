@@ -694,7 +694,7 @@
 
     <!-- Navbar -->
     <div class="navbar">
-      <a href="{{ route('logout') }}" class="brand logout-logo" title="Logout">
+      <a href="{{ route('order-fulfillment.logout') }}" class="brand logout-logo" title="Logout">
     <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
     <div class="brand-text">
         <div class="title">NEXORA</div>
@@ -702,11 +702,11 @@
     </div>
 </a>
       <div class="nav-links">
-        <a href="{{ route('dashboard') }}">Dashboard</a>
-     <a href="{{ route('orders') }}" class="active">Orders</a>
-      <a href="{{ route('packing') }}">Packing</a>
-      <a href="{{ route('shipping') }}">Shipping</a>
-      <a href="{{ route('return') }}">Returns</a>
+        <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
+     <a href="{{ route('order-fulfillment.orders') }}" class="active">Orders</a>
+      <a href="{{ route('order-fulfillment.packing') }}">Packing</a>
+      <a href="{{ route('order-fulfillment.shipping') }}">Shipping</a>
+      <a href="{{ route('order-fulfillment.return') }}">Returns</a>
       </div>
     </div>
 
@@ -734,15 +734,15 @@
 
       <div class="panel order-queue">
         <div class="panel-header">
-          <div class="title">ðŸ“¦ Order queue</div>
+          <div class="title">Ã°Å¸â€œÂ¦ Order queue</div>
           <div class="actions">
             <div class="search-wrap">
-              <span class="search-icon">ðŸ”</span>
+              <span class="search-icon">Ã°Å¸â€Â</span>
               <input type="text" id="orderSearch" placeholder="Search..." autocomplete="off">
             </div>
 
             <button id="filterBtn" class="filter-btn">
-              Filter <span class="caret">â–¾</span>
+              Filter <span class="caret">Ã¢â€“Â¾</span>
               <span id="filterBadge" class="filter-badge">1</span>
             </button>
 
@@ -847,7 +847,7 @@
 
       <div class="panel activity">
         <div class="panel-header">
-          <div class="title">ðŸ“ˆ Recent activity</div>
+          <div class="title">Ã°Å¸â€œË† Recent activity</div>
         </div>
         <div class="activity-list">
           @forelse ($recentActivity as $order)
@@ -891,7 +891,7 @@
         </div>
         <div>
           <p class="field-label">Amount</p>
-          <p class="field-value" id="modalAmount">â‚±0.00</p>
+          <p class="field-value" id="modalAmount">Ã¢â€šÂ±0.00</p>
         </div>
         <div>
           <p class="field-label">Priority</p>
@@ -903,7 +903,7 @@
         </div>
       </div>
       <div class="confirm-box" id="confirmBox">
-        <p>âš ï¸ Are you sure you want to cancel this order? This action can't be undone and the customer will be notified.</p>
+        <p>Ã¢Å¡Â Ã¯Â¸Â Are you sure you want to cancel this order? This action can't be undone and the customer will be notified.</p>
         <div class="confirm-actions">
           <button class="btn-yes" id="yesCancelBtn">Yes, cancel the order</button>
           <button class="btn-no" id="noKeepBtn">No, keep order</button>
@@ -946,7 +946,7 @@
 
     orderRows.forEach(function (row) {
       row.addEventListener('click', function (e) {
-        // If the click started on (or inside) a button â€” e.g. "Prepare" â€”
+        // If the click started on (or inside) a button Ã¢â‚¬â€ e.g. "Prepare" Ã¢â‚¬â€
         // don't open the order modal, let the button's own handler run.
         if (e.target.closest('button')) return;
         openOrderModal(this.dataset, this);
@@ -960,7 +960,7 @@
       document.getElementById('modalCustomer').textContent = data.customer;
       document.getElementById('modalProduct').textContent = data.product;
       document.getElementById('modalQty').textContent = data.qty;
-      document.getElementById('modalAmount').textContent = 'â‚±' + data.amount;
+      document.getElementById('modalAmount').textContent = 'Ã¢â€šÂ±' + data.amount;
       document.getElementById('modalDue').textContent = data.due;
       setStatusBadge(document.getElementById('modalStatus'), data.status);
 
@@ -983,7 +983,7 @@
       document.getElementById('confirmBox').classList.remove('show');
     }
 
-    const prepareUrlTemplate = @json(route('orders.prepare', ['id' => '__ID__']));
+    const prepareUrlTemplate = @json(route('order-fulfillment.orders.prepare', ['id' => '__ID__']));
 
     const csrfMeta = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
@@ -998,7 +998,7 @@
       if (btn.disabled) return;
 
       if (!csrfToken) {
-        alert('Missing CSRF token on this page â€” check the browser console for details.');
+        alert('Missing CSRF token on this page Ã¢â‚¬â€ check the browser console for details.');
         return;
       }
 
@@ -1034,7 +1034,7 @@
 
           setStatusBadge(row.querySelector('.badge.status'), 'PACKING');
 
-          // Order has moved past NEW â€” no action button needed anymore.
+          // Order has moved past NEW Ã¢â‚¬â€ no action button needed anymore.
           btn.remove();
 
           // If the floating window is currently open for this same order,
@@ -1060,7 +1060,7 @@
       document.getElementById('confirmBox').classList.remove('show');
     });
 
-    const cancelUrlTemplate = @json(route('orders.cancel', ['id' => '__ID__']));
+    const cancelUrlTemplate = @json(route('order-fulfillment.orders.cancel', ['id' => '__ID__']));
 
     document.getElementById('yesCancelBtn').addEventListener('click', function () {
       if (!currentOrderRow) return;
@@ -1069,7 +1069,7 @@
       const orderId = currentOrderRow.dataset.id;
 
       if (!csrfToken) {
-        alert('Missing CSRF token on this page â€” check the browser console for details.');
+        alert('Missing CSRF token on this page Ã¢â‚¬â€ check the browser console for details.');
         return;
       }
 
@@ -1101,7 +1101,7 @@
           // ---- Update modal ----
           setStatusBadge(document.getElementById('modalStatus'), 'CANCELLED');
           const priorityEl = document.getElementById('modalPriority');
-          priorityEl.textContent = 'â€”';
+          priorityEl.textContent = 'Ã¢â‚¬â€';
           priorityEl.className = 'badge';
           document.getElementById('cancelOrderBtn').classList.add('disabled');
           document.getElementById('confirmBox').classList.remove('show');

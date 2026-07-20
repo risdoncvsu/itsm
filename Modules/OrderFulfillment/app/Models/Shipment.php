@@ -41,7 +41,7 @@ class Shipment extends Model
     {
         // Requirement #5: a driver only becomes available again once the
         // shipment they were carrying is delivered. This fires no matter
-        // where the status change comes from ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â this controller, an API,
+        // where the status change comes from ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â this controller, an API,
         // a queue job, artisan tinker, etc.
         static::updating(function (Shipment $shipment) {
             if (

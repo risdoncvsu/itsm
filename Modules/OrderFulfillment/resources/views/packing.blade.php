@@ -794,7 +794,7 @@
 
     <!-- Navbar -->
     <div class="navbar">
-     <a href="{{ route('logout') }}" class="brand logout-logo" title="Logout">
+     <a href="{{ route('order-fulfillment.logout') }}" class="brand logout-logo" title="Logout">
     <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
     <div class="brand-text">
         <div class="title">NEXORA</div>
@@ -802,11 +802,11 @@
     </div>
 </a>
       <div class="nav-links">
-     <a href="{{ route('dashboard') }}">Dashboard</a>
-     <a href="{{ route('orders') }}">Orders</a>
-      <a href="{{ route('packing') }}" class="active">Packing</a>
-      <a href="{{ route('shipping') }}">Shipping</a>
-      <a href="{{ route('return') }}">Returns</a>
+     <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
+     <a href="{{ route('order-fulfillment.orders') }}">Orders</a>
+      <a href="{{ route('order-fulfillment.packing') }}" class="active">Packing</a>
+      <a href="{{ route('order-fulfillment.shipping') }}">Shipping</a>
+      <a href="{{ route('order-fulfillment.return') }}">Returns</a>
       </div>
     </div>
 
@@ -834,15 +834,15 @@
 
       <div class="panel order-queue">
         <div class="panel-header">
-          <div class="title">ðŸ“¦ Packing queue</div>
+          <div class="title">Ã°Å¸â€œÂ¦ Packing queue</div>
           <div class="actions">
             <div class="search-wrap">
-              <span class="search-icon">ðŸ”</span>
+              <span class="search-icon">Ã°Å¸â€Â</span>
               <input type="text" id="packingSearch" placeholder="Search..." autocomplete="off">
             </div>
 
             <button id="filterBtn" class="filter-btn">
-              Filter <span class="caret">â–¾</span>
+              Filter <span class="caret">Ã¢â€“Â¾</span>
               <span id="filterBadge" class="filter-badge">1</span>
             </button>
 
@@ -920,7 +920,7 @@
 
       <div class="panel activity">
         <div class="panel-header">
-          <div class="title">ðŸ“‹ Packing materials</div>
+          <div class="title">Ã°Å¸â€œâ€¹ Packing materials</div>
           <button class="btn-request-material" onclick="openRequestModal()">
           <span>+</span> Request material
           </button>
@@ -931,18 +931,18 @@
               $isLow = isset($material->stock_qty, $material->low_stock_threshold)
                   && $material->stock_qty <= $material->low_stock_threshold;
               if (!empty($material->is_box)) {
-                  $icon = $material->icon ?? 'ðŸ“¦';
+                  $icon = $material->icon ?? 'Ã°Å¸â€œÂ¦';
               } else {
-                  $icon = $material->icon ?? ($isLow ? 'âš ï¸' : 'âœ…');
+                  $icon = $material->icon ?? ($isLow ? 'Ã¢Å¡Â Ã¯Â¸Â' : 'Ã¢Å“â€¦');
               }
             @endphp
             <div class="activity-item">
               <span class="activity-icon">{{ $icon }}</span>
-              <span>{{ $material->name }} â€” {{ $material->stock_label ?? ($material->stock_qty . ' left') }}</span>
+              <span>{{ $material->name }} Ã¢â‚¬â€ {{ $material->stock_label ?? ($material->stock_qty . ' left') }}</span>
             </div>
           @empty
             <div class="activity-item">
-              <span class="activity-icon">ðŸ“¦</span>
+              <span class="activity-icon">Ã°Å¸â€œÂ¦</span>
               <span style="color: var(--text-muted);">No material data yet.</span>
             </div>
           @endforelse
@@ -956,34 +956,34 @@
   <div class="overlay" id="packingOverlay">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="modalOrderId">â€”</h2>
+        <h2 id="modalOrderId">Ã¢â‚¬â€</h2>
         <p>Website order</p>
       </div>
 
       <div class="modal-body">
         <div>
           <p class="field-label">Customer</p>
-          <p class="field-value" id="modalCustomer">â€”</p>
+          <p class="field-value" id="modalCustomer">Ã¢â‚¬â€</p>
         </div>
         <div>
           <p class="field-label">Priority</p>
-          <span class="priority-low" id="modalPriority">â€”</span>
+          <span class="priority-low" id="modalPriority">Ã¢â‚¬â€</span>
         </div>
         <div>
           <p class="field-label">Items</p>
-          <p class="field-value" id="modalItem">â€”</p>
+          <p class="field-value" id="modalItem">Ã¢â‚¬â€</p>
         </div>
         <div>
           <p class="field-label">Quantity</p>
-          <p class="field-value" id="modalQty">â€”</p>
+          <p class="field-value" id="modalQty">Ã¢â‚¬â€</p>
         </div>
         <div>
           <p class="field-label">Amount</p>
-          <p class="field-value" id="modalAmount">â€”</p>
+          <p class="field-value" id="modalAmount">Ã¢â‚¬â€</p>
         </div>
         <div style="grid-column: 1 / -1;">
           <p class="field-label">Delivery Address</p>
-          <p class="field-value" id="modalAddress">â€”</p>
+          <p class="field-value" id="modalAddress">Ã¢â‚¬â€</p>
         </div>
       </div>
 
@@ -994,7 +994,7 @@
               <div class="box-name">{{ $box->name }}</div>
               <div class="box-stock">{{ $box->stock_label ?? ($box->stock_qty . ' left') }}</div>
             </div>
-            <div class="box-icon">ðŸ“¦</div>
+            <div class="box-icon">Ã°Å¸â€œÂ¦</div>
           </div>
         @empty
           <div class="box-option" style="opacity:0.5; pointer-events:none;">
@@ -1002,7 +1002,7 @@
               <div class="box-name">No box sizes configured</div>
               <div class="box-stock">Add rows to packing_materials</div>
             </div>
-            <div class="box-icon">ðŸ“¦</div>
+            <div class="box-icon">Ã°Å¸â€œÂ¦</div>
           </div>
         @endforelse
       </div>
@@ -1030,7 +1030,7 @@
   <div class="overlay" id="packingFailedOverlay">
     <div class="modal error-modal">
       <div class="modal-header">
-        <span class="error-icon">âš ï¸</span>
+        <span class="error-icon">Ã¢Å¡Â Ã¯Â¸Â</span>
         <div>
           <h2>Packing Failed</h2>
           <p>This order could not be packed</p>
@@ -1049,10 +1049,10 @@
     <div class="modal request-modal">
       <div class="modal-header request-modal-header">
         <div>
-          <h2>ðŸšš Request material</h2>
+          <h2>Ã°Å¸Å¡Å¡ Request material</h2>
           <p>Sent to the procurement department for approval.</p>
         </div>
-        <span class="modal-close" onclick="closeRequestModal()">âœ•</span>
+        <span class="modal-close" onclick="closeRequestModal()">Ã¢Å“â€¢</span>
       </div>
 
       <div class="request-form-body">
@@ -1123,7 +1123,7 @@
 
   <script>
     // Order data keyed by order id, rendered straight from the DB
-    // ($packingOrders, queried in the controller) â€” nothing hardcoded.
+    // ($packingOrders, queried in the controller) Ã¢â‚¬â€ nothing hardcoded.
     const orders = @json($packingOrdersJson);
     let currentOrderId = null;
     let selectedBox = null;
@@ -1157,7 +1157,7 @@
     if (!payload.qty || payload.qty <= 0) { alert('Enter a valid quantity'); return; }
     if (!payload.requested_by) { alert('Enter your name'); return; }
 
-    const response = await fetch(`{{ url('/material-requests') }}`, {
+    const response = await fetch(`{{ route('order-fulfillment.material-requests.store') }}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1192,7 +1192,7 @@
         // clicked row's data-amount attribute if the JSON doesn't have it.
         const rawAmount = order.amount ?? (rowEl ? rowEl.dataset.amount : null);
         document.getElementById('modalAmount').textContent =
-          rawAmount != null ? 'â‚±' + rawAmount : 'â€”';
+          rawAmount != null ? 'Ã¢â€šÂ±' + rawAmount : 'Ã¢â‚¬â€';
 
         const priorityEl = document.getElementById('modalPriority');
         priorityEl.textContent = order.priority;
@@ -1327,7 +1327,7 @@
     }
 
     const response = await fetch(
-         `{{ url('/packing/process') }}/${encodeURIComponent(currentOrderId)}`,
+         `{{ url('/order-fulfillment/packing/process') }}/${encodeURIComponent(currentOrderId)}`,
         {
             method:'POST',
 
