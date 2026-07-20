@@ -42,6 +42,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'ecommerce' => [
+            'driver' => 'session',
+            'provider' => 'ecommerce_users',
+        ],
     ],
 
     /*
@@ -65,6 +69,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+        'ecommerce_users' => [
+            'driver' => 'eloquent',
+            'model' => \Modules\Ecommerce\Models\User::class,
         ],
 
         // 'users' => [

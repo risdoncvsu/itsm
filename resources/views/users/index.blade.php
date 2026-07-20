@@ -137,7 +137,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($users as $index => $user)
+                                    @forelse ($users as $user)
                                         <tr
                                             class="border-b border-slate-200"
                                             data-row-id="{{ $user->id }}"
@@ -152,7 +152,7 @@
                                             data-email="{{ $portal === 'client' ? e($user->email ?? '') : '' }}"
                                             data-department="{{ $portal === 'client' ? e($user->department ?? '') : '' }}"
                                         >
-                                            <td class="px-2 py-4">{{ $portal === 'admin' ? 'CL-' . str_pad((string) ($index + 1), 5, '0', STR_PAD_LEFT) : 'EMP-' . str_pad((string) ($index + 1), 5, '0', STR_PAD_LEFT) }}</td>
+                                            <td class="px-2 py-4">{{ $portal === 'admin' ? 'CL-' . str_pad((string) $user->id, 5, '0', STR_PAD_LEFT) : 'EMP-' . str_pad((string) $user->id, 5, '0', STR_PAD_LEFT) }}</td>
                                             <td class="px-2 py-4">{{ $portal === 'admin' ? $user->company_name : ($user->username ?? 'employee') }}</td>
                                             <td class="px-2 py-4">{{ $portal === 'admin' ? $user->admin_name : ($user->name ?? $user->full_name ?? 'Employee') }}</td>
                                             <td class="px-2 py-4">{{ $portal === 'admin' ? ($user->adminUser?->username ?? 'Not generated') : ($user->email ?? 'employee@company.com') }}</td>

@@ -177,6 +177,19 @@ return [
             'search_path' => env('ORDER_FULFILLMENT_DB_SEARCH_PATH', 'public'),
             'sslmode' => env('ORDER_FULFILLMENT_DB_SSLMODE', 'prefer'),
         ],
+        'ecommerce' => [
+            'driver' => env('ECOMMERCE_DB_CONNECTION', 'pgsql'),
+            'url' => env('ECOMMERCE_DB_URL'),
+            'host' => env('ECOMMERCE_DB_HOST'),
+            'port' => env('ECOMMERCE_DB_PORT', '5432'),
+            'database' => env('ECOMMERCE_DB_DATABASE'),
+            'username' => env('ECOMMERCE_DB_USERNAME'),
+            'password' => env('ECOMMERCE_DB_PASSWORD'),
+            'charset' => env('ECOMMERCE_DB_CHARSET', 'utf8'),
+            'prefix' => '', 'prefix_indexes' => true,
+            'search_path' => env('ECOMMERCE_DB_SEARCH_PATH', 'public'),
+            'sslmode' => env('ECOMMERCE_DB_SSLMODE', 'prefer'),
+        ],
 
         // Staging is optional. It must be configured explicitly: falling back
         // to DB_* would silently put integration data into the ITSM database.

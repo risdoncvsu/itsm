@@ -34,7 +34,10 @@ class CompanyController extends Controller
         $password = Str::random(14);
 
         DB::transaction(function () use ($validated, $username, $password): void {
-            $company = Company::create($validated + ['status' => 'Active']);
+            $company = Company::create($validated + [
+                'status' => 'Active',
+                'ecommerce_slug' => $this->uniqueEcommerceSlug($validated['company_name']),
+            ]);
 
             $admin = User::create([
                 'name' => $validated['admin_name'],
@@ -149,6 +152,21 @@ class CompanyController extends Controller
             $candidate = "{$local}{$counter}@{$domain}";
             $counter++;
         } while (User::where('username', $candidate)->exists());
+
+        return $candidate;
+    }
+
+    private function uniqueEcommerceSlug(string $companyName): string
+    {
+        $base = Str::slug($companyName);
+        $base = $base !== '' ? $base : 'store';
+        $candidate = $base;
+        $counter = 2;
+
+        while (Company::where('ecommerce_slug', $candidate)->exists()) {
+            $candidate = "{$base}-{$counter}";
+            $counter++;
+        }
 
         return $candidate;
     }
