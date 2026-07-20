@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Nexora – Manufacturing</title>
-    <link rel="icon" type="image/png" href="images/Nexora_Logo_Transparent.png">
+    <link rel="icon" type="image/png" href="{{ asset('manufacturing/images/Nexora_Logo_Transparent.png') }}">
     <link rel="stylesheet" href="{{ asset('manufacturing/css/styles.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="{{ asset('manufacturing/js/shared.js') }}"></script>
@@ -113,7 +113,7 @@
 
         {{-- Profile circle --}}
         <div class="flex items-center justify-end w-[5vw]">
-            <a href="/signin" class="p-1 w-9 h-9 rounded-full bg-white"><span class="inline-block" aria-hidden="true">&#8226;</span></a>
+            <a href="{{ route('login') }}" class="p-1 w-9 h-9 rounded-full bg-white" aria-label="Nexora sign in"><span class="inline-block" aria-hidden="true">&#8226;</span></a>
         </div>
     </header>
 
@@ -196,10 +196,10 @@
             <div class="flex-1 h-full p-4 bg-nexora-off-white border-[1px] border-nexora-corporate rounded-lg overflow-y-auto [&::-webkit-scrollbar]:hidden">
                 {{-- Dashboard --}}
                 @if($curPage === 'dashboard')
-                    @include('partials.dashboard')
+                    @include('manufacturing::partials.dashboard')
                     {{-- Reports --}}
                 @elseif($curPage === 'reports')
-                    @include('partials.reports')
+                    @include('manufacturing::partials.reports')
                 {{-- Work Orders --}}
                 @elseif($curPage === 'orders')
                 @php
@@ -214,29 +214,29 @@
                 @endphp
                     {{-- All Orders --}}
                     @if($curSub === 'all' || $curSub === '')
-                        @include('partials.workorder.allorder')
+                        @include('manufacturing::partials.workorder.allorder')
                     {{-- Status --}}
                     @elseif ($curSub === 'status')
-                        @include('partials.workorder.status')
+                        @include('manufacturing::partials.workorder.status')
                     {{-- Schedule --}}
                     @elseif($curSub === 'schedule')
-                        @include('partials.workorder.schedule')
+                        @include('manufacturing::partials.workorder.schedule')
                     {{-- BOMs --}}
                     @elseif($curSub === 'boms')
-                            @include('partials.workorder.bom')
+                            @include('manufacturing::partials.workorder.bom')
                     {{-- Assignment --}}
                     @elseif($curSub === 'assignment')
-                        @include('partials.workorder.assignment')
+                        @include('manufacturing::partials.workorder.assignment')
                     @endif
 
                 {{-- Quality Check --}}
                 @elseif($curPage === 'qc')
                     @if($curSub === 'benchmark' || $curSub === '')
-                        @include('partials.Quality Check.benchmark')
+                        @include('manufacturing::partials.Quality Check.benchmark')
                     @elseif($curSub === 'rework')
-                        @include('partials.Quality Check.rework')
+                        @include('manufacturing::partials.Quality Check.rework')
                     @elseif($curSub === 'analytics')
-                        @include('partials.Quality Check.analytics')
+                        @include('manufacturing::partials.Quality Check.analytics')
                     @endif
 
                 @endif
