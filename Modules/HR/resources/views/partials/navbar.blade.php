@@ -29,7 +29,7 @@
             </div>
 
             <div class="relative group">
-                <a href="#"
+                <a href="{{ route('hr.employees.index') }}"
                    class="{{ $navLink }} {{ $isWorkforce ? $navActive : '' }}">
                     Workforce
                     <svg class="w-3.5 h-3.5 opacity-80 transition-transform duration-300 origin-center group-hover:rotate-180 group-hover:opacity-100" viewBox="0 0 24 24" fill="none">
@@ -52,7 +52,7 @@
             </div>
 
             <div class="relative group">
-                <a href="#"
+                <a href="{{ route('hr.reports-analytics.attendance-overview') }}"
                    class="{{ $navLink }} {{ $isReports ? $navActive : '' }}">
                     Reports and Analytics
                     <svg class="w-3.5 h-3.5 opacity-80 transition-transform duration-300 origin-center group-hover:rotate-180 group-hover:opacity-100" viewBox="0 0 24 24" fill="none">
@@ -68,7 +68,7 @@
             </div>
 
             <div class="relative group">
-                <a href="#"
+                <a href="{{ route('hr.employee.dashboard') }}"
                    class="{{ $navLink }}">
                     Employee Management
                     <svg class="w-3.5 h-3.5 opacity-80 transition-transform duration-300 origin-center group-hover:rotate-180 group-hover:opacity-100" viewBox="0 0 24 24" fill="none">
@@ -76,8 +76,8 @@
                     </svg>
                 </a>
                 <div class="absolute top-[120%] left-1/2 -translate-x-1/2 translate-y-2.5 w-[220px] bg-[#132B52] rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2.5 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
-                    <a href="#" class="{{ $dropLink }}">Leave Management</a>
-                    <a href="#" class="{{ $dropLink }}">Resignation Management</a>
+                    <a href="{{ route('hr.reports-analytics.leave') }}" class="{{ $dropLink }}">Leave Record</a>
+                    <span class="block text-[#C9DAF8]/60 py-[11px] px-3.5 text-[13px] font-medium cursor-not-allowed" title="This HR feature has not been implemented yet">Resignation Management</span>
                 </div>
             </div>
         </nav>
