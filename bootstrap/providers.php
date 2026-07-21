@@ -1,5 +1,6 @@
 <?php
 
+<<<<<<< Updated upstream
 use App\Providers\AppServiceProvider;
 use Modules\Inventory\Providers\InventoryServiceProvider;
 use Modules\Procurement\Providers\ProcurementServiceProvider;
@@ -54,4 +55,10 @@ return [
     ManufacturingServiceProvider::class,
     FinanceServiceProvider::class,
     BusinessIntelligenceServiceProvider::class,
+=======
+return [
+    App\Providers\AppServiceProvider::class,
+    App\Providers\Filament\AdminPanelProvider::class,
+    Modules\Ecommerce\Providers\EcommerceServiceProvider::class,
+>>>>>>> Stashed changes
 ];

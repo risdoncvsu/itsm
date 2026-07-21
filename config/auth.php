@@ -46,6 +46,10 @@ return [
             'driver' => 'session',
             'provider' => 'ecommerce_users',
         ],
+        'ecommerce_admin' => [
+            'driver' => 'session',
+            'provider' => 'ecommerce_admins',
+        ],
     ],
 
     /*
@@ -73,6 +77,10 @@ return [
         'ecommerce_users' => [
             'driver' => 'eloquent',
             'model' => \Modules\Ecommerce\Models\User::class,
+        ],
+        'ecommerce_admins' => [
+            'driver' => 'eloquent',
+            'model' => \Modules\Ecommerce\Models\EcommerceAdmin::class,
         ],
 
         // 'users' => [

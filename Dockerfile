@@ -27,7 +27,8 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
 
 RUN npm install && npm run build
+RUN php artisan filament:assets
 
 RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
-CMD ["sh", "-c", "php artisan optimize:clear --no-interaction && php artisan hr:ensure-employees-table --no-interaction && php artisan migrate --force --no-interaction && php artisan bi:install-schema --no-interaction && php artisan procurement:install-schema --force --no-interaction && php artisan procurement:ensure-client-columns --no-interaction && php artisan order-fulfillment:install-schema --force --no-interaction && php artisan order-fulfillment:ensure-client-columns --no-interaction && php artisan serve --host=0.0.0.0 --port=$PORT"]
+CMD ["sh", "-c", "php artisan optimize --no-interaction && php artisan hr:ensure-employees-table --no-interaction && php artisan migrate --force --no-interaction && php artisan bi:install-schema --no-interaction && php artisan procurement:install-schema --force --no-interaction && php artisan procurement:ensure-client-columns --no-interaction && php artisan order-fulfillment:install-schema --force --no-interaction && php artisan order-fulfillment:ensure-client-columns --no-interaction && php artisan serve --host=0.0.0.0 --port=$PORT"]
