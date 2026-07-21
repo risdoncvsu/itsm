@@ -5,6 +5,8 @@ namespace Modules\Procurement\Http\Controllers\Procurement;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Modules\Inventory\Models\Warehouse;
 
 class PurchaseOrderController extends Controller
 {
@@ -80,6 +82,11 @@ class PurchaseOrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $warehouses = Warehouse::query()
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get(['id', 'name', 'address']);
+
         $statusCounts = $this->table('purchase_orders')
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
@@ -88,7 +95,7 @@ class PurchaseOrderController extends Controller
                 return [strtolower(str_replace([' ', '_'], '-', $status ?? 'pending')) => $total];
             });
 
-        return view('procurement::pages.purchase-orders', compact('purchaseOrders', 'suppliers', 'statusCounts'));
+        return view('procurement::pages.purchase-orders', compact('purchaseOrders', 'suppliers', 'warehouses', 'statusCounts'));
     }
 
     public function approved(Request $request)
@@ -121,7 +128,19 @@ class PurchaseOrderController extends Controller
             'createdBy' => 'nullable|string|max:150',
             'remarks' => 'nullable|string',
             'reqRef' => 'nullable|string|max:50',
+            'warehouse_id' => 'required|integer',
         ]);
+
+        $warehouse = Warehouse::query()
+            ->whereKey((int) $validated['warehouse_id'])
+            ->where('status', 'active')
+            ->first();
+
+        if (! $warehouse) {
+            throw ValidationException::withMessages([
+                'warehouse_id' => 'Select an active warehouse belonging to your client.',
+            ]);
+        }
 
         $supplier = $this->table('suppliers')->where('name', $validated['supplier'])->first();
         $supplierId = $supplier?->id;
@@ -158,6 +177,8 @@ class PurchaseOrderController extends Controller
             'brand' => $validated['brand'] ?? null,
             'unit_price' => (float) ($validated['unitPrice'] ?? 0),
             'requisition_reference' => $validated['reqRef'] ?? null,
+            'warehouse_id' => $warehouse->id,
+            'delivery_address' => $warehouse->address,
             'created_at' => now(),
             'updated_at' => now(),
         ];
