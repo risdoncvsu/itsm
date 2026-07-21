@@ -28,7 +28,7 @@ class OrderController extends Controller
     public function index()
     {
         $orders       = Order::with('items')->orderByDesc('created_at')->get();
-        $ordersToday  = Order::where('status', 'NEW')->count();
+        $ordersReceivedToday  = Order::where('status', 'NEW')->count();
         $inPacking    = Order::where('status', 'PACKING')->count();
         $shippedToday = Order::where('status', 'SHIPPED')->count();
         $delivered    = Order::where('status', 'DELIVERED')->count();
@@ -65,7 +65,7 @@ class OrderController extends Controller
             });
 
         return view('order-fulfillment::order', compact(
-            'orders', 'ordersToday', 'inPacking', 'shippedToday', 'onTimeRate', 'recentActivity'
+            'orders', 'ordersReceivedToday', 'inPacking', 'shippedToday', 'onTimeRate', 'recentActivity'
         ));
     }
 

@@ -29,10 +29,10 @@ public function index()
     )->where('status', 'Refunded')
      ->count();
 
-    return view('return', compact(
-        'returns',
-        'pendingReturns',
-        'refundedToday'
-    ));
+    return view('order-fulfillment::return', compact(
+    'returns',
+    'pendingReturns',
+    'refundedToday'
+));
 }
 }

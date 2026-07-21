@@ -9,19 +9,6 @@ use Modules\OrderFulfillment\Http\Controllers\MaterialRequestController;
 
 // Protected order-fulfillment routes
 Route::prefix('order-fulfillment')->name('order-fulfillment.')->middleware('order-fulfillment.access')->group(function (): void {
-    Route::post('/logout', function () {
-        session()->forget([
-            'employee_logged_in',
-            'employee_role',
-            'employee_id',
-            'employee_name',
-            'employee_email',
-            'employee_department',
-            'employee_client_id',
-        ]);
-        return redirect()->route('login');
-    })->name('logout');
-
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');

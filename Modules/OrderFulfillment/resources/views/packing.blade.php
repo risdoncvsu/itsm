@@ -42,7 +42,7 @@
     gap:14px;
 }
 
-.logout-logo{
+.brand-logo{
     display:flex;
     align-items:center;
     gap:14px;
@@ -54,27 +54,27 @@
         filter .25s ease;
 }
 
-.logout-logo:hover{
+.brand-logo:hover{
     transform:scale(1.06);
     filter:drop-shadow(0 8px 18px rgba(59,130,246,.45));
 }
 
-.logout-logo:active{
+.brand-logo:active{
     transform:scale(.96);
 }
 
-.logout-logo:visited,
-.logout-logo:link,
-.logout-logo:hover,
-.logout-logo:active{
+.brand-logo:visited,
+.brand-logo:link,
+.brand-logo:hover,
+.brand-logo:active{
     color:inherit;
 }
 
-.logout-logo .title{
+.brand-logo .title{
     color:#FFFFFF;
 }
 
-.logout-logo .subtitle{
+.brand-logo .subtitle{
     color:#3B82F6;
 }
 
@@ -942,6 +942,7 @@
 
     <!-- Navbar -->
     <div class="navbar">
+<<<<<<< Updated upstream
       <a href="{{ route('order-fulfillment.dashboard') }}" class="brand">
         <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
         <div class="brand-text">
@@ -949,6 +950,15 @@
             <div class="subtitle">ENTERPRISE RESOURCE PLANNING</div>
         </div>
       </a>
+=======
+     <div class="brand brand-logo">
+    <img class="logo" src="{{ asset('orderfulfillment/logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
+    <div class="brand-text">
+        <div class="title">NEXORA</div>
+        <div class="subtitle">ENTERPRISE RESOURCE PLANNING</div>
+    </div>
+</div>
+>>>>>>> Stashed changes
       <div class="nav-links">
         <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
         <a href="{{ route('order-fulfillment.orders') }}">Orders</a>
