@@ -333,7 +333,7 @@ class SearchController extends Controller
             return [
                 'name' => $item->name,
                 'type' => $item->type,
-                'price' => '₱' . number_format((float) $item->price, 2)
+                'price' => 'â‚±' . number_format((float) $item->price, 2)
             ];
         });
 

@@ -65,7 +65,7 @@ class SocialAuthController extends Controller
                     'provider' => $provider,
                     'provider_id' => $socialUser->getId(),
                 ]);
-                return redirect()->route('social.complete-registration');
+                return redirect()->route('ecommerce.social.complete-registration');
             }
         }
 
@@ -116,7 +116,6 @@ class SocialAuthController extends Controller
             return redirect(session()->pull('redirect_after_auth'))->with('success', 'Account created successfully!');
         }
 
-        return redirect()->route('account.profile')->with('success', 'Account created successfully! Please complete your profile.');
+        return redirect()->route('ecommerce.account.profile')->with('success', 'Account created successfully! Please complete your profile.');
     }
 }
-

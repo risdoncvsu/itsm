@@ -12,7 +12,7 @@ class CheckoutController extends Controller
     public function index()
     {
         if (!Auth::check()) {
-            session()->put('redirect_after_auth', route('checkout.index'));
+            session()->put('redirect_after_auth', route('ecommerce.checkout.index'));
             return redirect()->route('login');
         }
 
@@ -34,7 +34,7 @@ class CheckoutController extends Controller
         }
 
         if (count($cartItems) === 0) {
-            return redirect()->route('cart')->with('error', 'Your cart is empty.');
+            return redirect()->route('ecommerce.cart')->with('error', 'Your cart is empty.');
         }
 
         $subtotal = collect($cartItems)->sum(function($item) {
@@ -116,7 +116,7 @@ class CheckoutController extends Controller
 
         return response()->json([
             'success' => true,
-            'redirect_url' => route('checkout.success', $order->id)
+            'redirect_url' => route('ecommerce.checkout.success', $order->id)
         ]);
     }
 

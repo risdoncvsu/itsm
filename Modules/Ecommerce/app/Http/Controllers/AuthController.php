@@ -52,7 +52,7 @@ class AuthController extends Controller
             return redirect(session()->pull('redirect_after_auth'))->with('success', 'Account created successfully!');
         }
 
-        return redirect()->route('account.profile')->with('success', 'Account created successfully! Please complete your profile.');
+        return redirect()->route('ecommerce.account.profile')->with('success', 'Account created successfully! Please complete your profile.');
     }
 
     public function logout(Request $request)

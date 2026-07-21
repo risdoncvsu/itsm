@@ -37,6 +37,6 @@ class AccountController extends Controller
 
         $user->save();
 
-        return redirect()->route('account.profile')->with('success', 'Profile updated successfully!');
+        return redirect()->route('ecommerce.account.profile')->with('success', 'Profile updated successfully!');
     }
 }
