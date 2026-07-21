@@ -291,6 +291,7 @@
   .tag-new { background: rgba(255,255,255,0.1); color: var(--text-muted); }
   .tag-packing { background: #6B4A1E; color: #FBD38D; }
   .tag-shipped { background: #1E5A6B; color: #7DD3E8; }
+  .tag-transit { background: #1E3A6B; color: #93C5FD; }
   .tag-delivered { background: #1E5A3A; color: #86EFAC; }
   .tag-cancelled { background: #4A1E1E; color: #F3A9A9; }
 
@@ -432,7 +433,7 @@
 
   <!-- Navbar -->
   <div class="navbar">
-    <a href="{{ route('order-fulfillment.logout') }}" class="brand logout-logo" title="Logout">
+    <a href="{{ route('logout') }}" class="brand logout-logo" title="Logout">
     <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
     <div class="brand-text">
         <div class="title">NEXORA</div>
@@ -440,11 +441,11 @@
     </div>
   </a>
     <div class="nav-links">
-      <a href="{{ route('order-fulfillment.dashboard') }}" class="active">Dashboard</a>
-      <a href="{{ route('order-fulfillment.orders') }}">Orders</a>
-      <a href="{{ route('order-fulfillment.packing') }}">Packing</a>
-      <a href="{{ route('order-fulfillment.shipping') }}">Shipping</a>
-      <a href="{{ route('order-fulfillment.return') }}">Returns</a>
+      <a href="{{ route('dashboard') }}" class="active">Dashboard</a>
+      <a href="{{ route('orders') }}">Orders</a>
+      <a href="{{ route('packing') }}">Packing</a>
+      <a href="{{ route('shipping') }}">Shipping</a>
+      <a href="{{ route('return') }}">Returns</a>
     </div>
   </div>
 
@@ -470,13 +471,27 @@
 
   <!-- Board + Sidebar -->
   @php
-    $statusMap = [
-      'NEW'       => ['label' => 'NEW',       'class' => 'tag-new'],
-      'PACKING'   => ['label' => 'PACKING',   'class' => 'tag-packing'],
-      'SHIPPED'   => ['label' => 'SHIPPED',   'class' => 'tag-shipped'],
-      'DELIVERED' => ['label' => 'DELIVERED', 'class' => 'tag-delivered'],
-      'CANCELLED' => ['label' => 'CANCELLED', 'class' => 'tag-cancelled'],
+    // Class per color tier — kept local to this file because the CSS
+    // classes here (.tag-*) are named differently than order.blade.php
+    // (.status-*) and shipping.blade.php (.status-tag.tag-*). The text
+    // for every one of these comes from OrderStatus::label() below, so
+    // the wording itself can't drift between tabs even though the CSS
+    // class names do.
+    $statusClassByTier = [
+      'new'       => 'tag-new',
+      'packing'   => 'tag-packing',
+      'shipped'   => 'tag-shipped',
+      'transit'   => 'tag-transit',
+      'delivered' => 'tag-delivered',
+      'cancelled' => 'tag-cancelled',
     ];
+    $statusMap = [];
+    foreach (['NEW', 'PACKING', 'READY_TO_SHIP', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'DELAYED', 'CANCELLED'] as $key) {
+      $statusMap[$key] = [
+        'label' => \App\Helpers\OrderStatus::label($key),
+        'class' => $statusClassByTier[\App\Helpers\OrderStatus::tier($key)],
+      ];
+    }
   @endphp
   <div class="board">
 
@@ -490,16 +505,29 @@
       <div class="column-body">
         @forelse ($newOrders as $order)
           @php
-            $priority = \Modules\OrderFulfillment\Helpers\OrderPriority::dashboard($order->created_at ?? null);
-            $status   = $statusMap[strtoupper($order->status)] ?? ['label' => strtoupper($order->status), 'class' => 'tag-new'];
+            $priority     = \Modules\OrderFulfillment\Helpers\OrderPriority::dashboard($order->created_at ?? null);
+            $status       = $statusMap[strtoupper($order->status)] ?? ['label' => strtoupper($order->status), 'class' => 'tag-new'];
+            $statusIsNew  = strtoupper($order->status) === 'NEW';
+            // Never show two "NEW" tags on the same card, and never show a
+            // "NEW" priority once the order has moved past the NEW status.
+            if ($priority['label'] === 'NEW') {
+                $showPriority = !$statusIsNew;
+                if ($showPriority) {
+                    $priority = ['label' => 'LOW', 'class' => 'tag-low'];
+                }
+            } else {
+                $showPriority = true;
+            }
           @endphp
           <div class="order-card">
             <div class="order-id">{{ $order->id }}</div>
             <div class="order-details">
-              <div class="order-item">{{ $order->product_name }} Ãƒâ€”{{ $order->qty }}</div>
+              <div class="order-item">{{ $order->customer_name }}</div>
               <div class="tag-row">
                 <span class="tag {{ $status['class'] }}">{{ $status['label'] }}</span>
+                @if ($showPriority)
                 <span class="tag {{ $priority['class'] }}">{{ $priority['label'] }}</span>
+                @endif
               </div>
               @if (!empty($order->due_date))
                 <div class="order-due">Due: {{ \Carbon\Carbon::parse($order->due_date)->format('F j') }}</div>
@@ -522,16 +550,29 @@
       <div class="column-body">
         @forelse ($packingOrders as $order)
           @php
-            $priority = \Modules\OrderFulfillment\Helpers\OrderPriority::dashboard($order->created_at ?? null);
-            $status   = $statusMap[strtoupper($order->status)] ?? ['label' => strtoupper($order->status), 'class' => 'tag-packing'];
+            $priority     = \Modules\OrderFulfillment\Helpers\OrderPriority::dashboard($order->created_at ?? null);
+            $status       = $statusMap[strtoupper($order->status)] ?? ['label' => strtoupper($order->status), 'class' => 'tag-packing'];
+            $statusIsNew  = strtoupper($order->status) === 'NEW';
+            // Never show two "NEW" tags on the same card, and never show a
+            // "NEW" priority once the order has moved past the NEW status.
+            if ($priority['label'] === 'NEW') {
+                $showPriority = !$statusIsNew;
+                if ($showPriority) {
+                    $priority = ['label' => 'LOW', 'class' => 'tag-low'];
+                }
+            } else {
+                $showPriority = true;
+            }
           @endphp
           <div class="order-card">
             <div class="order-id">{{ $order->id }}</div>
             <div class="order-details">
-              <div class="order-item">{{ $order->product_name }}</div>
+              <div class="order-item">{{ $order->customer_name }}</div>
               <div class="tag-row">
                 <span class="tag {{ $status['class'] }}">{{ $status['label'] }}</span>
+                @if ($showPriority)
                 <span class="tag {{ $priority['class'] }}">{{ $priority['label'] }}</span>
+                @endif
               </div>
               @if (!empty($order->due_date))
                 <div class="order-due">Due: {{ \Carbon\Carbon::parse($order->due_date)->format('F j') }}</div>
@@ -544,7 +585,18 @@
       </div>
     </div>
 
-    <!-- SHIPPED -->
+    <!-- SHIPPED
+         $shippedOrders needs to come from the controller as everything
+         that has REACHED shipping or later — not literally status ==
+         'SHIPPED'. Otherwise an order vanishes from this column the
+         moment shipping.blade.php advances it to OUT_FOR_DELIVERY or
+         DELIVERED. In the controller that builds this view, that's:
+           $shippedOrders = Order::whereIn('status', [
+               'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED',
+           ])->latest()->get();
+         The per-row status/priority tags below already render whatever
+         the order's real current status is, so the card still shows
+         accurate info — it just no longer disappears from the board. -->
     <div class="column">
       <div class="column-header">
         <div class="column-title"><span class="dot dot-shipped"></span> SHIPPED</div>
@@ -554,16 +606,29 @@
       <div class="column-body">
         @forelse ($shippedOrders as $order)
           @php
-            $priority = \Modules\OrderFulfillment\Helpers\OrderPriority::dashboard($order->created_at ?? null);
-            $status   = $statusMap[strtoupper($order->status)] ?? ['label' => strtoupper($order->status), 'class' => 'tag-shipped'];
+            $priority     = \Modules\OrderFulfillment\Helpers\OrderPriority::dashboard($order->created_at ?? null);
+            $status       = $statusMap[strtoupper($order->status)] ?? ['label' => strtoupper($order->status), 'class' => 'tag-shipped'];
+            $statusIsNew  = strtoupper($order->status) === 'NEW';
+            // Never show two "NEW" tags on the same card, and never show a
+            // "NEW" priority once the order has moved past the NEW status.
+            if ($priority['label'] === 'NEW') {
+                $showPriority = !$statusIsNew;
+                if ($showPriority) {
+                    $priority = ['label' => 'LOW', 'class' => 'tag-low'];
+                }
+            } else {
+                $showPriority = true;
+            }
           @endphp
           <div class="order-card">
             <div class="order-id">{{ $order->id }}</div>
             <div class="order-details">
-              <div class="order-item">{{ $order->product_name }}</div>
+              <div class="order-item">{{ $order->customer_name }}</div>
               <div class="tag-row">
                 <span class="tag {{ $status['class'] }}">{{ $status['label'] }}</span>
+                @if ($showPriority)
                 <span class="tag {{ $priority['class'] }}">{{ $priority['label'] }}</span>
+                @endif
               </div>
               @if (!empty($order->due_date))
                 <div class="order-due">Due: {{ \Carbon\Carbon::parse($order->due_date)->format('F j') }}</div>
@@ -580,14 +645,14 @@
     <div class="sidebar">
       <div class="side-panel">
         <div class="side-header">
-          <div class="side-title">Ã°Å¸â€â€ Alerts</div>
+          <div class="side-title">🔔 Alerts</div>
         </div>
 
-        <div class="side-list">
+        <div class="side-list" id="alertsList" data-empty-text="No alerts.">
           @forelse ($alerts as $order)
             <div class="alert-row">
               <div class="alert-left">
-                <span>Ã°Å¸â€œÂ¦ New order {{ $order->id }} received</span>
+                <span>📦 New order {{ $order->id }} received</span>
               </div>
             </div>
           @empty
@@ -598,13 +663,13 @@
 
       <div class="side-panel">
         <div class="side-header">
-          <div class="side-title">Ã°Å¸â€œË† Activity feed</div>
+          <div class="side-title">📈 Activity feed</div>
           <div class="live-badge"><span class="live-dot"></span> Live</div>
         </div>
 
-        <div class="side-list">
+        <div class="side-list" id="activityFeedList" data-empty-text="No recent activity.">
           @forelse ($activity as $order)
-            <div class="activity-row">{{ $order->activity_icon }} {{ $order->activity_message }}</div>
+            <div class="activity-row" data-activity-id="{{ $order->id }}-{{ $order->status ?? '' }}">{{ $order->activity_icon }} {{ $order->activity_message }}</div>
           @empty
             <div class="empty-state">No recent activity.</div>
           @endforelse
@@ -613,6 +678,58 @@
     </div>
 
   </div>
+
+  <script>
+    /* =====================================================================
+       Live notify: picks up status changes made anywhere (Orders, Packing,
+       Shipping) and reflects them here without a refresh.
+       Requires GET /activity/recent?since=<ISO timestamp> to exist server
+       side — see the ActivityController snippet provided alongside this
+       file. Every other page (order.blade.php, shipping.blade.php) polls
+       the same endpoint, so a driver getting assigned on the Shipping tab
+       shows up here within one poll interval.
+       ===================================================================== */
+    (function () {
+      const POLL_MS = 8000;
+      let since = new Date().toISOString();
+
+      function rowHtml(item) {
+        if (item.type === 'alert') {
+          return '<div class="alert-row"><div class="alert-left"><span>' +
+                 (item.icon || '📦') + ' ' + item.message + '</span></div></div>';
+        }
+        return '<div class="activity-row" data-activity-id="' + item.id + '">' +
+               (item.icon || '📈') + ' ' + item.message + '</div>';
+      }
+
+      function prepend(container, items) {
+        if (!container || !items.length) return;
+        const emptyState = container.querySelector('.empty-state');
+        if (emptyState) emptyState.remove();
+        items.forEach(function (item) {
+          container.insertAdjacentHTML('afterbegin', rowHtml(item));
+        });
+      }
+
+      async function poll() {
+        try {
+          const res = await fetch('/activity/recent?since=' + encodeURIComponent(since));
+          if (!res.ok) return;
+          const data = await res.json();
+          if (data.items && data.items.length) {
+            prepend(document.getElementById('alertsList'), data.items.filter(i => i.type === 'alert'));
+            prepend(document.getElementById('activityFeedList'), data.items.filter(i => i.type === 'activity'));
+          }
+          if (data.now) since = data.now;
+        } catch (e) {
+          // Silently retry on the next interval — a missed poll shouldn't
+          // spam the console or interrupt whoever is using the dashboard.
+        }
+      }
+
+      setInterval(poll, POLL_MS);
+    })();
+  </script>
 
 </body>
 </html>

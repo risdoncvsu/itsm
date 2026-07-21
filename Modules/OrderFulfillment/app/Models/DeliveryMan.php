@@ -45,14 +45,44 @@ class DeliveryMan extends Model
     }
 
     /**
+     * shipments.courier is entered on the order form using
+     * customer-facing brand names (e.g. "J&T", "Flash Express"),
+     * while delivery_men.courier_provider stores the short internal
+     * code (e.g. "JNT", "FLASH"). These are genuinely different
+     * strings, not just formatting differences, so add every known
+     * variant here as new couriers/spellings show up.
+     */
+    protected static array $courierAliases = [
+        'JNT' => 'JNT',
+        'J&T' => 'JNT',
+        'J&T EXPRESS' => 'JNT',
+        'JNT EXPRESS' => 'JNT',
+        'FLASH' => 'FLASH',
+        'FLASH EXPRESS' => 'FLASH',
+    ];
+
+    /**
+     * Map a shipment's courier name to the internal courier_provider
+     * code used on delivery_men. Falls back to the trimmed/uppercased
+     * input itself if no alias is registered, so unmapped couriers
+     * still get an exact-match attempt instead of silently failing.
+     */
+    public static function normalizeCourier(string $courier): string
+    {
+        $key = strtoupper(trim($courier));
+
+        return self::$courierAliases[$key] ?? $key;
+    }
+
+    /**
      * Scope: only drivers who work for the given courier.
-     * Matched against shipments.courier in ShippingController.
+     * $courier is the raw value from shipments.courier — it gets
+     * normalized to delivery_men's internal code before matching.
      */
     public function scopeForCourier($query, string $courier)
     {
-        return $query->where('courier_provider', $courier);
+        return $query->whereRaw('UPPER(TRIM(courier_provider)) = ?', [
+            self::normalizeCourier($courier),
+        ]);
     }
 }
-
-
-
