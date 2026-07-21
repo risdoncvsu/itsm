@@ -215,7 +215,7 @@
                         </label>
 
                         <label class="block">
-                            <span class="mb-2 block text-sm font-semibold">New Password</span>
+                            <span class="mb-2 block text-sm font-semibold">Set Client System Admin Password</span>
                             <input type="password" name="admin_password" id="edit_admin_password" class="h-11 w-full rounded border border-slate-300 px-3" autocomplete="new-password">
                         </label>
 

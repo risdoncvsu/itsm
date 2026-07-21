@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\User;
 use App\Services\HrEmployeeProfileProvisioner;
+use App\Services\ErpIntegrationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
@@ -84,6 +85,10 @@ class CompanyController extends Controller
 
             if (! empty($validated['admin_password'])) {
                 $company->adminUser->update(['password' => Hash::make($validated['admin_password'])]);
+                app(ErpIntegrationService::class)->recordAudit((int) $company->id, 'client_admin.password_changed', 'ITSM', [
+                    'changed_by' => auth()->id(),
+                    'username' => $company->adminUser->username,
+                ]);
             }
 
         }
