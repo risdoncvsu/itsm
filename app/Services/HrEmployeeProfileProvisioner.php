@@ -331,6 +331,7 @@ class HrEmployeeProfileProvisioner
             'employee_name' => $employee->first_name ?? 'HR Manager',
             'employee_email' => $employee->company_email,
             'employee_department' => $employee->department ?? 'Human Resources',
+            'employee_position' => $employee->position ?? null,
             'employee_client_id' => (int) $employee->client_id,
         ]);
     }

@@ -21,8 +21,14 @@ class OrderFulfillmentAccess
         }
 
         $department = strtolower((string) session('employee_department', ''));
+        $position = strtolower((string) session('employee_position', ''));
+        $assignment = $department.' '.$position;
+
         abort_unless(
-            str_contains($department, 'fulfillment') || str_contains($department, 'operations') || str_contains($department, 'order'),
+            str_contains($assignment, 'fulfillment')
+                || str_contains($assignment, 'operations')
+                || str_contains($assignment, 'order')
+                || str_contains($assignment, 'shipping'),
             403
         );
 

@@ -59,29 +59,7 @@ class AuthController extends Controller
                 return redirect()->route('hr.first-login.password');
             }
 
-            $department = strtolower((string) session('employee_department', ''));
-
-            if (str_contains($department, 'inventory') || str_contains($department, 'warehouse')) {
-                return redirect()->route('inventory.index');
-            }
-
-            if (str_contains($department, 'procurement') || str_contains($department, 'purchasing')) {
-                return redirect()->route('procurement.dashboard');
-            }
-
-            if (str_contains($department, 'fulfillment') || str_contains($department, 'operations') || str_contains($department, 'order')) {
-                return redirect()->route('order-fulfillment.dashboard');
-            }
-
-            if (str_contains($department, 'manufacturing') || str_contains($department, 'production')) {
-                return redirect()->route('manufacturing.dashboard');
-            }
-
-            if (str_contains($department, 'finance') || str_contains($department, 'accounting')) {
-                return redirect()->route('finance.dashboard');
-            }
-
-            return redirect()->route('hr.dashboard');
+            return redirect()->route($this->employeeModuleRoute());
         }
 
         return back()->withErrors(['username' => $hrLogin['message']]);
@@ -106,29 +84,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        $department = strtolower((string) session('employee_department', ''));
-
-        if (str_contains($department, 'inventory') || str_contains($department, 'warehouse')) {
-            return redirect()->route('inventory.index');
-        }
-
-        if (str_contains($department, 'procurement') || str_contains($department, 'purchasing')) {
-            return redirect()->route('procurement.dashboard');
-        }
-
-        if (str_contains($department, 'fulfillment') || str_contains($department, 'operations') || str_contains($department, 'order')) {
-            return redirect()->route('order-fulfillment.dashboard');
-        }
-
-        if (str_contains($department, 'manufacturing') || str_contains($department, 'production')) {
-            return redirect()->route('manufacturing.dashboard');
-        }
-
-        if (str_contains($department, 'finance') || str_contains($department, 'accounting')) {
-            return redirect()->route('finance.dashboard');
-        }
-
-        return redirect()->route('hr.dashboard');
+        return redirect()->route($this->employeeModuleRoute());
     }
 
     private function companyAdminDestination($user): string
@@ -144,5 +100,40 @@ class AuthController extends Controller
         }
 
         return route('client.itsm.employees');
+    }
+
+    /**
+     * Resolve a module from both the employee's department and position.
+     * Some HR records use "Shipping" as a department while others keep the
+     * department as "Order Management" and store Shipping Coordinator only
+     * in the position field. Both are Order Fulfillment accounts.
+     */
+    private function employeeModuleRoute(): string
+    {
+        $department = strtolower((string) session('employee_department', ''));
+        $position = strtolower((string) session('employee_position', ''));
+        $assignment = $department.' '.$position;
+
+        if (str_contains($assignment, 'inventory') || str_contains($assignment, 'warehouse')) {
+            return 'inventory.index';
+        }
+
+        if (str_contains($assignment, 'procurement') || str_contains($assignment, 'purchasing')) {
+            return 'procurement.dashboard';
+        }
+
+        if (str_contains($assignment, 'fulfillment') || str_contains($assignment, 'operations') || str_contains($assignment, 'order') || str_contains($assignment, 'shipping')) {
+            return 'order-fulfillment.dashboard';
+        }
+
+        if (str_contains($assignment, 'manufacturing') || str_contains($assignment, 'production')) {
+            return 'manufacturing.dashboard';
+        }
+
+        if (str_contains($assignment, 'finance') || str_contains($assignment, 'accounting')) {
+            return 'finance.dashboard';
+        }
+
+        return 'hr.dashboard';
     }
 }
