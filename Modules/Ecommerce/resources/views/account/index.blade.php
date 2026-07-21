@@ -11,7 +11,20 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/ecommerce/tailwind-config.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: '#ff6b00', hover: '#e56000', glow: 'rgba(255, 107, 0, 0.5)' },
+                        dark: { bg: '#050505', surface: '#121212' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        };
+    </script>
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -130,8 +143,8 @@
             max-width: 0;
         }
     </style>
-    <link rel="stylesheet" href="/ecommerce/liquidglass.css">
-    <script defer src="/ecommerce/preloader.js"></script>
+
+    @vite('Modules/Ecommerce/resources/css/liquidglass.css')
 </head>
 <body class="relative antialiased selection:bg-primary selection:text-white">
 
@@ -143,7 +156,7 @@
                     <div class="relative flex items-center justify-center">
                         <div class="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
                         <div class="flex items-center relative z-10">
-                            <img src="{{ asset('ecommerce/Techforge_Logo.png') }}" alt="TechForge Logo" class="h-20 w-auto object-contain animate-spin-fast drop-shadow-[0_0_25px_rgba(255,107,0,0.6)]">
+                            <img src="{{ Vite::asset('Modules/Ecommerce/resources/img/Techforge_Logo.png') }}" alt="TechForge Logo" class="h-20 w-auto object-contain animate-spin-fast drop-shadow-[0_0_25px_rgba(255,107,0,0.6)]">
                             <span class="text-4xl md:text-5xl font-black text-white tracking-widest animate-slide-text">TECHFORGE</span>
                         </div>
                     </div>
@@ -227,7 +240,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
                                 <label class="w-32 text-sm text-gray-400 font-medium shrink-0">Username</label>
                                 <div class="flex-1">
-                                    <input type="text" value="{{ Auth::guard('ecommerce')->check() ? Auth::guard('ecommerce')->user()->name : 'user123' }}" disabled class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-500 cursor-not-allowed focus:outline-none shadow-inner">
+                                    <input type="text" value="{{ Auth::check() ? Auth::user()->name : 'user123' }}" disabled class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-500 cursor-not-allowed focus:outline-none shadow-inner">
                                 </div>
                             </div>
 
@@ -235,7 +248,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
                                 <label class="w-32 text-sm text-gray-400 font-medium shrink-0">Name</label>
                                 <div class="flex-1">
-                                    <input type="text" name="name" value="{{ Auth::guard('ecommerce')->user()->name ?? '' }}" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl px-4 py-2.5 text-sm text-white transition-all outline-none placeholder-gray-600">
+                                    <input type="text" name="name" value="{{ Auth::user()->name ?? '' }}" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl px-4 py-2.5 text-sm text-white transition-all outline-none placeholder-gray-600">
                                 </div>
                             </div>
 
@@ -243,7 +256,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
                                 <label class="w-32 text-sm text-gray-400 font-medium shrink-0">Email</label>
                                 <div class="flex-1">
-                                    <input type="email" name="email" value="{{ Auth::guard('ecommerce')->user()->email ?? '' }}" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl px-4 py-2.5 text-sm text-white transition-all outline-none placeholder-gray-600">
+                                    <input type="email" name="email" value="{{ Auth::user()->email ?? '' }}" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl px-4 py-2.5 text-sm text-white transition-all outline-none placeholder-gray-600">
                                 </div>
                             </div>
 
@@ -251,7 +264,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
                                 <label class="w-32 text-sm text-gray-400 font-medium shrink-0">Phone Number</label>
                                 <div class="flex-1">
-                                    <input type="tel" name="phone" value="{{ Auth::guard('ecommerce')->user()->phone ?? '' }}" placeholder="Enter your phone number" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl px-4 py-2.5 text-sm text-white transition-all outline-none placeholder-gray-600">
+                                    <input type="tel" name="phone" value="{{ Auth::user()->phone ?? '' }}" placeholder="Enter your phone number" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl px-4 py-2.5 text-sm text-white transition-all outline-none placeholder-gray-600">
                                 </div>
                             </div>
 
@@ -261,7 +274,7 @@
                                 <div class="flex-1 flex items-center gap-8 pt-2">
                                     <label class="flex items-center gap-3 cursor-pointer group">
                                         <div class="relative flex items-center justify-center">
-                                            <input type="radio" name="gender" value="male" class="peer sr-only" {{ (Auth::guard('ecommerce')->user()->gender ?? '') == 'male' ? 'checked' : '' }}>
+                                            <input type="radio" name="gender" value="male" class="peer sr-only" {{ (Auth::user()->gender ?? '') == 'male' ? 'checked' : '' }}>
                                             <div class="w-5 h-5 rounded-full border-2 border-gray-600 peer-checked:border-primary transition-colors"></div>
                                             <div class="w-2.5 h-2.5 bg-primary rounded-full absolute scale-0 peer-checked:scale-100 transition-transform shadow-[0_0_8px_rgba(255,107,0,0.8)]"></div>
                                         </div>
@@ -269,7 +282,7 @@
                                     </label>
                                     <label class="flex items-center gap-3 cursor-pointer group">
                                         <div class="relative flex items-center justify-center">
-                                            <input type="radio" name="gender" value="female" class="peer sr-only" {{ (Auth::guard('ecommerce')->user()->gender ?? '') == 'female' ? 'checked' : '' }}>
+                                            <input type="radio" name="gender" value="female" class="peer sr-only" {{ (Auth::user()->gender ?? '') == 'female' ? 'checked' : '' }}>
                                             <div class="w-5 h-5 rounded-full border-2 border-gray-600 peer-checked:border-primary transition-colors"></div>
                                             <div class="w-2.5 h-2.5 bg-primary rounded-full absolute scale-0 peer-checked:scale-100 transition-transform shadow-[0_0_8px_rgba(255,107,0,0.8)]"></div>
                                         </div>
@@ -277,7 +290,7 @@
                                     </label>
                                     <label class="flex items-center gap-3 cursor-pointer group">
                                         <div class="relative flex items-center justify-center">
-                                            <input type="radio" name="gender" value="other" class="peer sr-only" {{ (Auth::guard('ecommerce')->user()->gender ?? '') == 'other' ? 'checked' : '' }}>
+                                            <input type="radio" name="gender" value="other" class="peer sr-only" {{ (Auth::user()->gender ?? '') == 'other' ? 'checked' : '' }}>
                                             <div class="w-5 h-5 rounded-full border-2 border-gray-600 peer-checked:border-primary transition-colors"></div>
                                             <div class="w-2.5 h-2.5 bg-primary rounded-full absolute scale-0 peer-checked:scale-100 transition-transform shadow-[0_0_8px_rgba(255,107,0,0.8)]"></div>
                                         </div>
@@ -294,7 +307,7 @@
                                         <select name="dob_day" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl pl-4 pr-10 py-2.5 text-sm text-white transition-all outline-none appearance-none cursor-pointer">
                                             <option value="" disabled selected>DD</option>
                                             @for($i=1; $i<=31; $i++)
-                                                <option value="{{ $i }}" {{ (isset(Auth::guard('ecommerce')->user()->dob) && \Carbon\Carbon::parse(Auth::guard('ecommerce')->user()->dob)->day == $i) ? 'selected' : '' }}>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                                <option value="{{ $i }}" {{ (isset(Auth::user()->dob) && \Carbon\Carbon::parse(Auth::user()->dob)->day == $i) ? 'selected' : '' }}>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
                                             @endfor
                                         </select>
                                         <i class="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
@@ -303,7 +316,7 @@
                                         <select name="dob_month" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl pl-4 pr-10 py-2.5 text-sm text-white transition-all outline-none appearance-none cursor-pointer">
                                             <option value="" disabled selected>MM</option>
                                             @for($i=1; $i<=12; $i++)
-                                                <option value="{{ $i }}" {{ (isset(Auth::guard('ecommerce')->user()->dob) && \Carbon\Carbon::parse(Auth::guard('ecommerce')->user()->dob)->month == $i) ? 'selected' : '' }}>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                                                <option value="{{ $i }}" {{ (isset(Auth::user()->dob) && \Carbon\Carbon::parse(Auth::user()->dob)->month == $i) ? 'selected' : '' }}>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
                                             @endfor
                                         </select>
                                         <i class="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
@@ -312,7 +325,7 @@
                                         <select name="dob_year" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl pl-4 pr-10 py-2.5 text-sm text-white transition-all outline-none appearance-none cursor-pointer">
                                             <option value="" disabled selected>YYYY</option>
                                             @for($i=date('Y'); $i>=1900; $i--)
-                                                <option value="{{ $i }}" {{ (isset(Auth::guard('ecommerce')->user()->dob) && \Carbon\Carbon::parse(Auth::guard('ecommerce')->user()->dob)->year == $i) ? 'selected' : '' }}>{{ $i }}</option>
+                                                <option value="{{ $i }}" {{ (isset(Auth::user()->dob) && \Carbon\Carbon::parse(Auth::user()->dob)->year == $i) ? 'selected' : '' }}>{{ $i }}</option>
                                             @endfor
                                         </select>
                                         <i class="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
@@ -600,9 +613,9 @@
                                 <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-3 mb-2">
-                                            <h3 class="text-lg font-bold text-white">{{ Auth::guard('ecommerce')->user()->name ?? 'John Doe' }}</h3>
+                                            <h3 class="text-lg font-bold text-white">{{ Auth::user()->name ?? 'John Doe' }}</h3>
                                             <span class="text-gray-400">|</span>
-                                            <span class="text-sm text-gray-300">{{ Auth::guard('ecommerce')->user()->phone ?? '(+63) 912 345 6789' }}</span>
+                                            <span class="text-sm text-gray-300">{{ Auth::user()->phone ?? '(+63) 912 345 6789' }}</span>
                                         </div>
                                         <div class="flex items-center gap-2 mb-2">
                                             <span class="text-[10px] font-bold text-primary border border-primary/30 bg-primary/10 px-2 py-0.5 rounded uppercase tracking-wider">Default</span>
@@ -625,9 +638,9 @@
                                 <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-3 mb-2">
-                                            <h3 class="text-lg font-bold text-white">{{ Auth::guard('ecommerce')->user()->name ?? 'John Doe' }}</h3>
+                                            <h3 class="text-lg font-bold text-white">{{ Auth::user()->name ?? 'John Doe' }}</h3>
                                             <span class="text-gray-400">|</span>
-                                            <span class="text-sm text-gray-300">{{ Auth::guard('ecommerce')->user()->phone ?? '(+63) 912 345 6789' }}</span>
+                                            <span class="text-sm text-gray-300">{{ Auth::user()->phone ?? '(+63) 912 345 6789' }}</span>
                                         </div>
                                         <div class="flex items-center gap-2 mb-2">
                                             <span class="text-[10px] font-bold text-gray-400 border border-white/10 bg-white/5 px-2 py-0.5 rounded uppercase tracking-wider">Work</span>
@@ -1521,6 +1534,11 @@
                         });
                     }
                 </script>
+
+    
+
+    @vite(['Modules/Ecommerce/resources/js/Common/Preloader.js', 'Modules/Ecommerce/resources/js/Common/AmbientEffects.js'])
+
     <!-- Global Toast Notification -->
     <div id="toast-notification" class="fixed bottom-6 right-6 z-[200] transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 bg-[#13131a] border border-primary/30 shadow-[0_0_20px_rgba(255,107,0,0.2)] rounded-xl px-5 py-4 pointer-events-none">
         <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
@@ -1542,5 +1560,6 @@
     </script>
 
     <!-- Load our compiled JavaScript -->
+    @vite('Modules/Ecommerce/resources/js/HomePage/Homepage.js')
 </body>
 </html>

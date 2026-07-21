@@ -11,12 +11,12 @@ class CheckoutController extends Controller
 {
     public function index()
     {
-        if (!Auth::guard('ecommerce')->check()) {
-            session()->put('redirect_after_auth', route('ecommerce.checkout.index'));
-            return redirect()->route('ecommerce.login');
+        if (!Auth::check()) {
+            session()->put('redirect_after_auth', route('checkout.index'));
+            return redirect()->route('login');
         }
 
-        $cart = Cart::with('items')->where('user_id', Auth::guard('ecommerce')->id())->first();
+        $cart = Cart::with('items')->where('user_id', Auth::id())->first();
         
         $cartItems = [];
         if ($cart) {
@@ -34,7 +34,7 @@ class CheckoutController extends Controller
         }
 
         if (count($cartItems) === 0) {
-            return redirect()->route('ecommerce.cart')->with('error', 'Your cart is empty.');
+            return redirect()->route('cart')->with('error', 'Your cart is empty.');
         }
 
         $subtotal = collect($cartItems)->sum(function($item) {
@@ -51,7 +51,7 @@ class CheckoutController extends Controller
 
     public function process(Request $request)
     {
-        if (!Auth::guard('ecommerce')->check()) {
+        if (!Auth::check()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
@@ -67,7 +67,7 @@ class CheckoutController extends Controller
             'paymentMethod' => 'required|string',
         ]);
 
-        $cart = Cart::with('items')->where('user_id', Auth::guard('ecommerce')->id())->first();
+        $cart = Cart::with('items')->where('user_id', Auth::id())->first();
         if (!$cart || $cart->items->count() === 0) {
             return response()->json(['success' => false, 'message' => 'Cart is empty'], 400);
         }
@@ -81,7 +81,7 @@ class CheckoutController extends Controller
 
         // Create Order
         $order = Order::create([
-            'user_id' => Auth::guard('ecommerce')->id(),
+            'user_id' => Auth::id(),
             'status' => 'processing',
             'total' => $total,
             'shipping_fee' => $shippingFee,
@@ -116,13 +116,13 @@ class CheckoutController extends Controller
 
         return response()->json([
             'success' => true,
-            'redirect_url' => route('ecommerce.checkout.success', $order->id)
+            'redirect_url' => route('checkout.success', $order->id)
         ]);
     }
 
     public function success($id)
     {
-        $order = Order::with('items')->where('user_id', Auth::guard('ecommerce')->id())->findOrFail($id);
+        $order = Order::with('items')->where('user_id', Auth::id())->findOrFail($id);
         return view('ecommerce::checkout-success', compact('order'));
     }
 }

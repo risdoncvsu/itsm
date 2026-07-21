@@ -11,7 +11,20 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/ecommerce/tailwind-config.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: '#ff6b00', hover: '#e56000', glow: 'rgba(255, 107, 0, 0.5)' },
+                        dark: { bg: '#050505', surface: '#121212' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        };
+    </script>
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -97,13 +110,18 @@
         }
         .cart-item-exit { animation: fadeSlideOut 0.4s ease-in forwards; }
     </style>
-    <link rel="stylesheet" href="/ecommerce/liquidglass.css">
-    <script defer src="/ecommerce/preloader.js"></script>
+
+    @vite('Modules/Ecommerce/resources/css/liquidglass.css')
 </head>
 <body class="relative antialiased selection:bg-primary selection:text-white">
+
+    @vite('Modules/Ecommerce/resources/js/Common/Preloader.js')
+
     <!-- Background Ambient Effects -->
     <div class="ambient-light-1"></div>
     <div class="ambient-light-2"></div>
+    @vite('Modules/Ecommerce/resources/js/Common/AmbientEffects.js')
+
     <x-navbar />
 
     <!-- Cart & Returns Section -->
@@ -300,7 +318,7 @@
                         </div>
                         
                         @if(count($cart) > 0)
-                            <a href="{{ auth('ecommerce')->check() ? route('ecommerce.checkout.index') : route('ecommerce.cart.checkout.redirect') }}" id="checkout-btn" class="w-full bg-gradient-to-r from-primary to-orange-400 hover:from-primary-hover hover:to-primary text-white py-4 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(255,107,0,0.3)] hover:shadow-[0_0_25px_rgba(255,107,0,0.5)] hover:-translate-y-1 flex items-center justify-center gap-2 text-lg group">
+                            <a href="{{ auth()->check() ? route('ecommerce.checkout.index') : route('ecommerce.cart.checkout.redirect') }}" id="checkout-btn" class="w-full bg-gradient-to-r from-primary to-orange-400 hover:from-primary-hover hover:to-primary text-white py-4 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(255,107,0,0.3)] hover:shadow-[0_0_25px_rgba(255,107,0,0.5)] hover:-translate-y-1 flex items-center justify-center gap-2 text-lg group">
                                 Proceed to Checkout <i class="ph-bold ph-arrow-right group-hover:translate-x-1 transition-transform"></i>
                             </a>
                         @else
@@ -444,6 +462,10 @@
             }
         }
     </script>
+
+    @vite(['Modules/Ecommerce/resources/js/Common/Preloader.js', 'Modules/Ecommerce/resources/js/Common/AmbientEffects.js'])
+
     <!-- Load our compiled JavaScript -->
+    @vite('Modules/Ecommerce/resources/js/HomePage/Homepage.js')
 </body>
 </html>

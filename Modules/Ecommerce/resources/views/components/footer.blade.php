@@ -7,7 +7,7 @@
                 <div class="col-span-1 lg:pr-8">
                     <a href="#" class="flex items-center gap-3 mb-4">
                         <div class="bg-gradient-to-br from-primary to-orange-400 w-10 h-10 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(255,107,0,0.4)]">
-                            <img src="{{ asset('ecommerce/Techforge_Logo.png') }}" alt="TechForge Logo" class="h-6 w-auto object-contain">
+                            <img src="{{ Vite::asset('Modules/Ecommerce/resources/img/Techforge_Logo.png') }}" alt="TechForge Logo" class="h-6 w-auto object-contain">
                         </div>
                         <span class="text-xl font-bold tracking-wide text-white">TECHFORGE</span>
                     </a>
@@ -16,7 +16,7 @@
                     </p>
                     <div class="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 w-max">
                         <span class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Powered by</span>
-                        <img src="{{ asset('ecommerce/Nexora_Logo.png') }}" alt="Nexora Logo" class="h-5 w-auto object-contain opacity-80">
+                        <img src="{{ Vite::asset('Modules/Ecommerce/resources/img/Nexora_Logo.png') }}" alt="Nexora Logo" class="h-5 w-auto object-contain opacity-80">
                     </div>
                 </div>
 

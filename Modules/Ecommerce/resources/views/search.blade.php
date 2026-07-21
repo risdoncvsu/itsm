@@ -14,7 +14,21 @@
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/ecommerce/tailwind-config.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: '#ff6b00', hover: '#e56000', glow: 'rgba(255, 107, 0, 0.5)' },
+                        dark: { bg: '#050505', surface: '#121212' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        };
+    </script>
+    
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -62,8 +76,8 @@
             background: #ff6b00;
         }
     </style>
-    <link rel="stylesheet" href="/ecommerce/liquidglass.css">
-    <script defer src="/ecommerce/preloader.js"></script>
+
+    @vite('Modules/Ecommerce/resources/css/liquidglass.css')
 </head>
 <body class="relative antialiased selection:bg-primary selection:text-white">
 
@@ -162,5 +176,6 @@
     </script>
     
     <!-- Load our compiled JavaScript (You can remove LiquidGlass initialization from inside this file) -->
+    @vite(['Modules/Ecommerce/resources/js/HomePage/Homepage.js', 'Modules/Ecommerce/resources/js/Category/Category.js', 'Modules/Ecommerce/resources/js/Pages/Search/Search.js'])
 </body>
 </html>

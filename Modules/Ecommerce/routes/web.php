@@ -59,7 +59,7 @@ Route::post('/account/addresses', [\Modules\Ecommerce\Http\Controllers\AddressCo
 Route::put('/account/addresses/{address}', [\Modules\Ecommerce\Http\Controllers\AddressController::class, 'update'])->name('account.addresses.update');
 Route::delete('/account/addresses/{address}', [\Modules\Ecommerce\Http\Controllers\AddressController::class, 'destroy'])->name('account.addresses.destroy');
 Route::post('/account/addresses/{address}/default', [\Modules\Ecommerce\Http\Controllers\AddressController::class, 'setDefault'])->name('account.addresses.set-default');
-Route::get('/configurator-overview/{id}', function ($id) {
+Route::get('/configurator-overview/{id}', function ($store, $id) {
     $product = \Modules\Ecommerce\Models\CustombuiltConfig::with(['intelCpu', 'amdCpu', 'gpu', 'intelMotherboard', 'amdMotherboard', 'intelRam', 'amdRam', 'storage', 'powerSupply', 'pcCase', 'cooler'])->findOrFail($id);
     
     $cpus = \Modules\Ecommerce\Models\Cpu::all()->map(function($i) { $i->component_category = 'Processor'; return $i; });
@@ -77,7 +77,7 @@ Route::get('/configurator-overview/{id}', function ($id) {
     return view('ecommerce::configurator-overview', compact('product', 'allComponents'));
 })->name('configurator-overview');
 
-Route::get('/custompc-overview/{id}', function ($id) {
+Route::get('/custompc-overview/{id}', function ($store, $id) {
     if (str_starts_with($id, 'custom-pc-') || str_starts_with($id, 'custom_')) {
         $configuration = null;
         if (\Illuminate\Support\Facades\Auth::guard('ecommerce')->check()) {
@@ -121,12 +121,12 @@ Route::get('/custompc-overview/{id}', function ($id) {
 })->name('custompc-overview');
 
 
-Route::get('/laptop-overview/{id}', function ($id) {
+Route::get('/laptop-overview/{id}', function ($store, $id) {
     $product = \Modules\Ecommerce\Models\Laptop::findOrFail($id);
     return view('ecommerce::laptop-overview', compact('product'));
 })->name('laptop-overview');
 
-Route::get('/prebuilt-overview/{id}', function ($id) {
+Route::get('/prebuilt-overview/{id}', function ($store, $id) {
     $product = \Modules\Ecommerce\Models\PrebuiltConfig::with(['cpu', 'gpu', 'motherboard', 'ram', 'storage', 'powerSupply', 'pcCase'])->findOrFail($id);
     return view('ecommerce::prebuilt-overview', compact('product'));
 })->name('prebuilt-overview');
@@ -233,3 +233,4 @@ Route::middleware('auth:ecommerce')->group(function () {
 });
 
 });
+

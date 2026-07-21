@@ -7,7 +7,20 @@
     
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/ecommerce/tailwind-config.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: '#ff6b00', hover: '#e56000', glow: 'rgba(255, 107, 0, 0.5)' },
+                        dark: { bg: '#050505', surface: '#121212' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        };
+    </script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #050505; color: #ffffff; }
@@ -18,8 +31,6 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
     </style>
-    <link rel="stylesheet" href="/ecommerce/liquidglass.css">
-    <script defer src="/ecommerce/preloader.js"></script>
 </head>
 <body class="antialiased min-h-screen flex flex-col items-center justify-center py-20 px-4">
 
@@ -112,5 +123,6 @@
             cases: @json($cases)
         };
     </script>
+    @vite('Modules/Ecommerce/resources/js/Pages/Configurator/Configurator.js')
 </body>
 </html>

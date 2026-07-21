@@ -79,3 +79,4 @@ class AccessoryController extends Controller
         return view('ecommerce::store.monitors', compact('items'));
     }
 }
+

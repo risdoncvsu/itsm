@@ -7,12 +7,12 @@
     <!-- Navigation -->
     <nav class="fixed w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)] max-w-7xl left-1/2 -translate-x-1/2 top-4 z-[80] px-4 sm:px-6 py-3 flex items-center justify-between gap-4 sm:gap-6 transition-all duration-300">
         <!-- Background for Nav to prevent backdrop-filter nesting bug -->
-        <div class="absolute inset-0 liquid-glass rounded-2xl -z-10 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl pointer-events-none shadow-2xl"></div>
 
         <!-- Logo & Name -->
         <a href="{{ url('/') }}" class="flex items-center gap-3 shrink-0 relative z-30">
             <div class="bg-gradient-to-br from-primary to-orange-400 w-10 h-10 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(255,107,0,0.4)]">
-                <img src="{{ asset('ecommerce/Techforge_Logo.png') }}" alt="TechForge Logo" class="h-6 w-auto object-contain">
+                <img src="{{ Vite::asset('Modules/Ecommerce/resources/img/Techforge_Logo.png') }}" alt="TechForge Logo" class="h-6 w-auto object-contain">
             </div>
             <span class="hidden md:block text-xl font-bold tracking-wide text-white">TECHFORGE</span>
         </a>
@@ -35,7 +35,7 @@
             </div>
             
             <!-- Search Dropdown -->
-            <div id="search-dropdown" class="liquid-glass-heavy absolute top-[calc(100%+0.5rem)] left-0 w-full rounded-2xl overflow-hidden shadow-2xl py-4 opacity-0 pointer-events-none transition-all duration-300 transform -translate-y-2 origin-top">
+            <div id="search-dropdown" class="bg-[#1a1a1a]/90 backdrop-blur-2xl border border-white/10 absolute top-[calc(100%+0.5rem)] left-0 w-full rounded-2xl overflow-hidden shadow-2xl py-4 opacity-0 pointer-events-none transition-all duration-300 transform -translate-y-2 origin-top">
                 <div class="px-5 mb-2">
                     <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Popular Searches</span>
                 </div>
@@ -67,12 +67,12 @@
                     <i class="ph ph-user text-xl text-primary transition-colors"></i>
                     <div class="flex flex-col text-left">
                         <span class="text-[10px] text-gray-400 leading-tight">Welcome</span>
-                        <span class="text-sm font-bold text-white leading-tight">{{ Auth::guard('ecommerce')->user()->name }}</span>
+                        <span class="text-sm font-bold text-white leading-tight">{{ Auth::user()->name }}</span>
                     </div>
                 </div>
                 
                 <!-- Dropdown Menu -->
-                <div class="opacity-0 pointer-events-none scale-95 group-hover/user:opacity-100 group-hover/user:pointer-events-auto group-hover/user:scale-100 transition-all duration-300 origin-top-right absolute top-full right-0 mt-0 w-56 liquid-glass border border-white/10 rounded-xl shadow-2xl py-2 z-50">
+                <div class="opacity-0 pointer-events-none scale-95 group-hover/user:opacity-100 group-hover/user:pointer-events-auto group-hover/user:scale-100 transition-all duration-300 origin-top-right absolute top-full right-0 mt-0 w-56 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl py-2 z-50">
                     <div class="px-4 py-3 border-b border-white/10 mb-2 bg-white/5 mx-2 rounded-lg">
                         <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">FORGE Points</p>
                         <div class="flex items-end gap-2">
@@ -106,7 +106,7 @@
                 </a>
                 
                 <!-- Unauthenticated Dropdown -->
-                <div class="opacity-0 pointer-events-none scale-95 group-hover/guest:opacity-100 group-hover/guest:pointer-events-auto group-hover/guest:scale-100 transition-all duration-300 origin-top-right absolute top-full right-0 mt-0 w-64 liquid-glass border border-white/10 rounded-xl shadow-2xl p-4 z-50">
+                <div class="opacity-0 pointer-events-none scale-95 group-hover/guest:opacity-100 group-hover/guest:pointer-events-auto group-hover/guest:scale-100 transition-all duration-300 origin-top-right absolute top-full right-0 mt-0 w-64 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-4 z-50">
                     <h4 class="text-sm font-bold text-white mb-2">Join TechForge</h4>
                     <p class="text-[11px] text-gray-400 mb-4 leading-snug">Earn Forge Points, track orders, and checkout faster.</p>
                     <a href="{{ route('ecommerce.login') }}" class="block w-full bg-gradient-to-r from-primary to-orange-400 hover:from-primary hover:to-orange-500 text-white text-center py-2.5 rounded-xl font-bold text-sm transition-colors mb-2 shadow-[0_0_15px_rgba(255,107,0,0.3)]">Sign In</a>
@@ -124,7 +124,7 @@
                 </a>
 
                 <!-- Notification Dropdown -->
-                <div class="liquid-glass-heavy absolute top-[calc(100%+0.5rem)] right-0 w-80 sm:w-96 rounded-2xl overflow-hidden shadow-2xl p-5 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform group-hover:translate-y-0 -translate-y-2 origin-top">
+                <div class="bg-[#1a1a1a]/90 backdrop-blur-2xl border border-white/10 absolute top-[calc(100%+0.5rem)] right-0 w-80 sm:w-96 rounded-2xl overflow-hidden shadow-2xl p-5 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform group-hover:translate-y-0 -translate-y-2 origin-top">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-white">Notifications</h3>
                         <span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-1 rounded-md">1 New</span>
@@ -171,7 +171,7 @@
     </nav>
 
     <!-- Secondary Navigation -->
-    <div id="secondary-nav" class="fixed w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)] max-w-7xl left-1/2 -translate-x-1/2 top-[112px] z-[70] hidden md:flex items-center px-6 py-2.5 liquid-glass border border-white/5 rounded-2xl shadow-xl transition-all duration-300">
+    <div id="secondary-nav" class="fixed w-[calc(100%-2rem)] sm:w-[calc(100%-3rem)] lg:w-[calc(100%-4rem)] max-w-7xl left-1/2 -translate-x-1/2 top-[112px] z-[70] hidden md:flex items-center px-6 py-2.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl transition-all duration-300">
         <div class="flex items-center gap-8 lg:gap-12 text-[10px] font-bold tracking-widest uppercase">
             <div class="relative" id="gaming-pcs-container">
                 <a href="#" id="gaming-pcs-btn" class="text-gray-200 hover:text-primary transition-colors flex items-center gap-1.5 py-2 cursor-pointer">
@@ -179,7 +179,7 @@
                 </a>
 
                 <!-- Dropdown Mega Menu -->
-                <div id="gaming-pcs-dropdown" class="absolute top-[calc(100%+1rem)] -left-2 w-[400px] liquid-glass-heavy border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2 overflow-hidden z-[75]">
+                <div id="gaming-pcs-dropdown" class="absolute top-[calc(100%+1rem)] -left-2 w-[400px] bg-[#1a1a1a]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2 overflow-hidden z-[75]">
                     <div class="grid grid-cols-1 gap-8 pt-8 pb-6 px-8">
                         <!-- Column 1: Shop -->
                         <div>
@@ -219,7 +219,7 @@
                 </a>
 
                 <!-- Dropdown Mega Menu -->
-                <div id="gaming-laptops-dropdown" class="absolute top-[calc(100%+1rem)] -left-2 w-[400px] liquid-glass-heavy border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2 overflow-hidden z-[75]">
+                <div id="gaming-laptops-dropdown" class="absolute top-[calc(100%+1rem)] -left-2 w-[400px] bg-[#1a1a1a]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2 overflow-hidden z-[75]">
                     <div class="grid grid-cols-1 gap-8 pt-8 pb-6 px-8">
                         <!-- Column 1: Shop -->
                         <div>
@@ -256,7 +256,7 @@
                 </a>
 
                 <!-- Dropdown Mega Menu -->
-                <div id="forge-store-dropdown" class="absolute top-[calc(100%+1rem)] -left-2 w-[800px] liquid-glass-heavy border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2 overflow-hidden z-[75]">
+                <div id="forge-store-dropdown" class="absolute top-[calc(100%+1rem)] -left-2 w-[800px] bg-[#1a1a1a]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2 overflow-hidden z-[75]">
                     <div class="grid grid-cols-3 gap-8 pt-8 pb-8 px-8">
                         <!-- Column 1: Store -->
                         <div>
@@ -298,6 +298,8 @@
             </div>
         </div>
     </div>
+
+    @vite('Modules/Ecommerce/resources/js/Common/Navbar.js')
     <!-- Mini Cart Drawer -->
     <div id="mini-cart-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] opacity-0 pointer-events-none transition-all duration-300" onclick="toggleMiniCart()"></div>
 
@@ -467,3 +469,7 @@
             });
         });
     </script>
+
+
+
+
