@@ -76,7 +76,7 @@
                     $badgeColor = $colors[$h % count($colors)];
                   }
                 @endphp
-                <tr data-id="{{ $s->id }}" data-brand="{{ $s->brand ?? '' }}" data-products='@json($s->product_items ? json_decode($s->product_items, true) : [])'>
+                <tr data-id="{{ $s->id }}" data-brand="{{ $s->brand ?? '' }}" data-warehouse-id="{{ $s->warehouse_id ?? '' }}" data-products='@json($s->product_items ? json_decode($s->product_items, true) : [])'>
                   <td><div class="supplier-pill-cell"><span class="supplier-pill"><span class="supplier-badge" style="background: {{ $badgeColor }}">{{ $initials }}</span>{{ $s->name }}</span></div></td>
                   <td>{{ $s->brand ?? '—' }}</td>
                   <td>{{ $s->contact_person ?? '—' }}</td>
