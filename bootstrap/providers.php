@@ -1,6 +1,5 @@
 <?php
 
-<<<<<<< Updated upstream
 use App\Providers\AppServiceProvider;
 
 // Composer rebuilds the module namespace during deployment. This fallback
