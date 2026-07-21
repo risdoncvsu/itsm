@@ -22,7 +22,7 @@ class OrderResource extends Resource
 
     protected static ?string $navigationLabel = 'Storefront Orders';
 
-    protected static ?string $navigationGroup = 'Storefront';
+    protected static \UnitEnum|string|null $navigationGroup = 'Storefront';
 
     public static function form(Schema $schema): Schema
     {
