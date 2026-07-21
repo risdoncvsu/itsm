@@ -8,6 +8,17 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderController extends Controller
 {
+    private function table(string $name)
+    {
+        $query = DB::connection('procurement')->table($name);
+
+        if (! (config('nexora.root_admin_module_testing') && auth()->user()?->role === 'root_admin')) {
+            $query->where($name.'.client_id', (int) session('employee_client_id'));
+        }
+
+        return $query;
+    }
+
     /**
      * Detect a unique-constraint violation (e.g. a duplicate po_number),
      * regardless of which database driver raised it.
@@ -37,7 +48,7 @@ class PurchaseOrderController extends Controller
 
         while ($attempts < 3) {
             try {
-                return DB::table('purchase_orders')->insertGetId($currentInsert);
+                return DB::connection('procurement')->table('purchase_orders')->insertGetId($currentInsert);
             } catch (\Throwable $e) {
                 if ($this->isDuplicateKeyException($e)) {
                     $suffix = now()->format('YmdHis') . '-' . random_int(1000, 9999);
@@ -58,18 +69,18 @@ class PurchaseOrderController extends Controller
      */
     public function index(Request $request)
     {
-        $purchaseOrders = DB::table('purchase_orders')
+        $purchaseOrders = $this->table('purchase_orders')
             ->leftJoin('suppliers', 'purchase_orders.supplier_id', '=', 'suppliers.id')
             ->select('purchase_orders.*', 'suppliers.name as supplier_name')
             ->orderBy('purchase_orders.created_at', 'desc')
             ->limit(8)
             ->get();
 
-        $suppliers = DB::table('suppliers')
+        $suppliers = $this->table('suppliers')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $statusCounts = DB::table('purchase_orders')
+        $statusCounts = $this->table('purchase_orders')
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status')
@@ -82,7 +93,7 @@ class PurchaseOrderController extends Controller
 
     public function approved(Request $request)
     {
-        $approvedPurchaseOrders = DB::table('purchase_orders')
+        $approvedPurchaseOrders = $this->table('purchase_orders')
             ->leftJoin('suppliers', 'purchase_orders.supplier_id', '=', 'suppliers.id')
             ->select('purchase_orders.*', 'suppliers.name as supplier_name')
             ->where('purchase_orders.status', 'approved')
@@ -112,11 +123,12 @@ class PurchaseOrderController extends Controller
             'reqRef' => 'nullable|string|max:50',
         ]);
 
-        $supplier = DB::table('suppliers')->where('name', $validated['supplier'])->first();
+        $supplier = $this->table('suppliers')->where('name', $validated['supplier'])->first();
         $supplierId = $supplier?->id;
 
         if (! $supplierId) {
-            $supplierId = DB::table('suppliers')->insertGetId([
+            $supplierId = DB::connection('procurement')->table('suppliers')->insertGetId([
+                'client_id' => (int) session('employee_client_id'),
                 'name' => $validated['supplier'],
                 'contact_person' => 'Auto-imported',
                 'email' => 'auto@example.com',
@@ -131,6 +143,7 @@ class PurchaseOrderController extends Controller
         }
 
         $insert = [
+            'client_id' => (int) session('employee_client_id'),
             'po_number' => $validated['po'],
             'supplier_id' => $supplierId,
             'qty' => (int) ($validated['qty'] ?? 1),
@@ -150,9 +163,10 @@ class PurchaseOrderController extends Controller
         ];
 
         $poId = $this->insertPurchaseOrder($insert);
-        $savedPoNumber = DB::table('purchase_orders')->where('id', $poId)->value('po_number');
+        $savedPoNumber = $this->table('purchase_orders')->where('id', $poId)->value('po_number');
 
-        DB::table('purchase_order_items')->insert([
+        DB::connection('procurement')->table('purchase_order_items')->insert([
+            'client_id' => (int) session('employee_client_id'),
             'purchase_order_id' => $poId,
             'supplier_product_id' => null,
             'name' => $validated['item'] ?? 'Item',
@@ -185,7 +199,7 @@ class PurchaseOrderController extends Controller
             }
         }
 
-        DB::table('purchase_orders')->where('id', $purchaseOrder)->update([
+        $this->table('purchase_orders')->where('id', $purchaseOrder)->update([
             'status' => $status ?? DB::raw('status'),
             'amount' => $validated['amount'] ?? DB::raw('amount'),
             'remarks' => $validated['remarks'] ?? DB::raw('remarks'),
@@ -197,7 +211,7 @@ class PurchaseOrderController extends Controller
 
     public function destroy($purchaseOrder)
     {
-        DB::table('purchase_orders')->where('id', $purchaseOrder)->delete();
+        $this->table('purchase_orders')->where('id', $purchaseOrder)->delete();
 
         return response()->json(['status' => 'ok']);
     }

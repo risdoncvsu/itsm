@@ -10,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement(<<<SQL
+        DB::connection('procurement')->statement(<<<SQL
             CREATE TABLE IF NOT EXISTS suppliers (
                 id BIGSERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -28,7 +28,7 @@ return new class extends Migration
             )
         SQL);
 
-        DB::statement(<<<SQL
+        DB::connection('procurement')->statement(<<<SQL
             CREATE TABLE IF NOT EXISTS supplier_products (
                 id BIGSERIAL PRIMARY KEY,
                 supplier_id BIGINT NOT NULL,
@@ -42,7 +42,7 @@ return new class extends Migration
             )
         SQL);
 
-        DB::statement(<<<SQL
+        DB::connection('procurement')->statement(<<<SQL
             CREATE TABLE IF NOT EXISTS purchase_orders (
                 id BIGSERIAL PRIMARY KEY,
                 po_number VARCHAR(255) NOT NULL UNIQUE,
@@ -74,7 +74,7 @@ return new class extends Migration
             )
         SQL);
 
-        DB::statement(<<<SQL
+        DB::connection('procurement')->statement(<<<SQL
             CREATE TABLE IF NOT EXISTS purchase_order_items (
                 id BIGSERIAL PRIMARY KEY,
                 purchase_order_id BIGINT NOT NULL,
@@ -92,7 +92,7 @@ return new class extends Migration
             )
         SQL);
 
-        DB::statement(<<<SQL
+        DB::connection('procurement')->statement(<<<SQL
             CREATE TABLE IF NOT EXISTS deliveries (
                 id BIGSERIAL PRIMARY KEY,
                 shipment_number VARCHAR(255) NOT NULL UNIQUE,
@@ -120,7 +120,7 @@ return new class extends Migration
             )
         SQL);
 
-        DB::statement(<<<SQL
+        DB::connection('procurement')->statement(<<<SQL
             CREATE TABLE IF NOT EXISTS sessions (
                 id VARCHAR(255) PRIMARY KEY,
                 user_id BIGINT,
@@ -131,8 +131,8 @@ return new class extends Migration
             )
         SQL);
 
-        DB::statement("CREATE INDEX IF NOT EXISTS sessions_last_activity_index ON sessions (last_activity)");
-        DB::statement("CREATE INDEX IF NOT EXISTS sessions_user_id_index ON sessions (user_id)");
+        DB::connection('procurement')->statement("CREATE INDEX IF NOT EXISTS sessions_last_activity_index ON sessions (last_activity)");
+        DB::connection('procurement')->statement("CREATE INDEX IF NOT EXISTS sessions_user_id_index ON sessions (user_id)");
     }
 
     /**
@@ -140,11 +140,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('DROP TABLE IF EXISTS deliveries CASCADE');
-        DB::statement('DROP TABLE IF EXISTS purchase_order_items CASCADE');
-        DB::statement('DROP TABLE IF EXISTS purchase_orders CASCADE');
-        DB::statement('DROP TABLE IF EXISTS supplier_products CASCADE');
-        DB::statement('DROP TABLE IF EXISTS suppliers CASCADE');
-        DB::statement('DROP TABLE IF EXISTS sessions CASCADE');
+        DB::connection('procurement')->statement('DROP TABLE IF EXISTS deliveries CASCADE');
+        DB::connection('procurement')->statement('DROP TABLE IF EXISTS purchase_order_items CASCADE');
+        DB::connection('procurement')->statement('DROP TABLE IF EXISTS purchase_orders CASCADE');
+        DB::connection('procurement')->statement('DROP TABLE IF EXISTS supplier_products CASCADE');
+        DB::connection('procurement')->statement('DROP TABLE IF EXISTS suppliers CASCADE');
+        DB::connection('procurement')->statement('DROP TABLE IF EXISTS sessions CASCADE');
     }
 };
