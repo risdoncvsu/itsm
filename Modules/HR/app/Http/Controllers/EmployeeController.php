@@ -6,6 +6,7 @@ use Modules\HR\Http\Controllers\Concerns\ResolvesPerPage;
 use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
 use Modules\HR\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
@@ -63,12 +64,13 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        abort_unless((int) session('employee_client_id') > 0, 403);
+        $clientId = (int) session('employee_client_id');
+        abort_unless($clientId > 0, 403);
 
         $request->validate([
             'first_name'      => 'required',
             'last_name'       => 'required',
-            'email'           => 'required|email|unique:employees,email',
+            'email'           => ['required', 'email', Rule::unique('hr.employees', 'email')->where('client_id', $clientId)],
             'phone'           => 'nullable',
     'position'        => 'nullable',
     'department'      => 'required',
@@ -104,7 +106,7 @@ Employee::create([
     'marital_status' => $request->marital_status,
     'address' => $request->address,
     'profile_picture' => $imageName,
-    'client_id' => (int) session('employee_client_id'),
+    'client_id' => $clientId,
     'approval_status' => 'Pending',
 ]);
         return redirect()->route('hr.dashboard')
@@ -119,8 +121,10 @@ Employee::create([
 }
 public function update(Request $request, Employee $employee)
 {
+    $clientId = (int) session('employee_client_id');
+
     $request->validate([
-        'email'           => 'required|email|unique:employees,email,' . $employee->id,
+        'email'           => ['required', 'email', Rule::unique('hr.employees', 'email')->where('client_id', $clientId)->ignore($employee->id)],
         'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 2MB
     ]);
 

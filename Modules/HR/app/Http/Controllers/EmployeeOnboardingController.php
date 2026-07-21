@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Modules\HR\Models\Employee;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class EmployeeOnboardingController extends Controller
 {
@@ -26,11 +27,17 @@ class EmployeeOnboardingController extends Controller
 
     public function storeStep1(Request $request)
 {
+    $clientId = (int) session('employee_client_id');
+    abort_unless($clientId > 0, 403, 'A client-scoped HR session is required to create an employee.');
 
     $request->validate([
         'first_name' => 'required',
         'last_name' => 'required',
-        'email' => 'required|email|unique:employees,email',
+        'email' => [
+            'required',
+            'email',
+            Rule::unique('hr.employees', 'email')->where('client_id', $clientId),
+        ],
         'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
     ]);
 
@@ -178,6 +185,12 @@ class EmployeeOnboardingController extends Controller
 
         $clientId = (int) session('employee_client_id');
         abort_unless($clientId > 0, 403, 'A client-scoped HR session is required to create an employee.');
+
+        if (Employee::where('email', $step1['email'])->exists()) {
+            return redirect()->route('hr.onboarding.step1')
+                ->withErrors(['email' => 'An employee with this email already exists for your client.'])
+                ->withInput($step1);
+        }
 
         $companyEmail = self::generateUniqueCompanyEmail(
             $step1['first_name'],
