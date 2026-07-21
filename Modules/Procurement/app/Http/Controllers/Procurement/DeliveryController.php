@@ -44,9 +44,9 @@ class DeliveryController extends Controller
             'po' => ['required', 'string', 'max:255'],
             'supplier' => ['required', 'string', 'max:255'],
             'delDate' => ['required', 'date'],
-            'timer_minutes' => ['required', 'integer', 'min:1'],
             'items' => ['required', 'string', 'max:255'],
             'qty' => ['required', 'integer', 'min:1'],
+            'status' => ['nullable', 'string', 'in:intransit,delayed'],
             'remarks' => ['nullable', 'string'],
         ]);
 
@@ -69,19 +69,17 @@ class DeliveryController extends Controller
             'shipment_number' => $data['dr'],
             'purchase_order_id' => $purchaseOrder?->id,
             'supplier_id' => $supplier->id,
-            'stage' => 1,
-            'status' => 'shipment',
+            'status' => $data['status'] ?? 'intransit',
             'qty' => (int) $data['qty'],
             'qty_expected' => (int) $data['qty'],
-            'timer_minutes' => (int) $data['timer_minutes'],
             'items' => $data['items'],
             'remarks' => $data['remarks'] ?? null,
             'delivery_date' => $data['delDate'],
-            'started_at' => now(),
+            'estimated_arrival' => $purchaseOrder?->expected_delivery_date,
         ]);
 
         if ($purchaseOrder) {
-            $purchaseOrder->update(['delivery_status' => 'shipment', 'status' => 'processing']);
+            $purchaseOrder->update(['delivery_status' => 'intransit', 'status' => 'processing']);
 
             $requisition = null;
             if (! empty($purchaseOrder->requisition_reference)) {
@@ -93,7 +91,7 @@ class DeliveryController extends Controller
             }
 
             if ($requisition) {
-                $requisition->update(['delivery_status' => 'shipment']);
+                $requisition->update(['delivery_status' => 'intransit']);
             }
         }
 
@@ -116,14 +114,14 @@ class DeliveryController extends Controller
             'note' => ['nullable', 'string'],
         ]);
 
-        $purchaseOrder = $data['po']
+        $purchaseOrder = ($data['po'] ?? null)
             ? PurchaseOrder::where('po_number', $data['po'])->first()
             : $delivery->purchaseOrder;
-        $supplier = $data['supplier']
+        $supplier = ($data['supplier'] ?? null)
             ? Supplier::where('name', $data['supplier'])->first()
             : $delivery->supplier;
 
-        if ($data['supplier'] && ! $supplier) {
+        if (($data['supplier'] ?? null) && ! $supplier) {
             $supplier = Supplier::create([
                 'name' => $data['supplier'],
                 'contact_person' => 'Pending',
@@ -196,4 +194,3 @@ class DeliveryController extends Controller
         return response()->json(['success' => true]);
     }
 }
-
