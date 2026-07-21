@@ -27,28 +27,6 @@
                 <p style="font-size:11px; color: var(--slate-500); margin-bottom: 0.75rem;">Full details for all active
                     alerts</p>
                 <div class="alerts-scroll-row">
-                    @forelse($alerts as $alert)
-                        <div class="alert-square alert-square-{{ $alert['type'] }}">
-                            <div class="alert-square-icon"><i data-lucide="{{ $alert['icon'] }}"></i></div>
-                            <strong>{{ $alert['title'] }}</strong>
-                            <span class="alert-square-time">{{ $alert['time'] }} • {{ $alert['priority'] }}</span>
-                            <p>{{ $alert['description'] }}</p>
-                            @if(!empty($alert['details']))
-                                <table>
-                                    @foreach($alert['details'] as $row)
-                                        <tr>
-                                            @foreach($row as $cell)
-                                                <td>{{ $cell }}</td>
-                                            @endforeach
-                                        </tr>
-                                    @endforeach
-                                </table>
-                            @endif
-                            <p class="alert-square-action">{{ $alert['action'] }}</p>
-                        </div>
-                    @empty
-                        <p style="color: var(--slate-500); font-size: 11px;">No active alerts at this time.</p>
-                    @endforelse
                 </div>
             </div>
 
@@ -224,23 +202,23 @@
             const totalSev = total > 0 ? total : 1;
             const bar = document.getElementById('opRisksBar');
             bar.innerHTML = `
-                            <div class="op-severity-seg health-red" style="width:${Math.round((data.summary.critical / totalSev) * 100)}%;"></div>
-                            <div class="op-severity-seg health-orange" style="width:${Math.round((data.summary.warning / totalSev) * 100)}%;"></div>
-                            <div class="op-severity-seg health-blue" style="width:${Math.round((data.summary.info / totalSev) * 100)}%;"></div>`;
+                                <div class="op-severity-seg health-red" style="width:${Math.round((data.summary.critical / totalSev) * 100)}%;"></div>
+                                <div class="op-severity-seg health-orange" style="width:${Math.round((data.summary.warning / totalSev) * 100)}%;"></div>
+                                <div class="op-severity-seg health-blue" style="width:${Math.round((data.summary.info / totalSev) * 100)}%;"></div>`;
             document.getElementById('opRisksLegend').innerHTML = `
-                            <span><span class="op-legend-dot health-red"></span>Critical ${Math.round((data.summary.critical / totalSev) * 100)}%</span>
-                            <span><span class="op-legend-dot health-orange"></span>Warning ${Math.round((data.summary.warning / totalSev) * 100)}%</span>
-                            <span><span class="op-legend-dot health-blue"></span>Info ${Math.round((data.summary.info / totalSev) * 100)}%</span>`;
+                                <span><span class="op-legend-dot health-red"></span>Critical ${Math.round((data.summary.critical / totalSev) * 100)}%</span>
+                                <span><span class="op-legend-dot health-orange"></span>Warning ${Math.round((data.summary.warning / totalSev) * 100)}%</span>
+                                <span><span class="op-legend-dot health-blue"></span>Info ${Math.round((data.summary.info / totalSev) * 100)}%</span>`;
             const miniGrid = document.getElementById('opRisksMini');
             if (data.alerts && data.alerts.length > 0) {
                 miniGrid.innerHTML = data.alerts.slice(0, 3).map(a => `
-                                <div class="op-risk-mini-card op-risk-mini-${a.severity}">
-                                    <div class="op-risk-mini-header">
-                                        <span class="op-risk-mini-category">${a.department}</span>
-                                        <span class="op-risk-mini-days" data-timestamp="${a.timestamp}">${timeAgo(a.timestamp)}</span>
-                                    </div>
-                                    <p class="op-risk-mini-issue">${a.title}</p>
-                                </div>`).join('');
+                                    <div class="op-risk-mini-card op-risk-mini-${a.severity}">
+                                        <div class="op-risk-mini-header">
+                                            <span class="op-risk-mini-category">${a.department}</span>
+                                            <span class="op-risk-mini-days" data-timestamp="${a.timestamp}">${timeAgo(a.timestamp)}</span>
+                                        </div>
+                                        <p class="op-risk-mini-issue">${a.title}</p>
+                                    </div>`).join('');
             }
         }
 
