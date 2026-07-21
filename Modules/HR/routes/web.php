@@ -21,7 +21,7 @@ Route::middleware('hr.access')->group(function () {
         ->name('employee.dashboard');
 
     Route::post('/logout', function () {
-        session()->forget(['employee_logged_in', 'employee_role', 'employee_department', 'employee_id']);
+        session()->forget(['employee_logged_in', 'employee_role', 'employee_department', 'employee_id', 'employee_code']);
 
         return redirect()->route('login');
     })->name('logout');

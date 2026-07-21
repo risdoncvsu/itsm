@@ -36,6 +36,7 @@ class AuthController extends Controller
             'employee_logged_in' => true,
             'employee_role' => $isHrManager ? 'admin' : 'employee',
             'employee_id' => $employee->id,
+            'employee_code' => $employee->employee_id,
             'employee_name' => $employee->first_name,
             'employee_email' => $employee->company_email,
             'employee_department' => $employee->department,

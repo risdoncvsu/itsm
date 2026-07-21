@@ -13,14 +13,28 @@ class AttendanceController extends Controller
 {
     public function clockIn(Request $request)
     {
-        $request->validate([
-            'employee_id' => 'required|string|exists:employees,employee_id',
+        $validated = $request->validate([
+            // A bare exists rule would query the ITSM default database rather
+            // than the dedicated HR connection.
+            'employee_id' => 'required|string',
             'action' => 'nullable|in:clock_in,clock_out',
             'photo' => 'required|string',
         ]);
 
-        $employeeCode = $request->input('employee_id');
-        $employee = Employee::where('employee_id', $employeeCode)->first();
+        $employeeCode = trim($validated['employee_id']);
+        $employee = Employee::query()->where('employee_id', $employeeCode)->first();
+
+        // Sessions created before employee_code was stored may still prefill
+        // the HR primary key; preserve that existing attendance flow.
+        if (! $employee && ctype_digit($employeeCode)) {
+            $employee = Employee::query()->whereKey((int) $employeeCode)->first();
+        }
+
+        if (! $employee) {
+            return back()
+                ->withErrors(['employee_id' => 'The selected employee ID is invalid.'])
+                ->withInput(['employee_id' => $employeeCode]);
+        }
         $now = Carbon::now('Asia/Manila');
         $today = $now->toDateString();
         $action = $request->input('action', 'clock_in');

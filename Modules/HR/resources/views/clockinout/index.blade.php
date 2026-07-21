@@ -42,7 +42,7 @@
 
     <!-- NAVBAR -->
     <header class="w-full h-[80px] sm:h-[108px] bg-[#1B3A6B] flex items-center px-6 sm:px-[60px] shadow-[0_2px_8px_rgba(0,0,0,.08)]">
-        <img src="images/logo.png" alt="Nexora Logo" class="h-12 sm:h-[72px] w-auto object-contain">
+        <img src="{{ asset('images/logo.png') }}" alt="Nexora Logo" class="h-12 sm:h-[72px] w-auto object-contain">
     </header>
 
     <!-- MAIN -->
@@ -99,7 +99,7 @@
                             name="employee_id"
                             inputmode="numeric"
                             autocomplete="off"
-                            value="{{ old('employee_id', session('employee_id')) }}"
+                            value="{{ old('employee_id', session('employee_code', session('employee_id'))) }}"
                             class="flex-1 h-full border-none outline-none bg-transparent text-white text-base sm:text-2xl min-w-0">
                     </div>
 
@@ -117,7 +117,11 @@
 
                 <button id="attendanceBtn" type="button" disabled
                     class="w-full h-[80px] sm:h-[114px] border-none rounded-[7.9px] bg-[#132B52] text-white text-xl sm:text-[28.6px] font-normal cursor-pointer transition-colors duration-[250ms] mb-2 flex justify-center items-center hover:bg-[#0f2e59] disabled:hover:bg-[#132B52]">
-                    {{ $attendanceButtonLabel }}
+                    @if (session('clocked_in', false) && !session('clocked_out', false))
+                        <span aria-hidden="true">&#9654;</span>&nbsp;Clock Out
+                    @else
+                        <span aria-hidden="true">&#9654;</span>&nbsp;Clock In
+                    @endif
                 </button>
 
                 <div id="requirementNote" class="text-sm sm:text-base text-[#6c757d] mb-5 sm:mb-6 text-center">
@@ -249,6 +253,10 @@ const canvas = document.getElementById("canvas");
 const photo = document.getElementById("photo");
 const photoData = document.getElementById("photoData");
 
+// Use HTML entities for icon glyphs so this page stays readable even if a
+// source file was previously saved using an incompatible text encoding.
+captureBtn.innerHTML = "&#9673;&nbsp;Capture Photo";
+
 const serverClockIn = @json(session('clock_in'));
 const serverClockOut = @json(session('clock_out'));
 const serverClockedIn = @json(session('clocked_in', false));
@@ -294,6 +302,12 @@ if (serverClockedOut) {
 } else if (clockedIn) {
     btn.innerHTML = "â—´ Clock Out";
     requirementNote.innerHTML = "Capture a photo to enable Clock Out.";
+}
+
+// This runs after the legacy label assignment above and replaces any
+// previously mojibaked glyph with an encoding-safe entity.
+if (clockedIn && !serverClockedOut) {
+    btn.innerHTML = "&#9654;&nbsp;Clock Out";
 }
 
 captureBtn.addEventListener("click", async () => {
