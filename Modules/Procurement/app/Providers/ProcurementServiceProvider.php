@@ -17,7 +17,10 @@ class ProcurementServiceProvider extends ServiceProvider
             \Modules\Procurement\Console\Commands\InstallProcurementSchema::class,
         ]);
 
-        Route::middleware('web')->group(__DIR__.'/../../routes/web.php');
+        Route::middleware('web')
+            ->prefix('procurement')
+            ->name('procurement.')
+            ->group(__DIR__.'/../../routes/web.php');
 
 
           View::composer('partials.sidebar', function ($view): void {
