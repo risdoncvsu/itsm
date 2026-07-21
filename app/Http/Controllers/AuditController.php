@@ -2,67 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 
 class AuditController extends Controller
 {
     public function index(Request $request)
     {
         $clientId = (int) $request->user()->company_id;
+        $allAudits = Schema::hasTable('erp_audit_logs')
+            ? DB::table('erp_audit_logs')->where('client_id', $clientId)->latest('created_at')->get()->map(function ($log): array {
+                return [
+                    'id' => '#ERP-'.str_pad((string) $log->id, 6, '0', STR_PAD_LEFT).': '.str_replace('.', ' ', ucfirst($log->event)),
+                    'scope' => ucfirst($log->module),
+                    'auditor' => 'ERP Integration',
+                    'date' => \Illuminate\Support\Carbon::parse($log->created_at)->format('F d, Y H:i'),
+                    'score' => 'Recorded',
+                    'status' => str_ends_with($log->event, 'failed') ? 'Failed' : 'Completed',
+                    'status_class' => str_ends_with($log->event, 'failed') ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800',
+                ];
+            })
+            : collect([]);
+
+        // 2. Save to session if a new audit is created via modal form submission
         if ($request->isMethod('post')) {
+            $newAudits = session()->get('added_audits', []);
+            
+            // Build a new dynamic database row mock from user input fields
+            $newAudits[] = [
+                'id' => '#AUD-2026-0' . (count($allAudits) + count($newAudits) + 1) . ': ' . $request->input('title'),
+                'scope' => $request->input('scope'),
+                'auditor' => $request->input('auditor'),
+                'date' => date('F d, Y', strtotime($request->input('date'))),
+                'score' => '—',
+                'status' => 'Scheduled',
+                'status_class' => 'bg-blue-100 text-blue-800'
+            ];
+
+            session()->put('added_audits', $newAudits);
             return redirect()->route('client.itsm.audit');
         }
 
-        $audits = Schema::hasTable('erp_audit_logs')
-            ? DB::table('erp_audit_logs')
-                ->where('client_id', $clientId)
-                ->orderByDesc('created_at')
-                ->get()
-                ->map(function ($log): array {
-                    $details = $this->decodeDetails($log->details);
-                    $eventLabel = Str::of((string) $log->event)
-                        ->afterLast('.')
-                        ->replace(['_', '-'], ' ')
-                        ->title();
-                    $moduleLabel = Str::of((string) $log->module)
-                        ->replace(['_', '-'], ' ')
-                        ->title();
-                    $actorLabel = $this->actorLabel($log->actor_id, $details);
-                    $status = Str::contains(strtolower((string) $log->event), 'failed') ? 'Failed' : 'Completed';
+        // Combine base collection and dynamically session-appended list rows
+        $addedAudits = session()->get('added_audits', []);
+        $audits = collect(array_merge($allAudits->toArray(), $addedAudits));
 
-                    return [
-                        'reference' => '#ERP-' . str_pad((string) $log->id, 6, '0', STR_PAD_LEFT),
-                        'title' => $eventLabel,
-                        'scope' => $moduleLabel,
-                        'auditor' => $actorLabel,
-                        'date' => Carbon::parse($log->created_at)->format('F d, Y H:i'),
-                        'summary' => $details['summary'] ?? ($details['note'] ?? 'Recorded through the ERP integration layer.'),
-                        'status' => $status,
-                        'status_class' => $status === 'Failed' ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800',
-                    ];
-                })
-            : collect([]);
-
-        $totalRecords = $audits->count();
-        $moduleCount = $audits->pluck('scope')->unique()->count();
+        // --- METRICS CALCULATION (Calculated from the total pool before filtering) ---
+        $upcomingCount = $audits->where('status', 'Scheduled')->count();
+        $totalInspections = $audits->count();
         $failedCount = $audits->where('status', 'Failed')->count();
+        // ----------------------------------------------------------------------------
 
+        // 3. Apply structural Search filter queries if requested by user
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = strtolower($request->search);
             $audits = $audits->filter(function ($item) use ($searchTerm) {
-                return str_contains(strtolower($item['reference']), $searchTerm) ||
-                       str_contains(strtolower($item['title']), $searchTerm) ||
+                return str_contains(strtolower($item['id']), $searchTerm) ||
                        str_contains(strtolower($item['scope']), $searchTerm) ||
-                       str_contains(strtolower($item['auditor']), $searchTerm) ||
-                       str_contains(strtolower($item['summary']), $searchTerm);
+                       str_contains(strtolower($item['auditor']), $searchTerm);
             });
         }
 
+        // 4. Apply analytical Status constraints matching view request queries
         $currentStatus = $request->get('status', 'All');
         if ($currentStatus !== 'All') {
             $audits = $audits->filter(function ($item) use ($currentStatus) {
@@ -70,49 +72,7 @@ class AuditController extends Controller
             });
         }
 
-        return view('audit', compact('audits', 'currentStatus', 'totalRecords', 'moduleCount', 'failedCount'));
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function decodeDetails(mixed $details): array
-    {
-        if (is_array($details)) {
-            return $details;
-        }
-
-        if (is_object($details)) {
-            return (array) $details;
-        }
-
-        if (! is_string($details) || $details === '') {
-            return [];
-        }
-
-        $decoded = json_decode($details, true);
-
-        return is_array($decoded) ? $decoded : [];
-    }
-
-    private function actorLabel(mixed $actorId, array $details): string
-    {
-        $actorName = $details['actor_name'] ?? $details['actor'] ?? null;
-
-        if (is_string($actorName) && $actorName !== '') {
-            return $actorName;
-        }
-
-        if (is_numeric($actorId)) {
-            $user = User::query()->find((int) $actorId);
-
-            if ($user) {
-                return $user->name ?: $user->username ?: $user->email;
-            }
-
-            return 'User #' . $actorId;
-        }
-
-        return 'System';
+        // Send counts directly alongside your main collection items array matrix
+        return view('audit', compact('audits', 'currentStatus', 'upcomingCount', 'totalInspections', 'failedCount'));
     }
 }

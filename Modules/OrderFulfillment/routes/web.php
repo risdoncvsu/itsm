@@ -6,7 +6,6 @@ use Modules\OrderFulfillment\Http\Controllers\DashboardController;
 use Modules\OrderFulfillment\Http\Controllers\OrderController;
 use Modules\OrderFulfillment\Http\Controllers\PackingController;
 use Modules\OrderFulfillment\Http\Controllers\ShippingController;
-use Modules\OrderFulfillment\Http\Controllers\ReturnController;
 use Modules\OrderFulfillment\Http\Controllers\MaterialRequestController;
 
 // Protected order-fulfillment routes
@@ -27,7 +26,7 @@ Route::prefix('order-fulfillment')->name('order-fulfillment.')->middleware('orde
 
     Route::post('/material-requests', [MaterialRequestController::class, 'store'])->name('material-requests.store');
 
-    Route::get('/returns', [ReturnController::class, 'index'])->name('return');
+    Route::view('/returns', 'order-fulfillment::return')->name('return');
 
     Route::post('/logout', function () {
         Auth::logout();
