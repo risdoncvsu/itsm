@@ -167,7 +167,7 @@
                     @endphp
 
                     @foreach($orderSubs as $tab)
-                        <a href="?page=orders&sub={{ $tab['sub'] }}"
+                        <a href="{{ $tab['sub'] === 'boms' ? route('manufacturing.boms.index') : '?page=orders&sub='.$tab['sub'] }}"
                            class="flex gap-4 px-3 py-2 pb-4 items-center rounded-md font-medium transition-colors duration-150
                                   {{ ($curSub === $tab['sub'] || ($curSub === '' && $tab['sub'] === 'all'))
                                       ? 'bg-nexora-sky text-white'

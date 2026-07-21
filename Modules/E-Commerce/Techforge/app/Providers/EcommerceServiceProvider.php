@@ -8,12 +8,14 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Ecommerce\Support\EcommerceClientContext;
 use Modules\Ecommerce\Console\Commands\EnsureEcommerceClientColumns;
 use Modules\Ecommerce\Console\Commands\AssignEcommerceCatalogToClient;
+use Modules\Ecommerce\Services\ListingAvailabilityService;
 
 class EcommerceServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->app->scoped(EcommerceClientContext::class, fn (): EcommerceClientContext => new EcommerceClientContext());
+        $this->app->scoped(ListingAvailabilityService::class, fn (): ListingAvailabilityService => new ListingAvailabilityService());
         $this->commands([
             EnsureEcommerceClientColumns::class,
             AssignEcommerceCatalogToClient::class,

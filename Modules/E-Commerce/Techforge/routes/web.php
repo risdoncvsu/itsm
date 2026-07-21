@@ -23,8 +23,9 @@ Route::get('/debug-session', function () {
 Route::get('/', function () {
     $prebuiltPcs = \Modules\Ecommerce\Models\PrebuiltConfig::with(['cpu', 'gpu', 'ram', 'storage', 'powerSupply'])->take(6)->get();
     $customConfigs = \Modules\Ecommerce\Models\CustombuiltConfig::with(['intelCpu', 'amdCpu', 'gpu', 'intelRam', 'amdRam', 'storage', 'powerSupply'])->take(4)->get();
-    return view('ecommerce::welcome', compact('prebuiltPcs', 'customConfigs'));
-});
+    $storefrontListings = \Modules\Ecommerce\Models\StorefrontListing::query()->where('status', 'active')->latest()->take(8)->get();
+    return view('ecommerce::welcome', compact('prebuiltPcs', 'customConfigs', 'storefrontListings'));
+})->name('home');
 
 Route::get('/login', function () {
     return view('ecommerce::auth.login');
@@ -33,6 +34,8 @@ Route::get('/login', function () {
 Route::post('/login', [\Modules\Ecommerce\Http\Controllers\AuthController::class, 'login'])->name('login.post');
 Route::post('/register', [\Modules\Ecommerce\Http\Controllers\AuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [\Modules\Ecommerce\Http\Controllers\AuthController::class, 'logout'])->name('logout');
+Route::get('/listings/{listing}', [\Modules\Ecommerce\Http\Controllers\StorefrontListingController::class, 'show'])->name('listings.show');
+Route::post('/listings/{listing}/cart', [\Modules\Ecommerce\Http\Controllers\StorefrontListingController::class, 'addToCart'])->name('listings.cart');
 
 // Social Auth Routes
 Route::get('/auth/complete-registration', [\Modules\Ecommerce\Http\Controllers\Auth\SocialAuthController::class, 'completeRegistration'])->name('social.complete-registration');

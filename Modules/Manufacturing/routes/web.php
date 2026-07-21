@@ -2,11 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Manufacturing\Http\Controllers\ManufacturingController;
+use Modules\Manufacturing\Http\Controllers\BomController;
 
 Route::get('/', fn () => redirect()->route('manufacturing.dashboard'));
 
 Route::middleware('manufacturing.access')->name('manufacturing.')->group(function (): void {
     Route::get('/dashboard', [ManufacturingController::class, 'index'])->name('dashboard');
+    Route::get('/boms', [BomController::class, 'index'])->name('boms.index');
+    Route::post('/boms', [BomController::class, 'store'])->name('boms.store');
+    Route::delete('/boms/{bom}', [BomController::class, 'destroy'])->name('boms.destroy');
     Route::post('/update-order', [ManufacturingController::class, 'updateOrder'])->name('update-order');
     Route::post('/cancel-order', [ManufacturingController::class, 'cancelOrder'])->name('cancel-order');
     Route::post('/update-qc', [ManufacturingController::class, 'updateQC'])->name('update-qc');

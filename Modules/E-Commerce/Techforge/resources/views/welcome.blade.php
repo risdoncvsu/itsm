@@ -580,6 +580,13 @@
         </div>
     </section>
 
+    @if($storefrontListings->isNotEmpty())
+    <section class="max-w-7xl mx-auto px-6 lg:px-8 mb-24 relative z-10 pt-10">
+        <div class="flex items-end justify-between mb-8"><div><p class="text-primary text-xs font-black tracking-[0.3em] uppercase mb-2">Available now</p><h2 class="text-3xl md:text-4xl font-black">CLIENT STORE PICKS</h2></div><span class="text-xs text-gray-400">Live inventory availability</span></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">@foreach($storefrontListings as $listing)<a href="{{ route('ecommerce.listings.show', $listing) }}" class="rounded-2xl p-5 bg-white/5 border border-white/10 hover:border-primary/70 transition"><div class="h-36 rounded-xl bg-black/40 flex items-center justify-center overflow-hidden">@if($listing->image_url)<img class="max-h-full object-contain" src="{{ asset('storage/'.$listing->image_url) }}" alt="{{ $listing->name }}">@endif</div><h3 class="font-bold mt-4">{{ $listing->name }}</h3><p class="text-primary font-black text-xl mt-2">₱{{ number_format((float) $listing->price, 2) }}</p><p class="text-xs text-emerald-400 mt-2">{{ $listing->available_quantity }} available</p></a>@endforeach</div>
+    </section>
+    @endif
+
     <!-- Featured Products (Prebuilts) -->
     <section class="max-w-7xl mx-auto px-6 lg:px-8 mb-32 relative z-10 pt-10">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-16 border-b border-white/10 pb-8">

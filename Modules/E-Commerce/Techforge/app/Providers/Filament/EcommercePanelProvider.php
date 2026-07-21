@@ -30,7 +30,7 @@ class EcommercePanelProvider extends PanelProvider
             ->login()
             ->authGuard('ecommerce_admin')
             ->colors([
-                'primary' => Color::Indigo,
+                'primary' => Color::Blue,
             ])
             ->brandLogo(fn () => view('ecommerce::filament.brand-logo'))
             ->brandLogoHeight('2rem')
@@ -39,7 +39,12 @@ class EcommercePanelProvider extends PanelProvider
                 $company = $admin?->getCompany();
                 return $company?->company_name ?? 'E-Commerce Admin';
             })
-            ->discoverResources(in: __DIR__ . '/../../Filament/Resources', for: 'Modules\\Ecommerce\\Filament\\Resources')
+            // The standalone project exposed raw component tables. The ERP
+            // panel deliberately exposes only client-safe operational areas.
+            ->resources([
+                \Modules\Ecommerce\Filament\Resources\StorefrontListings\StorefrontListingResource::class,
+                \Modules\Ecommerce\Filament\Resources\Orders\OrderResource::class,
+            ])
             ->discoverPages(in: __DIR__ . '/../../Filament/Pages', for: 'Modules\\Ecommerce\\Filament\\Pages')
             ->pages([
                 Dashboard::class,

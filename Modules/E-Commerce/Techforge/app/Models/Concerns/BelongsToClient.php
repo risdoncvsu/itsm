@@ -30,10 +30,7 @@ trait BelongsToClient
                 return;
             }
 
-            $builder->where(function ($query) use ($builder, $clientId) {
-                $query->where($builder->getModel()->qualifyColumn('client_id'), $clientId)
-                      ->orWhereNull($builder->getModel()->qualifyColumn('client_id'));
-            });
+            $builder->where($builder->getModel()->qualifyColumn('client_id'), $clientId);
         });
 
         static::creating(function ($model): void {

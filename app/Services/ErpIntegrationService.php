@@ -166,9 +166,37 @@ class ErpIntegrationService
 
         return $inventory->transaction(function () use ($inventory, $clientId, $orderId, $items): array {
             $reserved = [];
+            $requirements = [];
 
             foreach ($items as $line) {
                 $quantity = max(1, (int) $line->quantity);
+
+                if (($line->product_type ?? null) === 'bom_listing') {
+                    $configuration = is_array($line->configuration ?? null)
+                        ? $line->configuration
+                        : json_decode((string) ($line->configuration ?? ''), true);
+                    $bomId = (int) ($configuration['bom_id'] ?? 0);
+                    $components = $bomId
+                        ? DB::connection('manufacturing')->table('product_bom_items')
+                            ->where('client_id', $clientId)->where('bom_id', $bomId)->get()
+                        : collect();
+
+                    if ($components->isEmpty()) {
+                        throw new RuntimeException("The Bill of Materials for '{$line->name}' is no longer available.");
+                    }
+
+                    foreach ($components as $component) {
+                        $itemId = (int) $component->inventory_item_id;
+                        $requirements[$itemId] = [
+                            'name' => (string) $component->item_name,
+                            'quantity' => ($requirements[$itemId]['quantity'] ?? 0)
+                                + ($quantity * max(1, (int) $component->quantity_required)),
+                        ];
+                    }
+
+                    continue;
+                }
+
                 $item = $inventory->table('items')
                     ->where('client_id', $clientId)
                     ->where(function ($query) use ($line): void {
@@ -182,43 +210,63 @@ class ErpIntegrationService
                     throw new RuntimeException("Inventory item '{$line->name}' is not mapped for this client.");
                 }
 
+                $requirements[(int) $item->id] = [
+                    'name' => (string) $item->name,
+                    'quantity' => ($requirements[(int) $item->id]['quantity'] ?? 0) + $quantity,
+                ];
+            }
+
+            foreach ($requirements as $itemId => $requirement) {
                 $existing = $inventory->table('order_reservations')
                     ->where('client_id', $clientId)
                     ->where('order_reference', $orderId)
-                    ->where('item_id', $item->id)
+                    ->where('item_id', $itemId)
                     ->where('status', 'reserved')
-                    ->first();
+                    ->exists();
 
                 if ($existing) {
-                    $reserved[] = ['item_id' => (int) $item->id, 'warehouse_id' => (int) $existing->warehouse_id, 'quantity' => (int) $existing->quantity];
                     continue;
                 }
 
-                $level = $inventory->table('stock_levels')
+                $levels = $inventory->table('stock_levels')
                     ->where('client_id', $clientId)
-                    ->where('item_id', $item->id)
+                    ->where('item_id', $itemId)
                     ->whereRaw('stock > reserved_quantity')
                     ->orderBy('id')
                     ->lockForUpdate()
-                    ->first();
+                    ->get();
 
-                if (! $level || ((int) $level->stock - (int) $level->reserved_quantity) < $quantity) {
-                    throw new RuntimeException("Insufficient available inventory for '{$line->name}'.");
+                $available = $levels->sum(fn ($level) => (int) $level->stock - (int) $level->reserved_quantity);
+                if ($available < $requirement['quantity']) {
+                    throw new RuntimeException("Insufficient available inventory for '{$requirement['name']}'.");
                 }
 
-                $inventory->table('stock_levels')->where('id', $level->id)->increment('reserved_quantity', $quantity, ['updated_at' => now()]);
-                $inventory->table('order_reservations')->insert([
-                    'client_id' => $clientId, 'order_reference' => $orderId, 'source' => 'ecommerce',
-                    'item_id' => $item->id, 'warehouse_id' => $level->warehouse_id, 'quantity' => $quantity,
-                    'status' => 'reserved', 'reserved_at' => now(), 'created_at' => now(), 'updated_at' => now(),
-                ]);
-                $inventory->table('stock_movements')->insert([
-                    'client_id' => $clientId, 'type' => 'reservation', 'item_id' => $item->id,
-                    'warehouse_id' => $level->warehouse_id, 'quantity' => -$quantity,
-                    'reference' => 'ECOM-'.$orderId, 'reference_id' => $orderId,
-                    'performed_by' => null, 'notes' => 'Reserved for ecommerce order', 'created_at' => now(),
-                ]);
-                $reserved[] = ['item_id' => (int) $item->id, 'warehouse_id' => (int) $level->warehouse_id, 'quantity' => $quantity];
+                $remaining = (int) $requirement['quantity'];
+                foreach ($levels as $level) {
+                    if ($remaining === 0) {
+                        break;
+                    }
+
+                    $allocated = min($remaining, (int) $level->stock - (int) $level->reserved_quantity);
+                    if ($allocated < 1) {
+                        continue;
+                    }
+
+                    $inventory->table('stock_levels')->where('id', $level->id)->increment('reserved_quantity', $allocated, ['updated_at' => now()]);
+                    $inventory->table('order_reservations')->insert([
+                        'client_id' => $clientId, 'order_reference' => $orderId, 'source' => 'ecommerce',
+                        'item_id' => $itemId, 'warehouse_id' => $level->warehouse_id, 'quantity' => $allocated,
+                        'status' => 'reserved', 'reserved_at' => now(), 'created_at' => now(), 'updated_at' => now(),
+                    ]);
+                    $inventory->table('stock_movements')->insert([
+                        'client_id' => $clientId, 'type' => 'reservation', 'item_id' => $itemId,
+                        'warehouse_id' => $level->warehouse_id, 'quantity' => -$allocated,
+                        'reference' => 'ECOM-'.$orderId, 'reference_id' => $orderId,
+                        'performed_by' => null, 'notes' => 'Reserved for ecommerce order', 'created_at' => now(),
+                    ]);
+                    $reserved[] = ['item_id' => $itemId, 'warehouse_id' => (int) $level->warehouse_id, 'quantity' => $allocated];
+                    $remaining -= $allocated;
+                }
             }
 
             return $reserved;
