@@ -810,13 +810,14 @@
         showToast(json?.message || 'Only approved purchase orders can be logged in deliveries.', 'info');
         return;
       }
+      const shipmentNumber = json?.shipment_number || json?.data?.shipment_number || d.dr;
       const table = document.querySelector('#deliveries-table tbody');
       const poRow = findPoRowByNumber(d.po || '');
       if(table){
         const tr = document.createElement('tr');
         tr.dataset.status = isDelayed ? 'delayed' : 'intransit';
         tr.dataset.date = d.delDate;
-        tr.dataset.ship = d.dr;
+        tr.dataset.ship = shipmentNumber;
         tr.dataset.po = d.po;
         tr.dataset.sup = d.supplier;
         tr.dataset.stage = stage;
@@ -824,7 +825,7 @@
         tr.dataset.carrier = 'Assigned carrier';
         tr.dataset.expected = expectedDate;
         tr.innerHTML = `
-          <td><a class="po-link">${d.dr}</a></td>
+          <td><a class="po-link">${htmlEscape(shipmentNumber)}</a></td>
           <td><a class="po-link">${d.po}</a></td>
           <td>${supplierPill(d.supplier)}</td>
           <td>${htmlEscape(d.items || '—')}</td>
@@ -846,11 +847,12 @@
         reqRow.dataset.status = 'intransit';
         persistRequisitionStatus(reqRow, 'intransit');
       }
-      NEXT_ID.dr++;
-      ID_COUNTS.dr++;
+      const shipmentSequence = Number(String(shipmentNumber).match(/(\d+)$/)?.[1] || 0);
+      ID_COUNTS.dr = Math.max(ID_COUNTS.dr, shipmentSequence);
+      NEXT_ID.dr = ID_COUNTS.dr + 1;
       initRowActionButtons();
       updateStatusCounts();
-      showToast(`Delivery ${d.dr} logged`, 'ok');
+      showToast(`Delivery ${shipmentNumber} logged`, 'ok');
       closeAddModal('delivery');
     }).catch(() => {
       showToast('Unable to save delivery right now.', 'no');

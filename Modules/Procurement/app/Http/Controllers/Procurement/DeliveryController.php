@@ -10,9 +10,55 @@ use Modules\Procurement\Models\Supplier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Database\QueryException;
 
 class DeliveryController extends Controller
 {
+    private function nextAvailableShipmentNumber(string $requestedNumber): string
+    {
+        if (! preg_match('/^(.*?)(\d+)$/', $requestedNumber, $matches)) {
+            return $requestedNumber . '-' . now()->format('YmdHis');
+        }
+
+        $prefix = $matches[1];
+        $width = strlen($matches[2]);
+        $highestSequence = Delivery::query()
+            ->where('shipment_number', 'like', $prefix . '%')
+            ->pluck('shipment_number')
+            ->map(function (string $number) use ($prefix): int {
+                return preg_match('/^' . preg_quote($prefix, '/') . '(\d+)$/', $number, $parts)
+                    ? (int) $parts[1]
+                    : 0;
+            })
+            ->max() ?? 0;
+
+        return $prefix . str_pad($highestSequence + 1, $width, '0', STR_PAD_LEFT);
+    }
+
+    private function createDeliveryWithUniqueShipmentNumber(array $attributes): Delivery
+    {
+        if (Delivery::query()->where('shipment_number', $attributes['shipment_number'])->exists()) {
+            $attributes['shipment_number'] = $this->nextAvailableShipmentNumber($attributes['shipment_number']);
+        }
+
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            try {
+                return Delivery::create($attributes);
+            } catch (QueryException $exception) {
+                $message = $exception->getMessage();
+
+                if (! str_contains($message, 'deliveries_shipment_number_key')
+                    && ! str_contains($message, 'shipment_number')) {
+                    throw $exception;
+                }
+
+                $attributes['shipment_number'] = $this->nextAvailableShipmentNumber($attributes['shipment_number']);
+            }
+        }
+
+        throw new \RuntimeException('Unable to allocate a unique shipment number.');
+    }
+
     public function index(): View
     {
         $deliveries = Delivery::with(['supplier', 'purchaseOrder'])->orderBy('delivery_date')->get();
@@ -65,7 +111,7 @@ class DeliveryController extends Controller
             ]);
         }
 
-        $delivery = Delivery::create([
+        $delivery = $this->createDeliveryWithUniqueShipmentNumber([
             'shipment_number' => $data['dr'],
             'purchase_order_id' => $purchaseOrder?->id,
             'supplier_id' => $supplier->id,
@@ -98,6 +144,7 @@ class DeliveryController extends Controller
         return response()->json([
             'success' => true,
             'data' => $delivery,
+            'shipment_number' => $delivery->shipment_number,
             'delete_url' => route('procurement.deliveries.destroy', $delivery),
         ], 201);
     }
