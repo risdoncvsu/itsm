@@ -42,7 +42,7 @@
 
        <form
     id="onboarding-step1-form"
-    action="{{ route('onboarding.storeStep1') }}"
+    action="{{ route('hr.onboarding.storeStep1') }}"
     method="POST"
     enctype="multipart/form-data"
     class="space-y-4 max-w-3xl">

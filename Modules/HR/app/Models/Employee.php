@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace Modules\HR\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
 {
+    protected $connection = 'hr';
+
     public function attendances()
     {
         return $this->hasMany(Attendance::class);

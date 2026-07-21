@@ -39,7 +39,7 @@
 @endif
 
 <form
-    action="{{ route('onboarding.storeStep3') }}"
+    action="{{ route('hr.onboarding.storeStep3') }}"
     method="POST"
     enctype="multipart/form-data"
     class="space-y-6">
@@ -99,7 +99,7 @@
 
     <!-- Navigation Buttons -->
     <!-- Back Button -->
-    <a href="{{ route('onboarding.step2') }}"
+    <a href="{{ route('hr.onboarding.step2') }}"
    class="inline-flex items-center gap-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-semibold px-6 py-2.5 rounded shadow transition">
     BACK
 </a>

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
-use App\Http\Controllers\Concerns\ResolvesPerPage;
-use App\Http\Controllers\Concerns\RespondsWithAjaxList;
-use App\Models\Employee;
+use Modules\HR\Http\Controllers\Concerns\ResolvesPerPage;
+use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
+use Modules\HR\Models\Employee;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -53,12 +53,12 @@ class EmployeeController extends Controller
             return $this->ajaxListResponse('employees.partials.list-results', compact('employees'));
         }
 
-        return view('employees.index', compact('employees'));
+        return view('hr.employees.index', compact('employees'));
     }
 
     public function create()
     {
-        return view('employees.create');
+        return view('hr.employees.create');
     }
 
     public function store(Request $request)
@@ -103,7 +103,7 @@ Employee::create([
     'address' => $request->address,
     'profile_picture' => $imageName,
 ]);
-        return redirect()->route('dashboard')
+        return redirect()->route('hr.dashboard')
             ->with('success', 'Employee added successfully!');
     }
 

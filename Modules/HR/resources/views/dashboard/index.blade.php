@@ -63,7 +63,7 @@
         radial-gradient(circle at 85% 8%, rgba(61,132,255,.06), transparent 18%),
         linear-gradient(180deg, #183667 0%, #132C5B 100%);
     }
-    /* Grid lines behind the attendance bars — easiest kept as a small utility, Tailwind has no clean bg-stripe primitive */
+    /* Grid lines behind the attendance bars â€” easiest kept as a small utility, Tailwind has no clean bg-stripe primitive */
     .att-grid-lines {
       background: linear-gradient(to top,
         transparent 0 19%, rgba(255,255,255,.04) 19% 20%,
@@ -94,7 +94,7 @@
         <div class="w-full h-[142px] flex items-stretch justify-between gap-5 px-0 py-px relative">
           <div class="flex flex-col justify-start pt-2 pl-6">
             <div class="text-[11.9px] font-medium tracking-wide text-[#F4F8FF] uppercase">
-              HR OPERATIONS <span class="text-red-500 ml-1">• LIVE</span>
+              HR OPERATIONS <span class="text-red-500 ml-1">â€¢ LIVE</span>
             </div>
             <h1 class="text-white text-2xl md:text-3xl font-bold mt-0.5">
               Welcome back, {{ session('employee_name') }}
@@ -256,13 +256,13 @@
           <div class="flex justify-between items-start mb-6">
             <div>
               <h3 class="text-lg font-semibold text-white">Attendance Rate</h3>
-              <p class="mt-1 text-xs text-[rgba(219,232,255,.45)]">Company-wide average · {{ number_format($totalPresentDaysYear ?? 0) }} present days YTD</p>
+              <p class="mt-1 text-xs text-[rgba(219,232,255,.45)]">Company-wide average Â· {{ number_format($totalPresentDaysYear ?? 0) }} present days YTD</p>
             </div>
             <div class="text-right">
               <div class="text-[34px] font-bold text-white leading-none">{{ number_format($overallAttendanceRate ?? 0, 2) }}%</div>
               @php $change = $rateChange ?? 0; @endphp
               <div class="inline-flex justify-center items-center mt-2.5 px-3 h-6 rounded-full {{ $change >= 0 ? 'bg-[#0b6328] text-[#35ff7a]' : 'bg-[#5c1a1a] text-[#ff7a7a]' }} text-[10px] font-semibold">
-                {{ $change >= 0 ? '↑' : '↓' }} {{ number_format(abs($change), 1) }}%
+                {{ $change >= 0 ? 'â†‘' : 'â†“' }} {{ number_format(abs($change), 1) }}%
               </div>
             </div>
           </div>

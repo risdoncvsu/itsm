@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
-use App\Models\Attendance;
-use App\Models\Employee;
+use Modules\HR\Models\Attendance;
+use Modules\HR\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -54,7 +54,7 @@ class AttendanceController extends Controller
             $attendance->time_out_image = $photoPath;
             $attendance->save();
 
-            return redirect()->route('clockinout')
+            return redirect()->route('hr.clockinout')
                 ->with('success', 'Clock out recorded for employee #' . $employeeCode)
                 ->with('employee_id', $employeeCode)
                 ->with('clock_in', $attendance->time_in)
@@ -82,7 +82,7 @@ class AttendanceController extends Controller
         $attendance->status = 'Present';
         $attendance->save();
 
-        return redirect()->route('clockinout')
+        return redirect()->route('hr.clockinout')
             ->with('success', 'Clock in recorded for employee #' . $employeeCode)
             ->with('employee_id', $employeeCode)
             ->with('clock_in', $attendance->time_in)

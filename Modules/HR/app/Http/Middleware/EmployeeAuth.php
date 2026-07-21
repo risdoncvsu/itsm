@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace Modules\HR\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -16,15 +16,15 @@ class EmployeeAuth
     public function handle(Request $request, Closure $next): Response
     {
         if (! session('employee_logged_in')) {
-            return redirect()->route('signin');
+            return redirect()->route('login');
         }
 
         $role = session('employee_role');
         $department = strtolower(trim(session('employee_department', '')));
 
         if ($role === 'employee' && $department !== 'human resources') {
-            if (! $request->routeIs('employee.dashboard') && ! $request->routeIs('logout')) {
-                return redirect()->route('employee.dashboard');
+            if (! $request->routeIs('hr.employee.dashboard') && ! $request->routeIs('hr.logout')) {
+                return redirect()->route('hr.employee.dashboard');
             }
         }
 

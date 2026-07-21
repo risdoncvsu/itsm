@@ -60,8 +60,8 @@
 
                 @php
                     $attendanceButtonLabel = session('clocked_in', false) && !session('clocked_out', false)
-                        ? '◴ Clock Out'
-                        : '◴ Clock In';
+                        ? 'â—´ Clock Out'
+                        : 'â—´ Clock In';
                 @endphp
 
                 @if (session('success'))
@@ -86,7 +86,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('clockinout.index') }}" id="attendanceForm">
+                <form method="POST" action="{{ route('hr.clockinout.index') }}" id="attendanceForm">
                     @csrf
                     <input type="hidden" name="action" id="attendanceAction" value="clock_in">
                     <input type="hidden" name="photo" id="photoData" value="">
@@ -105,7 +105,7 @@
 
                     <div id="captureBtn"
                         class="w-full h-[50px] bg-[#173d73] text-white rounded-md flex justify-center items-center mb-5 text-base sm:text-xl cursor-pointer select-none">
-                        [◉] Capture Photo
+                        [â—‰] Capture Photo
                     </div>
 
                 <video id="video" autoplay playsinline
@@ -195,7 +195,7 @@ function checkRequirements(){
 
 empIDInput.addEventListener("input", function(){
 
-    // Numbers only — strip anything that isn't a digit
+    // Numbers only â€” strip anything that isn't a digit
     const cleaned = empIDInput.value.replace(/[^0-9]/g, "");
 
     if(empIDInput.value !== cleaned){
@@ -292,7 +292,7 @@ if (serverClockedOut) {
     empIDInput.disabled = true;
     captureBtn.classList.add("opacity-55","pointer-events-none");
 } else if (clockedIn) {
-    btn.innerHTML = "◴ Clock Out";
+    btn.innerHTML = "â—´ Clock Out";
     requirementNote.innerHTML = "Capture a photo to enable Clock Out.";
 }
 

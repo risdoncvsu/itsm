@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Employee;
+use Modules\HR\Models\Employee;
 
 class AuthController extends Controller
 {
@@ -24,7 +24,7 @@ class AuthController extends Controller
         'employee_name' => 'Administrator',
     ]);
 
-    return redirect()->route('dashboard');
+    return redirect()->route('hr.dashboard');
 }
 
         $employee = Employee::where(
@@ -51,8 +51,8 @@ class AuthController extends Controller
 
         $department = strtolower(trim($employee->department ?? ''));
         $route = $department === 'human resources'
-            ? 'dashboard'
-            : 'employee.dashboard';
+            ? 'hr.dashboard'
+            : 'hr.employee.dashboard';
 
         return redirect()->route($route);
     }
@@ -64,6 +64,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('signin');
+        return redirect()->route('login');
     }
 }

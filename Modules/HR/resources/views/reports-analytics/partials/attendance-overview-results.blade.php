@@ -44,7 +44,7 @@
                         <span class="status-badge">{{ $statusLabel }}</span>
                     </td>
                     <td class="p-4 text-[0.84375rem] text-center font-extralight">
-                        <a href="{{ route('reports-analytics.employee-attendance', $employee->id) }}" class="inline-block bg-[#132B52] text-white no-underline px-[21px] py-1.5 rounded-xl text-[0.6875rem] transition-all duration-[250ms] hover:bg-[#2e5ca3] hover:-translate-y-px">
+                        <a href="{{ route('hr.reports-analytics.employee-attendance', $employee->id) }}" class="inline-block bg-[#132B52] text-white no-underline px-[21px] py-1.5 rounded-xl text-[0.6875rem] transition-all duration-[250ms] hover:bg-[#2e5ca3] hover:-translate-y-px">
                             View
                         </a>
                     </td>

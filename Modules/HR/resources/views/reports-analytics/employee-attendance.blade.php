@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Employee Attendance — {{ $employee->first_name }} {{ $employee->last_name }}</title>
+<title>Employee Attendance â€” {{ $employee->first_name }} {{ $employee->last_name }}</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 <style>
@@ -17,7 +17,7 @@
   <div class="w-full px-6 py-8" data-ajax-list>
 
     <nav class="mb-1 text-xs text-slate-400">
-      <a href="{{ route('reports-analytics.attendance-overview') }}" class="hover:text-slate-200">Attendance Record</a>
+      <a href="{{ route('hr.reports-analytics.attendance-overview') }}" class="hover:text-slate-200">Attendance Record</a>
       <span class="mx-1">&gt;</span>
       <span class="text-sky-400">Employee Attendance</span>
     </nav>
@@ -26,8 +26,8 @@
       $fullName = trim($employee->first_name.' '.$employee->last_name);
       $hireDate = $employee->hire_date
           ? \Carbon\Carbon::parse($employee->hire_date)->format('d M Y')
-          : '—';
-      $email = $employee->company_email ?: ($employee->email ?: '—');
+          : 'â€”';
+      $email = $employee->company_email ?: ($employee->email ?: 'â€”');
     @endphp
 
     <div class="h-[184px] mt-4 mb-6 flex flex-wrap items-center gap-6 rounded-xl bg-[#0B1E3D] px-6 py-2 ring-1 ring-white/5">
@@ -41,12 +41,12 @@
         @endif
         <div>
           <div class="text-base font-semibold text-white">{{ $fullName }}</div>
-          <div class="text-sm text-slate-400">{{ $employee->employee_id }} — {{ $employee->position ?: '—' }}</div>
+          <div class="text-sm text-slate-400">{{ $employee->employee_id }} â€” {{ $employee->position ?: 'â€”' }}</div>
           <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
             <i class="fa-regular fa-envelope"></i> {{ $email }}
           </div>
           <div class="mt-0.5 flex items-center gap-1.5 text-xs text-slate-400">
-            <i class="fa-regular fa-building"></i> {{ $employee->department ?: '—' }}
+            <i class="fa-regular fa-building"></i> {{ $employee->department ?: 'â€”' }}
           </div>
         </div>
       </div>

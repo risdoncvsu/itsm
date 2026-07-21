@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
-use App\Http\Controllers\Concerns\ResolvesPerPage;
-use App\Http\Controllers\Concerns\RespondsWithAjaxList;
-use App\Models\Employee;
+use Modules\HR\Http\Controllers\Concerns\ResolvesPerPage;
+use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
+use Modules\HR\Models\Employee;
 use Illuminate\Http\Request;
-use App\Models\Department;
+use Modules\HR\Models\Department;
 
 class DepartmentController extends Controller
 {
@@ -27,7 +27,7 @@ class DepartmentController extends Controller
 
         $departments = $query->orderBy('department_name')->get();
 
-        return view('departments.index', compact('departments'));
+        return view('hr.departments.index', compact('departments'));
     }
 
 
@@ -105,7 +105,7 @@ class DepartmentController extends Controller
             );
         }
 
-        return view('departments.show', compact(
+        return view('hr.departments.show', compact(
             'departments',
             'departmentName'
         ));

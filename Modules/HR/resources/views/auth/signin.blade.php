@@ -360,7 +360,7 @@
                         </div>
                     @endif
                     
-                    <form method="POST" action="{{ route('signin.post') }}">
+                    <form method="POST" action="{{ route('hr.signin.post') }}">
     @csrf
 
   
@@ -419,7 +419,7 @@
 
     if (hasError) {
         // A failed login just reloaded this page (e.g. server redirected back
-        // with validation errors) — skip the splash intro entirely and show
+        // with validation errors) â€” skip the splash intro entirely and show
         // the form immediately with the warning message already in place.
         splash.style.display = "none";
         mainWrapper.classList.add("no-intro");

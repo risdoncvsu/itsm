@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
-use App\Http\Controllers\Concerns\ResolvesPerPage;
-use App\Http\Controllers\Concerns\RespondsWithAjaxList;
-use App\Models\Attendance;
-use App\Models\Employee;
+use Modules\HR\Http\Controllers\Concerns\ResolvesPerPage;
+use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
+use Modules\HR\Models\Attendance;
+use Modules\HR\Models\Employee;
 use Illuminate\Http\Request;
 
 class ReportsAnalyticsController extends Controller
@@ -78,7 +78,7 @@ class ReportsAnalyticsController extends Controller
         }
 
         return view(
-            'reports-analytics.attendance-overview',
+            'hr.reports-analytics.attendance-overview',
             compact('employees', 'employeeCount', 'totalPresentDays', 'totalAbsentDays', 'totalLeaveDays')
         );
     }
@@ -114,7 +114,7 @@ class ReportsAnalyticsController extends Controller
         ];
 
         return view(
-            'reports-analytics.employee-attendance',
+            'hr.reports-analytics.employee-attendance',
             compact('employee', 'attendances', 'stats')
         );
     }
@@ -146,6 +146,6 @@ class ReportsAnalyticsController extends Controller
             );
         }
 
-        return view('reports-analytics.leave', compact('employees'));
+        return view('hr.reports-analytics.leave', compact('employees'));
     }
 }

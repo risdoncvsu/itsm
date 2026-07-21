@@ -20,6 +20,7 @@ class HRServiceProvider extends ServiceProvider
         // available from the same application at /hr.
         Route::middleware('web')
             ->prefix('hr')
+            ->as('hr.')
             ->group(__DIR__ . '/../../routes/web.php');
     }
 

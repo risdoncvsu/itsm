@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Employee;
+use Modules\HR\Models\Employee;
 use Illuminate\Support\Str;
 
 class EmployeeOnboardingController extends Controller
@@ -44,13 +44,13 @@ class EmployeeOnboardingController extends Controller
 
     session(['step1' => $data]);
 
-    return redirect()->route('onboarding.step2');
+    return redirect()->route('hr.onboarding.step2');
 }
 
     public function step2()
     {
         if (! session('step1')) {
-            return redirect()->route('onboarding.step1')
+            return redirect()->route('hr.onboarding.step1')
                 ->with('error', 'Please complete step 1 first.');
         }
 
@@ -60,7 +60,7 @@ class EmployeeOnboardingController extends Controller
     public function storeStep2(Request $request)
     {
         if (! session('step1')) {
-            return redirect()->route('onboarding.step1')
+            return redirect()->route('hr.onboarding.step1')
                 ->with('error', 'Please complete step 1 first.');
         }
 
@@ -87,18 +87,18 @@ class EmployeeOnboardingController extends Controller
 
         session(['step2' => $validated]);
 
-        return redirect()->route('onboarding.step3');
+        return redirect()->route('hr.onboarding.step3');
     }
 
     public function step3()
     {
         if (! session('step1')) {
-            return redirect()->route('onboarding.step1')
+            return redirect()->route('hr.onboarding.step1')
                 ->with('error', 'Please complete step 1 first.');
         }
 
         if (! session('step2')) {
-            return redirect()->route('onboarding.step2')
+            return redirect()->route('hr.onboarding.step2')
                 ->with('error', 'Please complete step 2 first.');
         }
 
@@ -108,7 +108,7 @@ class EmployeeOnboardingController extends Controller
     public function storeStep3(Request $request)
     {
         if (! session('step1') || ! session('step2')) {
-            return redirect()->route('onboarding.step1')
+            return redirect()->route('hr.onboarding.step1')
                 ->with('error', 'Your onboarding session expired. Please start again.');
         }
 
@@ -126,23 +126,23 @@ class EmployeeOnboardingController extends Controller
 
         session(['step3' => $data]);
 
-        return redirect()->route('onboarding.step4');
+        return redirect()->route('hr.onboarding.step4');
     }
 
     public function step4()
     {
         if (! session('step1')) {
-            return redirect()->route('onboarding.step1')
+            return redirect()->route('hr.onboarding.step1')
                 ->with('error', 'Please complete step 1 first.');
         }
 
         if (! session('step2')) {
-            return redirect()->route('onboarding.step2')
+            return redirect()->route('hr.onboarding.step2')
                 ->with('error', 'Please complete step 2 first.');
         }
 
         if (! session('step3')) {
-            return redirect()->route('onboarding.step3')
+            return redirect()->route('hr.onboarding.step3')
                 ->with('error', 'Please complete step 3 first.');
         }
 
@@ -162,7 +162,7 @@ class EmployeeOnboardingController extends Controller
         $step3 = session('step3');
 
         if (! $step1 || ! $step2 || ! $step3) {
-            return redirect()->route('onboarding.step1')
+            return redirect()->route('hr.onboarding.step1')
                 ->with('error', 'Your onboarding session expired. Please start again.');
         }
 
@@ -212,7 +212,7 @@ class EmployeeOnboardingController extends Controller
     session()->forget(['step1', 'step2', 'step3']);
     session(['employee' => $employee]);
 
-    return redirect()->route('onboarding.success');
+    return redirect()->route('hr.onboarding.success');
 }
 
     public function success()
@@ -220,7 +220,7 @@ class EmployeeOnboardingController extends Controller
         $employee = session('employee');
 
         if (! $employee) {
-            return redirect()->route('onboarding.step1');
+            return redirect()->route('hr.onboarding.step1');
         }
 
         return view('employees.onboarding.success', compact('employee'));

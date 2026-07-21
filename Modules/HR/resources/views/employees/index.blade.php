@@ -142,7 +142,7 @@
     <div class="w-[96.82%] max-w-[1859px] mx-auto" data-ajax-list>
 
         <div class="flex justify-between items-center gap-5 py-2.5 flex-wrap">
-        <form method="GET" action="{{ route('employees.index') }}" class="flex justify-start items-center gap-5 flex-wrap">
+        <form method="GET" action="{{ route('hr.employees.index') }}" class="flex justify-start items-center gap-5 flex-wrap">
             @if (request()->filled('per_page'))
                 <input type="hidden" name="per_page" value="{{ request('per_page') }}">
             @endif

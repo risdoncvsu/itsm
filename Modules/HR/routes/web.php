@@ -1,35 +1,30 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\EmployeeOnboardingController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ReportsAnalyticsController;
-use App\Models\Employee;
+use Modules\HR\Http\Controllers\DashboardController;
+use Modules\HR\Http\Controllers\EmployeeController;
+use Modules\HR\Http\Controllers\DepartmentController;
+use Modules\HR\Http\Controllers\AttendanceController;
+use Modules\HR\Http\Controllers\EmployeeOnboardingController;
+use Modules\HR\Http\Controllers\ReportsAnalyticsController;
+use Modules\HR\Models\Attendance;
 
 Route::get('/', function () {
-    return redirect()->route('signin');
+    return redirect()->route('hr.dashboard');
 });
 
-Route::get('/signin', function () {
-    return view('auth.signin');
-})->name('signin');
-
-Route::post('/signin', [AuthController::class, 'login'])
-    ->name('signin.post');
-
-Route::middleware('employee.auth')->group(function () {
+Route::middleware('hr.access')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
     Route::get('/employee-dashboard', [DashboardController::class, 'employeeIndex'])
         ->name('employee.dashboard');
 
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->name('logout');
+    Route::post('/logout', function () {
+        session()->forget(['employee_logged_in', 'employee_role', 'employee_department', 'employee_id']);
+
+        return redirect()->route('login');
+    })->name('logout');
 
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
     Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
@@ -70,7 +65,7 @@ Route::middleware('employee.auth')->group(function () {
 
     Route::get('/attendance/today-count', function () {
         return response()->json([
-            'count' => \App\Models\Attendance::whereDate('attendance_date', today())
+            'count' => Attendance::whereDate('attendance_date', today())
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
                 ->count()

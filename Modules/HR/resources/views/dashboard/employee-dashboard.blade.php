@@ -31,7 +31,7 @@
       </div>
       <div class="flex flex-col gap-3 sm:items-end">
         @if(!empty($isHr))
-          <a href="{{ route('dashboard') }}"
+          <a href="{{ route('hr.dashboard') }}"
              class="rounded-2xl bg-[#2D7EFF] px-5 py-3 text-white font-semibold transition hover:bg-[#4D95FF] no-underline text-center">
             Back to HR Dashboard
           </a>
@@ -64,7 +64,7 @@
           </div>
           <div class="rounded-3xl bg-[#132B52] p-4 text-slate-200">
             <p class="font-semibold">Sign out safely</p>
-            <form method="POST" action="{{ route('logout') }}" class="mt-3">
+            <form method="POST" action="{{ route('hr.logout') }}" class="mt-3">
               @csrf
               <button type="submit" class="rounded-2xl bg-[#2D7EFF] px-5 py-3 text-white font-semibold transition hover:bg-[#4D95FF]">
                 Logout

@@ -31,7 +31,7 @@
 </h2>
 
  <form 
-action="{{ route('onboarding.storeStep4') }}" 
+action="{{ route('hr.onboarding.storeStep4') }}"
 method="POST"
 > @csrf
 
@@ -209,7 +209,7 @@ method="POST"
 
 <div class="pt-6 flex gap-4">
 
-<a href="{{ route('onboarding.step3') }}"
+<a href="{{ route('hr.onboarding.step3') }}"
 class="inline-flex items-center gap-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-semibold px-6 py-2.5 rounded shadow transition">
 BACK
 </a>

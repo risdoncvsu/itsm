@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Modules\HR\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Attendance extends Model
 {
+    protected $connection = 'hr';
+
     /** Fallback allotted work time when employee schedule is missing. */
     public const ALLOTTED_WORK_MINUTES = 9 * 60;
 
@@ -61,14 +63,14 @@ class Attendance extends Model
     {
         return $this->time_in
             ? Carbon::parse($this->time_in)->format('h:i A')
-            : '—';
+            : 'â€”';
     }
 
     public function formattedTimeOut(): string
     {
         return $this->time_out
             ? Carbon::parse($this->time_out)->format('h:i A')
-            : '—';
+            : 'â€”';
     }
 
     /** HR-assigned start time from employee work schedule. */
@@ -111,7 +113,7 @@ class Attendance extends Model
     public function formattedElapsedDuration(?int $minutes = null): string
     {
         if ($minutes === null) {
-            return '—';
+            return 'â€”';
         }
 
         $hours = intdiv($minutes, 60);
