@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Services\ErpIntegrationService;
 
 class StockAdjustmentController extends Controller
 {
@@ -128,6 +129,11 @@ class StockAdjustmentController extends Controller
         $result = $this->executeApproval($adjustment);
 
         if ($result === true) {
+            app(ErpIntegrationService::class)->inventoryAvailabilityChanged(
+                (int) session('employee_client_id'),
+                (int) $adjustment->item_id,
+                'inventory.adjustment_approved'
+            );
             return back()->with('success', 'Adjustment approved and stock updated.');
         }
 
@@ -247,4 +253,3 @@ class StockAdjustmentController extends Controller
         return back()->withErrors(["adj_action_{$adjustment->id}" => $result]);
     }
 }
-

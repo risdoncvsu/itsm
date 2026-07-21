@@ -7,6 +7,7 @@ use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
 use Modules\HR\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Services\ErpIntegrationService;
 
 class EmployeeController extends Controller
 {
@@ -151,6 +152,9 @@ public function update(Request $request, Employee $employee)
 public function destroy($id)
 {
     $employee = Employee::findOrFail($id);
+    $clientId = (int) $employee->client_id;
+    $employeeId = (int) $employee->id;
+    $email = (string) $employee->email;
 
     // Delete profile picture if meron
     if ($employee->profile_picture &&
@@ -160,6 +164,7 @@ public function destroy($id)
     }
 
     $employee->delete();
+    app(ErpIntegrationService::class)->employeeRemoved($clientId, $employeeId, $email);
 
     return redirect()->route('hr.employees.index')
     ->with('success','Employee deleted successfully!');

@@ -5,7 +5,10 @@ namespace Modules\Ecommerce\Http\Controllers;
 use Illuminate\Http\Request;
 use Modules\Ecommerce\Models\Cart;
 use Modules\Ecommerce\Models\Order;
+use App\Services\ErpIntegrationService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Modules\Ecommerce\Support\EcommerceClientContext;
 
 class CheckoutController extends Controller
 {
@@ -79,6 +82,13 @@ class CheckoutController extends Controller
         $shippingFee = $request->shippingMethod === 'express' ? 300 : ($request->shippingMethod === 'pickup' ? 0 : 150);
         $total = $subtotal + $shippingFee;
 
+        $clientId = app(EcommerceClientContext::class)->clientId();
+        if (! $clientId) {
+            return response()->json(['success' => false, 'message' => 'Storefront client could not be resolved.'], 422);
+        }
+
+        try {
+        $order = DB::connection('ecommerce')->transaction(function () use ($cart, $request, $subtotal, $shippingFee, $total, $clientId) {
         // Create Order
         $order = Order::create([
             'user_id' => Auth::id(),
@@ -111,8 +121,16 @@ class CheckoutController extends Controller
             ]);
         }
 
-        // Clear Cart
+        app(ErpIntegrationService::class)->propagateEcommerceOrder($clientId, $order, $order->items);
+
+        // Clear Cart only after every required ERP record has been created.
         $cart->items()->delete();
+
+        return $order;
+        });
+        } catch (\RuntimeException $exception) {
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
+        }
 
         return response()->json([
             'success' => true,

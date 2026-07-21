@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\ErpIntegrationService;
 
 class ItemCatalogController extends Controller
 {
@@ -146,6 +147,12 @@ class ItemCatalogController extends Controller
             return $item;
         });
 
+        app(ErpIntegrationService::class)->inventoryAvailabilityChanged(
+            (int) session('employee_client_id'),
+            (int) $item->id,
+            'inventory.item_created'
+        );
+
         return redirect()->route('inventory.item-catalog')->with('success', "Item '{$item->sku}' created successfully.");
     }
 
@@ -160,6 +167,7 @@ class ItemCatalogController extends Controller
         }
 
         $sku = $item->sku;
+        app(ErpIntegrationService::class)->inventoryProductDeleted((int) session('employee_client_id'), $item);
         $item->delete();
 
         return redirect()->route('inventory.item-catalog')->with('success', "Item '{$sku}' deleted successfully.");
@@ -190,4 +198,3 @@ class ItemCatalogController extends Controller
         return redirect()->route('inventory.item-catalog')->with('success', 'Packing material deleted.');
     }
 }
-

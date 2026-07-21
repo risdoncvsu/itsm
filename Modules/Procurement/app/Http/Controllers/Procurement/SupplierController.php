@@ -8,6 +8,7 @@ use Modules\Procurement\Models\SupplierProduct;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Services\ErpIntegrationService;
 
 class SupplierController extends Controller
 {
@@ -74,6 +75,8 @@ class SupplierController extends Controller
             $supplier->update(['product_items' => implode(' | ', $productItems)]);
         }
 
+        app(ErpIntegrationService::class)->supplierChanged((int) session('employee_client_id'), $supplier->fresh());
+
         return response()->json([
             'success' => true,
             'data' => $supplier,
@@ -128,11 +131,14 @@ class SupplierController extends Controller
             'status' => $data['status'] ?? 'active',
         ]);
 
+        app(ErpIntegrationService::class)->supplierChanged((int) session('employee_client_id'), $supplier->fresh());
+
         return response()->json(['success' => true, 'data' => $supplier]);
     }
 
     public function destroy(Supplier $supplier): JsonResponse
     {
+        app(ErpIntegrationService::class)->supplierChanged((int) session('employee_client_id'), $supplier, true);
         $supplier->delete();
 
         return response()->json(['success' => true]);

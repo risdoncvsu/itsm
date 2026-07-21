@@ -5,6 +5,7 @@ namespace Modules\Finance\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Modules\Finance\Models\Invoice;
+use App\Services\ErpIntegrationService;
 
 class InvoiceController extends Controller
 {
@@ -54,13 +55,23 @@ class InvoiceController extends Controller
 
     public function update(Request $request, Invoice $invoice)
     {
-        $invoice->update($request->validate(['invoice_amount' => 'required|numeric', 'status' => 'required|string|max:20']));
+        $data = $request->validate(['invoice_amount' => 'required|numeric', 'status' => 'required|string|max:20']);
+        if (strtolower($data['status']) === 'paid') {
+            $data += [
+                'payment_status' => 'Paid',
+                'paid_amount' => $data['invoice_amount'],
+                'payment_date' => now()->toDateString(),
+            ];
+        }
+        $invoice->update($data);
+        app(ErpIntegrationService::class)->financeInvoiceChanged((int) session('employee_client_id'), $invoice->fresh());
         return response()->json(['success' => true]);
     }
 
     public function reject(Invoice $invoice)
     {
         $invoice->update(['status' => 'Rejected']);
+        app(ErpIntegrationService::class)->financeInvoiceChanged((int) session('employee_client_id'), $invoice->fresh(), true);
         return response()->json(['success' => true]);
     }
 }
