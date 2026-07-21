@@ -36,17 +36,16 @@ class PasswordResetController extends Controller
 
         if (! $user) {
             $employee = DB::connection('hr')->table('employees')
-                ->where('company_email', $identifier)
-                ->orWhere('email', $identifier)
+                ->where(fn ($query) => $query->where('company_email', $identifier)->orWhere('email', $identifier))
                 ->first();
             $company = $employee?->client_id ? Company::find($employee->client_id) : null;
         }
 
-        if ($user || ($employee && strtolower((string) ($employee->approval_status ?? 'Active')) === 'active')) {
-            ServiceTicket::create([
+        if ($company && ($user || ($employee && strtolower((string) ($employee->approval_status ?? 'Active')) === 'active'))) {
+            $ticket = ServiceTicket::create([
                 'company_id' => $company?->id,
                 'ticket_no' => 'NX-'.str_pad((string) ((int) ServiceTicket::max('id') + 1), 4, '0', STR_PAD_LEFT),
-                'ticket_type' => 'nexora_support',
+                'ticket_type' => 'client_password_reset',
                 'requester' => $identifier,
                 'client_name' => $company?->company_name,
                 'module' => $user ? 'ITSM' : 'HR',
@@ -56,14 +55,20 @@ class PasswordResetController extends Controller
                 'subject' => 'Password reset request',
                 'description' => 'Requested from the public sign-in page.',
             ]);
+
+            app(ErpIntegrationService::class)->recordAudit((int) $company->id, 'password.reset_requested', 'ITSM', [
+                'ticket_id' => $ticket->id,
+                'requester' => $identifier,
+                'module' => $ticket->module,
+            ]);
         }
 
-        return back()->with('status', 'If the account exists, a password-reset request has been sent to the Nexora Service Desk.');
+        return back()->with('status', 'If the account exists, a password-reset request has been sent to its client ITSM Account Recovery queue.');
     }
 
     public function process(ServiceTicket $ticket): RedirectResponse
     {
-        abort_unless($ticket->ticket_type === 'nexora_support' && $ticket->category === 'Password Reset', 404);
+        abort_unless(in_array($ticket->ticket_type, ['client_password_reset', 'nexora_support'], true) && $ticket->category === 'Password Reset', 404);
         abort_unless(Auth::user()?->role === 'company_admin' && Auth::user()?->company_id === $ticket->company_id, 403);
         abort_if($ticket->status === 'Resolved', 422, 'This password-reset request has already been resolved.');
 

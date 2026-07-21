@@ -59,7 +59,7 @@
                             <a href="#" class="block font-medium hover:text-[#346DCB]">SLA Review</a>
                         @else
                             <a href="{{ route('client.itsm.service-desk') }}" class="block {{ $ticketType === 'erp_module' ? 'font-extrabold' : 'font-medium hover:text-[#346DCB]' }}">Module Ticket Dashboard</a>
-                            <a href="{{ route('client.itsm.service-desk.support') }}" class="block {{ $ticketType === 'nexora_support' ? 'font-extrabold' : 'font-medium hover:text-[#346DCB]' }}">Ask Nexora Support</a>
+                            <a href="{{ route('client.itsm.service-desk.support') }}" class="block {{ $ticketType === 'client_password_reset' ? 'font-extrabold' : 'font-medium hover:text-[#346DCB]' }}">Account Recovery</a>
                             <a href="#" class="block font-medium hover:text-[#346DCB]">Resolved Tickets</a>
                             <a href="#" class="block font-medium hover:text-[#346DCB]">Knowledge Base</a>
                         @endif
@@ -175,9 +175,11 @@
                                                             </form>
                                                         </details>
                                                     @endif
-                                                    <button type="button" class="edit-ticket rounded-md border border-slate-300 px-3 py-1 font-semibold hover:bg-slate-100">
-                                                        {{ $updateMode === 'status_only' ? 'Resolve' : 'Edit' }}
-                                                    </button>
+                                                    @if ($updateMode !== 'password_reset')
+                                                        <button type="button" class="edit-ticket rounded-md border border-slate-300 px-3 py-1 font-semibold hover:bg-slate-100">
+                                                            {{ $updateMode === 'status_only' ? 'Resolve' : 'Edit' }}
+                                                        </button>
+                                                    @endif
                                                 </td>
                                             @endif
                                         </tr>
