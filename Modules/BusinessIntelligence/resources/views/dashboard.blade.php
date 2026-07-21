@@ -224,23 +224,23 @@
             const totalSev = total > 0 ? total : 1;
             const bar = document.getElementById('opRisksBar');
             bar.innerHTML = `
-                        <div class="op-severity-seg health-red" style="width:${Math.round((data.summary.critical / totalSev) * 100)}%;"></div>
-                        <div class="op-severity-seg health-orange" style="width:${Math.round((data.summary.warning / totalSev) * 100)}%;"></div>
-                        <div class="op-severity-seg health-blue" style="width:${Math.round((data.summary.info / totalSev) * 100)}%;"></div>`;
+                            <div class="op-severity-seg health-red" style="width:${Math.round((data.summary.critical / totalSev) * 100)}%;"></div>
+                            <div class="op-severity-seg health-orange" style="width:${Math.round((data.summary.warning / totalSev) * 100)}%;"></div>
+                            <div class="op-severity-seg health-blue" style="width:${Math.round((data.summary.info / totalSev) * 100)}%;"></div>`;
             document.getElementById('opRisksLegend').innerHTML = `
-                        <span><span class="op-legend-dot health-red"></span>Critical ${Math.round((data.summary.critical / totalSev) * 100)}%</span>
-                        <span><span class="op-legend-dot health-orange"></span>Warning ${Math.round((data.summary.warning / totalSev) * 100)}%</span>
-                        <span><span class="op-legend-dot health-blue"></span>Info ${Math.round((data.summary.info / totalSev) * 100)}%</span>`;
+                            <span><span class="op-legend-dot health-red"></span>Critical ${Math.round((data.summary.critical / totalSev) * 100)}%</span>
+                            <span><span class="op-legend-dot health-orange"></span>Warning ${Math.round((data.summary.warning / totalSev) * 100)}%</span>
+                            <span><span class="op-legend-dot health-blue"></span>Info ${Math.round((data.summary.info / totalSev) * 100)}%</span>`;
             const miniGrid = document.getElementById('opRisksMini');
             if (data.alerts && data.alerts.length > 0) {
                 miniGrid.innerHTML = data.alerts.slice(0, 3).map(a => `
-                            <div class="op-risk-mini-card op-risk-mini-${a.severity}">
-                                <div class="op-risk-mini-header">
-                                    <span class="op-risk-mini-category">${a.department}</span>
-                                    <span class="op-risk-mini-days" data-timestamp="${a.timestamp}">${timeAgo(a.timestamp)}</span>
-                                </div>
-                                <p class="op-risk-mini-issue">${a.title}</p>
-                            </div>`).join('');
+                                <div class="op-risk-mini-card op-risk-mini-${a.severity}">
+                                    <div class="op-risk-mini-header">
+                                        <span class="op-risk-mini-category">${a.department}</span>
+                                        <span class="op-risk-mini-days" data-timestamp="${a.timestamp}">${timeAgo(a.timestamp)}</span>
+                                    </div>
+                                    <p class="op-risk-mini-issue">${a.title}</p>
+                                </div>`).join('');
             }
         }
 
