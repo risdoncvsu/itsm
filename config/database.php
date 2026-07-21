@@ -203,6 +203,21 @@ return [
             'search_path' => env('MANUFACTURING_DB_SEARCH_PATH', 'public'),
             'sslmode' => env('MANUFACTURING_DB_SSLMODE', 'prefer'),
         ],
+        'finance' => [
+            // Finance owns accounting data. Never fall back to DB_* or a
+            // shared module connection: this keeps financial records out of ITSM.
+            'driver' => env('FINANCE_DB_CONNECTION', 'pgsql'),
+            'url' => env('FINANCE_DB_URL'),
+            'host' => env('FINANCE_DB_HOST'),
+            'port' => env('FINANCE_DB_PORT', '5432'),
+            'database' => env('FINANCE_DB_DATABASE'),
+            'username' => env('FINANCE_DB_USERNAME'),
+            'password' => env('FINANCE_DB_PASSWORD'),
+            'charset' => env('FINANCE_DB_CHARSET', 'utf8'),
+            'prefix' => '', 'prefix_indexes' => true,
+            'search_path' => env('FINANCE_DB_SEARCH_PATH', 'public'),
+            'sslmode' => env('FINANCE_DB_SSLMODE', 'prefer'),
+        ],
 
         // Staging is optional. It must be configured explicitly: falling back
         // to DB_* would silently put integration data into the ITSM database.

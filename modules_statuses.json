@@ -4,5 +4,6 @@
     "Procurement": true,
     "OrderFulfillment": true,
     "Ecommerce": true,
-    "Manufacturing": true
+    "Manufacturing": true,
+    "Finance": true
 }

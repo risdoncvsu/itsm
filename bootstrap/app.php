@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'order-fulfillment.access' => \Modules\OrderFulfillment\Http\Middleware\OrderFulfillmentAccess::class,
             'ecommerce.client' => \Modules\Ecommerce\Http\Middleware\ResolveStorefrontClient::class,
             'manufacturing.access' => \Modules\Manufacturing\Http\Middleware\ManufacturingAccess::class,
+            'finance.access' => \Modules\Finance\Http\Middleware\FinanceAccess::class,
             'root.admin' => \App\Http\Middleware\EnsureRootAdmin::class,
             'client.admin' => \App\Http\Middleware\EnsureClientAdmin::class,
         ]);

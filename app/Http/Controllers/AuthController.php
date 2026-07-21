@@ -77,6 +77,10 @@ class AuthController extends Controller
                 return redirect()->route('manufacturing.dashboard');
             }
 
+            if (str_contains($department, 'finance') || str_contains($department, 'accounting')) {
+                return redirect()->route('finance.dashboard');
+            }
+
             return redirect()->route('hr.dashboard');
         }
 
@@ -118,6 +122,10 @@ class AuthController extends Controller
 
         if (str_contains($department, 'manufacturing') || str_contains($department, 'production')) {
             return redirect()->route('manufacturing.dashboard');
+        }
+
+        if (str_contains($department, 'finance') || str_contains($department, 'accounting')) {
+            return redirect()->route('finance.dashboard');
         }
 
         return redirect()->route('hr.dashboard');
