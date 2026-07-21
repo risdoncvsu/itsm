@@ -784,7 +784,7 @@
           <tbody id="ordersTableBody">
             @forelse($orders as $order)
             @php
-            $priority = \App\Helpers\OrderPriority::order($order->created_at);
+            $priority = \Modules\OrderFulfillment\Helpers\OrderPriority::order($order->created_at);
             $statusRaw = strtoupper($order->status);
             $statusClassMap = [
                 'NEW'       => 'status-new',

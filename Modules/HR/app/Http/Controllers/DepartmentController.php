@@ -1,13 +1,12 @@
 <?php
 
-namespace Modules\HR\Http\Controllers;
+namespace App\Http\Controllers;
 
-use Modules\HR\Http\Controllers\Concerns\ResolvesPerPage;
-use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
-use Modules\HR\Models\Employee;
+use App\Http\Controllers\Concerns\ResolvesPerPage;
+use App\Http\Controllers\Concerns\RespondsWithAjaxList;
+use App\Models\Employee;
 use Illuminate\Http\Request;
-use Modules\HR\Models\Department;
-use Illuminate\Routing\Controller;
+use App\Models\Department;
 
 class DepartmentController extends Controller
 {
@@ -19,8 +18,11 @@ class DepartmentController extends Controller
         $query = Department::query();
 
         if ($request->filled('search')) {
-            $query->where('department_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('department_code', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('department_name', 'like', '%' . $search . '%')
+                  ->orWhere('department_code', 'like', '%' . $search . '%');
+            });
         }
 
         $departments = $query->orderBy('department_name')->get();

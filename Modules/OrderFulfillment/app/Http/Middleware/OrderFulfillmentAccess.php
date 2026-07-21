@@ -14,7 +14,7 @@ class OrderFulfillmentAccess
         }
 
         $department = strtolower((string) session('employee_department', ''));
-        abort_unless(session('employee_logged_in') && session('employee_client_id') && (str_contains($department, 'fulfillment') || str_contains($department, 'operations')), 403);
+        abort_unless(session('employee_logged_in') && session('employee_client_id') && (str_contains($department, 'fulfillment') || str_contains($department, 'operations') || str_contains($department, 'order')), 403);
         return $next($request);
     }
 }

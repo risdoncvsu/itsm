@@ -4,7 +4,7 @@
     $dropLink = 'block no-underline text-[#C9DAF8] py-[11px] px-3.5 rounded-[10px] text-[13px] font-medium transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]';
     $dropActive = 'bg-[#f3f6fb] text-[#2D7EFF]';
 
-    $isDashboard = request()->routeIs('hr.dashboard');
+    $isDashboard = request()->routeIs('dashboard');
     $isWorkforce = request()->routeIs('employees.*') || request()->routeIs('departments.*');
     $isEmployees = request()->routeIs('employees.index') || request()->routeIs('employees.show') || request()->routeIs('employees.create');
     $isDepartments = request()->routeIs('departments.*');
@@ -22,7 +22,7 @@
     <div class="flex items-center gap-7">
         <nav class="flex items-center gap-px">
             <div class="relative group">
-                <a href="{{ route('hr.dashboard') }}"
+                <a href="{{ route('dashboard') }}"
                    class="{{ $navLink }} {{ $isDashboard ? $navActive : '' }}">
                     Dashboard
                 </a>
@@ -37,13 +37,16 @@
                     </svg>
                 </a>
                 <div class="absolute top-[120%] left-1/2 -translate-x-1/2 translate-y-2.5 w-[220px] bg-[#132B52] rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2.5 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
-                    <a href="{{ route('employees.index') }}" class="{{ $dropLink }} {{ $isEmployees ? $dropActive : '' }}">Employee List</a>
-                    <a href="{{ route('departments.index') }}" class="{{ $dropLink }} {{ $isDepartments ? $dropActive : '' }}">Department List</a>
+                    <a href="{{ route('employees.index') }}"
+                       class="{{ $dropLink }} {{ $isEmployees ? $dropActive : '' }}">Employee List</a>
+                    <a href="{{ route('departments.index') }}"
+                       class="{{ $dropLink }} {{ $isDepartments ? $dropActive : '' }}">Department List</a>
                 </div>
             </div>
 
             <div class="relative group">
-                <a href="{{ route('onboarding.step1') }}" class="{{ $navLink }} {{ $isOnboarding ? $navActive : '' }}">
+                <a href="{{ route('onboarding.step1') }}"
+                   class="{{ $navLink }} {{ $isOnboarding ? $navActive : '' }}">
                     Employee Onboarding
                 </a>
             </div>
@@ -57,8 +60,10 @@
                     </svg>
                 </a>
                 <div class="absolute top-[120%] left-1/2 -translate-x-1/2 translate-y-2.5 w-[220px] bg-[#132B52] rounded-[18px] shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2.5 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
-                    <a href="{{ route('reports-analytics.attendance-overview') }}" class="{{ $dropLink }} {{ $isAttendance ? $dropActive : '' }}">Attendance Record</a>
-                    <a href="{{ route('reports-analytics.leave') }}" class="{{ $dropLink }} {{ $isLeave ? $dropActive : '' }}">Leave Record</a>
+                    <a href="{{ route('reports-analytics.attendance-overview') }}"
+                       class="{{ $dropLink }} {{ $isAttendance ? $dropActive : '' }}">Attendance Record</a>
+                    <a href="{{ route('reports-analytics.leave') }}"
+                       class="{{ $dropLink }} {{ $isLeave ? $dropActive : '' }}">Leave Record</a>
                 </div>
             </div>
 
@@ -86,7 +91,15 @@
                 </svg>
             </div>
 
-            <div class="absolute top-[120%] right-0 left-auto translate-y-2.5 w-[160px] bg-[#132B52] rounded-2xl shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
+            <div class="absolute top-[120%] right-0 left-auto translate-y-2.5 w-[200px] bg-[#132B52] rounded-2xl shadow-[0_20px_45px_rgba(0,0,0,.25),inset_0_1px_0_rgba(21,21,21,.7)] p-2 opacity-0 invisible transition-all duration-300 z-[999] group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
+                <a href="{{ route('employee.dashboard') }}"
+                   class="flex items-center gap-2 no-underline text-[#C9DAF8] py-2.5 px-3 rounded-[10px] text-[13px] font-semibold transition-all duration-200 hover:bg-[#f3f6fb] hover:text-[#2D7EFF]">
+                    <svg class="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 12l9-8 9 8M5 10.5V20h5v-5h4v5h5v-9.5"
+                              stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Employee Dashboard
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="w-full text-left bg-none border-none cursor-pointer">

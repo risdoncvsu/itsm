@@ -347,7 +347,7 @@
         <main class="page">
             <div class="form-col">
                 <div class="login-card">
-                    <h1>LOG In</h1>
+                    <h1>Sign In</h1>
 
                     @if ($errors->any() || session('error'))
                         <div class="alert-error">

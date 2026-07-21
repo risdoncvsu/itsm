@@ -28,6 +28,16 @@
     REQUIRED DOCUMENTS
 </h2>
 
+@if ($errors->any())
+    <div class="mb-4 rounded bg-red-500/20 border border-red-400 text-red-200 px-4 py-3 text-sm">
+        <ul class="list-disc list-inside space-y-1">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <form
     action="{{ route('onboarding.storeStep3') }}"
     method="POST"
@@ -39,40 +49,52 @@
     <!-- Birth Certificate -->
     <div>
         <label class="block text-slate-300 text-xs mb-1">
-            Birth Certificate
+            Birth Certificate <span class="text-red-400">*</span>
         </label>
 
         <div class="relative">
-           <input type="file" name="birth_certificate"
+           <input type="file" name="birth_certificate" required
+                accept=".pdf,.jpg,.jpeg,.png"
                 class="w-[1335px] h-[45px] bg-[#0D1730] text-white text-sm rounded px-3 outline-none cursor-pointer"
             />
         </div>
+        @error('birth_certificate')
+            <p class="mt-1 text-xs text-red-300">{{ $message }}</p>
+        @enderror
     </div>
 
     <!-- Curriculum Vitae -->
     <div>
         <label class="block text-slate-300 text-xs mb-1">
-            Curriculum Vitae
+            Curriculum Vitae <span class="text-red-400">*</span>
         </label>
 
         <div class="relative">
-            <input type="file" name="curriculum_vitae"
+            <input type="file" name="curriculum_vitae" required
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                 class="w-[1335px] h-[45px] bg-[#0D1730] text-white text-sm rounded px-3 outline-none cursor-pointer"
             />
         </div>
+        @error('curriculum_vitae')
+            <p class="mt-1 text-xs text-red-300">{{ $message }}</p>
+        @enderror
     </div>
 
     <!-- Valid ID -->
     <div>
         <label class="block text-slate-300 text-xs mb-1">
-            Valid ID
+            Valid ID <span class="text-red-400">*</span>
         </label>
 
         <div class="relative">
-           <input type="file" name="valid_id"
+           <input type="file" name="valid_id" required
+                accept=".pdf,.jpg,.jpeg,.png"
                 class="w-[1335px] h-[45px] bg-[#0D1730] text-white text-sm rounded px-3 outline-none cursor-pointer"
             />
         </div>
+        @error('valid_id')
+            <p class="mt-1 text-xs text-red-300">{{ $message }}</p>
+        @enderror
     </div>
 
     <!-- Navigation Buttons -->

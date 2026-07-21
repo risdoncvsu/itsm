@@ -92,7 +92,7 @@
         <!-- Dashboard Button -->
         <div class="pt-8">
             <a 
-href="{{ route('hr.dashboard') }}"
+href="{{ route('dashboard') }}"
 class="inline-flex items-center bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold px-8 py-3 rounded shadow-lg shadow-blue-900/40 transition">
 
     DASHBOARD
