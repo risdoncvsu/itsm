@@ -11,10 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::connection('ecommerce')->table('addresses', function (Blueprint $table) {
-            $table->decimal('latitude', 10, 8)->nullable()->after('detailed_address');
-            $table->decimal('longitude', 11, 8)->nullable()->after('latitude');
-        });
+        $schema = Schema::connection('ecommerce');
+
+        // This database was originally managed by the standalone storefront.
+        // Some deployed copies already have one or both coordinate columns even
+        // when this unified-app migration has not been recorded there.
+        if (! $schema->hasTable('addresses')) {
+            return;
+        }
+
+        if (! $schema->hasColumn('addresses', 'latitude')) {
+            $schema->table('addresses', function (Blueprint $table) {
+                $table->decimal('latitude', 10, 8)->nullable();
+            });
+        }
+
+        if (! $schema->hasColumn('addresses', 'longitude')) {
+            $schema->table('addresses', function (Blueprint $table) {
+                $table->decimal('longitude', 11, 8)->nullable();
+            });
+        }
     }
 
     /**
@@ -22,8 +38,18 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::connection('ecommerce')->table('addresses', function (Blueprint $table) {
-            $table->dropColumn(['latitude', 'longitude']);
-        });
+        $schema = Schema::connection('ecommerce');
+
+        if (! $schema->hasTable('addresses')) {
+            return;
+        }
+
+        $columns = array_filter(['latitude', 'longitude'], fn (string $column) => $schema->hasColumn('addresses', $column));
+
+        if ($columns) {
+            $schema->table('addresses', function (Blueprint $table) use ($columns) {
+                $table->dropColumn($columns);
+            });
+        }
     }
 };
