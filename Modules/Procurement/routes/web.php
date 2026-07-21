@@ -17,6 +17,11 @@ use Modules\Procurement\Http\Controllers\Procurement\DeliveryController;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+Route::post('/logout', function () {
+    session()->forget(['employee_logged_in', 'employee_role', 'employee_id', 'employee_name', 'employee_email', 'employee_department', 'employee_position', 'employee_client_id']);
+    return redirect()->route('login');
+})->name('logout');
+
 Route::prefix('purchase-orders')->name('purchase-orders.')->group(function () {
     Route::get('/', [PurchaseOrderController::class, 'index'])->name('index');
     Route::get('/approved', [PurchaseOrderController::class, 'approved'])->name('approved');

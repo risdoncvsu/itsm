@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\OrderFulfillment\App\Helpers;
+namespace Modules\OrderFulfillment\Helpers;
 
 /**
  * Single source of truth for order/shipment status TEXT.

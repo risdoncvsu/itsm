@@ -492,8 +492,8 @@
     $statusMap = [];
     foreach (['NEW', 'PACKING', 'READY_TO_SHIP', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'DELAYED', 'CANCELLED'] as $key) {
       $statusMap[$key] = [
-        'label' => \App\Helpers\OrderStatus::label($key),
-        'class' => $statusClassByTier[\App\Helpers\OrderStatus::tier($key)],
+        'label' => \Modules\OrderFulfillment\Helpers\OrderStatus::label($key),
+        'class' => $statusClassByTier[\Modules\OrderFulfillment\Helpers\OrderStatus::tier($key)],
       ];
     }
   @endphp
