@@ -2,20 +2,12 @@
 
 namespace Modules\Ecommerce\Models;
 
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Models\Contracts\HasName;
-use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class EcommerceAdmin extends Authenticatable implements FilamentUser, HasName
+class EcommerceAdmin extends Authenticatable
 {
     protected $connection = 'hr';
     protected $table = 'employees';
-
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return $this->isEcommerceEmployee();
-    }
 
     public function isEcommerceEmployee(): bool
     {
@@ -34,11 +26,6 @@ class EcommerceAdmin extends Authenticatable implements FilamentUser, HasName
     public function getAuthPasswordName(): string
     {
         return 'temporary_password';
-    }
-
-    public function getFilamentName(): string
-    {
-        return trim("{$this->first_name} {$this->last_name}");
     }
 
     /**

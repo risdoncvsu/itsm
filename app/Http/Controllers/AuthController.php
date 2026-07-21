@@ -152,10 +152,6 @@ class AuthController extends Controller
 
     private function signInEcommerceAdmin(): void
     {
-        if (! class_exists(\Filament\Panel::class)) {
-            return;
-        }
-
         $employeeId = (int) session('employee_id');
         $clientId = (int) session('employee_client_id');
 

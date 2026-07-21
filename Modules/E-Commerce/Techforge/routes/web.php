@@ -260,6 +260,22 @@ Route::middleware([\Modules\Ecommerce\Http\Middleware\RequireEcommerceAuth::clas
 
 });
 
+Route::prefix('ecommerce-admin')->name('ecommerce.admin.')->group(function (): void {
+    Route::get('/login', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'login'])->name('login');
+    Route::post('/login', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'authenticate'])->name('login.post');
+
+    Route::middleware('ecommerce.admin')->group(function (): void {
+        Route::get('/', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/listings', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'listings'])->name('listings');
+        Route::get('/listings/create', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'createListing'])->name('listings.create');
+        Route::post('/listings', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'storeListing'])->name('listings.store');
+        Route::get('/listings/{listing}/edit', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'editListing'])->name('listings.edit');
+        Route::put('/listings/{listing}', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'updateListing'])->name('listings.update');
+        Route::delete('/listings/{listing}', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'destroyListing'])->name('listings.destroy');
+        Route::get('/orders', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'orders'])->name('orders');
+        Route::post('/logout', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'logout'])->name('logout');
+    });
+});
 
 if (app()->environment('local')) {
     Route::get('/auth/{provider}/callback', function($provider, \Illuminate\Http\Request $request) {
