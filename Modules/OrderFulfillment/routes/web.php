@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use Modules\OrderFulfillment\Http\Controllers\DashboardController;
 use Modules\OrderFulfillment\Http\Controllers\OrderController;
 use Modules\OrderFulfillment\Http\Controllers\PackingController;
@@ -26,4 +27,13 @@ Route::prefix('order-fulfillment')->name('order-fulfillment.')->middleware('orde
     Route::post('/material-requests', [MaterialRequestController::class, 'store'])->name('material-requests.store');
 
     Route::view('/returns', 'order-fulfillment::return')->name('return');
+
+    Route::post('/logout', function () {
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+        return redirect()->route('login');
+    })->name('logout');
+
+
 });
