@@ -13,28 +13,27 @@ class ResolveStorefrontClient
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $baseDomain = strtolower((string) config('ecommerce.storefront_base_domain'));
-        $host = strtolower($request->getHost());
-        
-        $baseHost = explode(':', $baseDomain)[0];
-        $requestHost = explode(':', $host)[0];
+        $store = strtolower(trim((string) $request->route('store')));
 
-        if ($requestHost !== $baseHost) {
-            if (app()->environment('local') && in_array($requestHost, ['localhost', '127.0.0.1'])) {
-                // Bypass for local OAuth callbacks
-            } else {
-                abort(404);
-            }
-        }
+        // The route owns this value, but validate it before using it as a
+        // company identifier. It prevents a malformed hostname from ever
+        // being treated as a storefront.
+        abort_unless(preg_match('/^[a-z0-9][a-z0-9-]{0,62}$/', $store), 404);
 
         $company = Company::query()
             ->where('status', 'Active')
+            ->where('ecommerce_slug', $store)
             ->first();
 
-        if ($company) {
-            app(EcommerceClientContext::class)->setClientId((int) $company->id);
-            $request->attributes->set('ecommerce_company', $company);
-        }
+        abort_unless($company, 404);
+
+        app(EcommerceClientContext::class)->setClientId((int) $company->id);
+        $request->attributes->set('ecommerce_company', $company);
+
+        // All route() and redirect()->route() calls issued while serving the
+        // store retain its subdomain without every Blade view needing to pass
+        // the {store} parameter manually.
+        URL::defaults(['store' => $company->ecommerce_slug]);
 
         return $next($request);
     }

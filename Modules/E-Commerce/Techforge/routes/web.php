@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::domain(config('ecommerce.storefront_base_domain'))
+// One deployment serves every client store. For example, the company whose
+// ecommerce_slug is "rog" is available at rog.shop.section4.tech.
+Route::domain('{store}.'.config('ecommerce.storefront_base_domain'))
     ->middleware('ecommerce.client')
     ->name('ecommerce.')
     ->group(function (): void {
@@ -269,4 +271,3 @@ if (app()->environment('local')) {
         return app(\Modules\Ecommerce\Http\Controllers\Auth\SocialAuthController::class)->callback($provider);
     });
 }
-
