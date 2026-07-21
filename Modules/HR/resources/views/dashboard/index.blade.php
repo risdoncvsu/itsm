@@ -77,7 +77,7 @@
 </head>
 <body class="w-full min-h-screen bg-navy-bg text-white font-sans opacity-0 animate-pageFade">
 
-  @include('hr::partials.navbar')
+  @include('partials.navbar')
 
 
   <!-- =====================================================
@@ -256,11 +256,14 @@
           <div class="flex justify-between items-start mb-6">
             <div>
               <h3 class="text-lg font-semibold text-white">Attendance Rate</h3>
-              <p class="mt-1 text-xs text-[rgba(219,232,255,.45)]">Company-wide average</p>
+              <p class="mt-1 text-xs text-[rgba(219,232,255,.45)]">Company-wide average · {{ number_format($totalPresentDaysYear ?? 0) }} present days YTD</p>
             </div>
             <div class="text-right">
-              <div class="text-[34px] font-bold text-white leading-none">93.67%</div>
-              <div class="inline-flex justify-center items-center mt-2.5 px-3 h-6 rounded-full bg-[#0b6328] text-[#35ff7a] text-[10px] font-semibold">↑ 9.7%</div>
+              <div class="text-[34px] font-bold text-white leading-none">{{ number_format($overallAttendanceRate ?? 0, 2) }}%</div>
+              @php $change = $rateChange ?? 0; @endphp
+              <div class="inline-flex justify-center items-center mt-2.5 px-3 h-6 rounded-full {{ $change >= 0 ? 'bg-[#0b6328] text-[#35ff7a]' : 'bg-[#5c1a1a] text-[#ff7a7a]' }} text-[10px] font-semibold">
+                {{ $change >= 0 ? '↑' : '↓' }} {{ number_format(abs($change), 1) }}%
+              </div>
             </div>
           </div>
 
@@ -273,35 +276,28 @@
               <span>20%</span>
             </div>
 
-            <div class="absolute left-10 right-0 top-0 bottom-8">
-              <div class="absolute inset-0 flex flex-col justify-between">
-                <div class="border-t border-white/[.08]"></div>
-                <div class="border-t border-white/[.08]"></div>
-                <div class="border-t border-white/[.08]"></div>
-                <div class="border-t border-white/[.08]"></div>
-                <div class="border-t border-white/[.08]"></div>
-              </div>
+            <div class="absolute left-10 right-0 top-0 bottom-8 overflow-x-auto overflow-y-hidden" style="scrollbar-width:thin;scrollbar-color:rgba(99,148,220,.55) rgba(255,255,255,.06);">
+              <div class="relative h-full" style="min-width: {{ max(count($monthlyAttendance ?? []) * 72, 520) }}px;">
+                <div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                  <div class="border-t border-white/[.08]"></div>
+                  <div class="border-t border-white/[.08]"></div>
+                  <div class="border-t border-white/[.08]"></div>
+                  <div class="border-t border-white/[.08]"></div>
+                  <div class="border-t border-white/[.08]"></div>
+                </div>
 
-              <div class="absolute inset-0 flex justify-around items-end">
-                <div class="flex flex-col items-center h-full justify-end">
-                  <div class="w-6 rounded-full bg-[#1B6FC8] animate-growBar origin-bottom [animation-delay:.2s]" style="height:87%;"></div>
-                  <span class="mt-3 text-xs text-[rgba(219,232,255,.6)]">APR</span>
-                </div>
-                <div class="flex flex-col items-center h-full justify-end">
-                  <div class="w-6 rounded-full bg-[#1B6FC8] animate-growBar origin-bottom [animation-delay:.34s]" style="height:73%;"></div>
-                  <span class="mt-3 text-xs text-[rgba(219,232,255,.6)]">MAY</span>
-                </div>
-                <div class="flex flex-col items-center h-full justify-end">
-                  <div class="w-6 rounded-full bg-[#1B6FC8] animate-growBar origin-bottom [animation-delay:.48s]" style="height:97%;"></div>
-                  <span class="mt-3 text-xs text-[rgba(219,232,255,.6)]">JUN</span>
-                </div>
-                <div class="flex flex-col items-center h-full justify-end">
-                  <div class="w-6 rounded-full bg-[#1B6FC8] animate-growBar origin-bottom [animation-delay:.62s]" style="height:80%;"></div>
-                  <span class="mt-3 text-xs text-[rgba(219,232,255,.6)]">JUL</span>
-                </div>
-                <div class="flex flex-col items-center h-full justify-end">
-                  <div class="w-6 rounded-full bg-[#1B6FC8] animate-growBar origin-bottom [animation-delay:.7s]" style="height:90%;"></div>
-                  <span class="mt-3 text-xs text-[rgba(219,232,255,.6)]">AUG</span>
+                <div class="absolute inset-0 flex justify-around items-end gap-2 px-1">
+                  @foreach($monthlyAttendance ?? [] as $index => $monthData)
+                    @php
+                      $barHeight = max(2, min(100, (float) $monthData['rate']));
+                      $delay = 0.15 + ($index * 0.08);
+                      $isCurrent = ($monthData['month_number'] ?? null) === ($currentMonth ?? null);
+                    @endphp
+                    <div class="flex flex-col items-center h-full justify-end shrink-0 w-12" title="{{ $monthData['month_name'] }}: {{ $monthData['present_days'] }} present days ({{ $monthData['rate'] }}%)">
+                      <div class="w-6 rounded-full {{ $isCurrent ? 'bg-[#3F8CFF]' : 'bg-[#1B6FC8]' }} animate-growBar origin-bottom" style="height:{{ $barHeight }}%; animation-delay:{{ $delay }}s;"></div>
+                      <span class="mt-3 text-xs {{ $isCurrent ? 'text-white font-semibold' : 'text-[rgba(219,232,255,.6)]' }}">{{ strtoupper($monthData['month']) }}</span>
+                    </div>
+                  @endforeach
                 </div>
               </div>
             </div>

@@ -1,31 +1,12 @@
 <?php
 
-namespace Modules\HR\Models;
+namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 
 class Employee extends Model
 {
-    protected $connection = 'hr';
-
-    protected static function booted(): void
-    {
-        static::addGlobalScope('client', function (Builder $query): void {
-            $clientId = session('employee_client_id');
-
-            if ($clientId) {
-                $query->where('client_id', $clientId);
-            }
-        });
-
-        static::creating(function (self $employee): void {
-            if (! $employee->client_id && session('employee_client_id')) {
-                $employee->client_id = session('employee_client_id');
-            }
-        });
-    }
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
@@ -50,14 +31,11 @@ class Employee extends Model
         'email',
         'company_email',
         'temporary_password',
-        'must_change_password',
-        'approval_status',
         'birth_certificate',
         'curriculum_vitae',
         'valid_id',
         'medical_certificate',
         'signature',
-        'client_id',
     ];
 
     /**
