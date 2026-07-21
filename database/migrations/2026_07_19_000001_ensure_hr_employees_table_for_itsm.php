@@ -28,10 +28,12 @@ return new class extends Migration
                 $table->string('position')->nullable();
                 $table->date('hire_date')->nullable();
                 $table->string('work_schedule')->nullable();
-                $table->string('email')->unique();
-                $table->string('company_email')->nullable()->unique();
+                $table->string('email');
+                $table->string('company_email')->nullable();
                 $table->string('temporary_password')->nullable();
                 $table->unsignedBigInteger('client_id')->nullable()->index();
+                $table->unique(['client_id', 'email'], 'employees_client_id_email_unique');
+                $table->unique(['client_id', 'company_email'], 'employees_client_id_company_email_unique');
                 $table->string('approval_status')->default('Active');
                 $table->string('birth_certificate')->nullable();
                 $table->string('curriculum_vitae')->nullable();
@@ -106,11 +108,11 @@ return new class extends Migration
             }
 
             if (! $schema->hasColumn('employees', 'email')) {
-                $table->string('email')->nullable()->unique();
+                $table->string('email')->nullable();
             }
 
             if (! $schema->hasColumn('employees', 'company_email')) {
-                $table->string('company_email')->nullable()->unique();
+                $table->string('company_email')->nullable();
             }
 
             if (! $schema->hasColumn('employees', 'temporary_password')) {

@@ -16,6 +16,10 @@ use App\Http\Controllers\DocumentController; // Imported DocumentController
 use App\Http\Controllers\NewUserSetupController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\RolesAndPermissionController;
+use App\Http\Controllers\ApprovalController;
+use App\Http\Controllers\KnowledgeBaseController;
+use App\Http\Controllers\ServiceController;
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -122,3 +126,50 @@ Route::middleware('auth')->group(function () {
 Route::get('/', function () {
     return redirect()->route('login');
 });
+
+
+
+Route::get('/users/index', function () {
+    return view('users.index');
+})->name('users.index');
+
+Route::get('/users/roles', [RolesAndPermissionController::class, 'index'])
+    ->name('users.roles');
+
+Route::post('/roles/bulk-delete', [RolesAndPermissionController::class, 'bulkDelete'])
+    ->name('roles.bulk-delete');
+
+Route::post('/roles/store', [RolesAndPermissionController::class, 'store'])
+    ->name('roles.store');
+
+Route::patch('/roles/{role}', [RolesAndPermissionController::class, 'update'])
+    ->name('roles.update');
+
+Route::delete('/roles/{role}', [RolesAndPermissionController::class, 'destroy'])
+    ->name('roles.destroy');
+
+
+
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::get('/users/pending', [UserController::class, 'pending'])->name('users.pending');
+
+
+Route::post('/approvals/bulk-handle', [ApprovalController::class, 'bulkHandle'])
+    ->name('approvals.bulk-handle');
+
+    Route::get('/service/resolved-tickets', [ServiceController::class, 'resolvedTickets'])
+    ->name('service.resolvedtickets');
+
+
+Route::get('/service/knowledge-base', [ServiceController::class, 'knowledgeBase'])
+    ->name('service.knowledgebase');
+
+
+Route::get('/client/itsm/service-desk/resolved-tickets', [ServiceController::class, 'resolvedTickets'])
+    ->name('client.itsm.service-desk.resolvedtickets');
+
+Route::get('/client/itsm/service-desk/knowledge-base', [ServiceController::class, 'knowledgeBase'])
+    ->name('client.itsm.service-desk.knowledgebase');
+
+Route::post('/knowledge-base/store', [KnowledgeBaseController::class, 'store'])
+    ->name('knowledge-base.store');

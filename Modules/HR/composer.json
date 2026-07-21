@@ -20,11 +20,11 @@
         "phpunit/phpunit": "^12.5.12"
     },
     "autoload": {
-    "psr-4": {
-        "Modules\\HR\\": "app/",
-        "Modules\\HR\\Database\\Factories\\": "Database/factories/",
-        "Modules\\HR\\Database\\Seeders\\": "Database/seeders/"
-         }
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
     },
     "autoload-dev": {
         "psr-4": {

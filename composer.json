@@ -9,7 +9,8 @@
         "php": "^8.3",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
-        "nwidart/laravel-modules": "^13.0"
+        "nwidart/laravel-modules": "^13.0",
+        "laravel/socialite": "^5.28"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -28,7 +29,11 @@
             "Modules\\HR\\": "Modules/HR/app/",
             "Modules\\Inventory\\": "Modules/Inventory/app/",
             "Modules\\Procurement\\": "Modules/Procurement/app/",
-            "Modules\\OrderFulfillment\\": "Modules/OrderFulfillment/app/"
+            "Modules\\OrderFulfillment\\": "Modules/OrderFulfillment/app/",
+            "Modules\\Ecommerce\\": "Modules/Ecommerce/app/",
+            "Modules\\Manufacturing\\": "Modules/Manufacturing/app/",
+            "Modules\\Finance\\": "Modules/Finance/app/",
+            "Modules\\BusinessIntelligence\\": "Modules/BusinessIntelligence/app/"
         }
     },
     "autoload-dev": {

@@ -17,10 +17,6 @@ class UserController extends Controller
     {
     }
 
-    public function index()
-    {
-        return $this->employees();
-    }
 
     public function clients()
     {
@@ -144,4 +140,16 @@ class UserController extends Controller
 
         return Company::find($user->company_id);
     }
+
+
+     public function index()
+    {
+        return $this->employees();
+    }
+
+ public function pending()
+{
+    $pendingUsers = User::where('status', 'pending')->get();
+    return view('users.pending', compact('pendingUsers'));
+}
 }

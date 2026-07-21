@@ -5,28 +5,11 @@ namespace Modules\HR\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 
 class Attendance extends Model
 {
     protected $connection = 'hr';
 
-    protected static function booted(): void
-    {
-        static::addGlobalScope('client', function (Builder $query): void {
-            $clientId = session('employee_client_id');
-
-            if ($clientId) {
-                $query->where('client_id', $clientId);
-            }
-        });
-
-        static::creating(function (self $attendance): void {
-            if (! $attendance->client_id && session('employee_client_id')) {
-                $attendance->client_id = session('employee_client_id');
-            }
-        });
-    }
     /** Fallback allotted work time when employee schedule is missing. */
     public const ALLOTTED_WORK_MINUTES = 9 * 60;
 
@@ -41,7 +24,6 @@ class Attendance extends Model
         'time_out',
         'time_out_image',
         'status',
-        'client_id',
     ];
 
     public function employee(): BelongsTo
@@ -81,14 +63,14 @@ class Attendance extends Model
     {
         return $this->time_in
             ? Carbon::parse($this->time_in)->format('h:i A')
-            : '—';
+            : 'â€”';
     }
 
     public function formattedTimeOut(): string
     {
         return $this->time_out
             ? Carbon::parse($this->time_out)->format('h:i A')
-            : '—';
+            : 'â€”';
     }
 
     /** HR-assigned start time from employee work schedule. */
@@ -131,7 +113,7 @@ class Attendance extends Model
     public function formattedElapsedDuration(?int $minutes = null): string
     {
         if ($minutes === null) {
-            return '—';
+            return 'â€”';
         }
 
         $hours = intdiv($minutes, 60);

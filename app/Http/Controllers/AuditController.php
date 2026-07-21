@@ -3,13 +3,27 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class AuditController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Baseline configuration starting empty without predefined static data
-        $allAudits = collect([]);
+        $clientId = (int) $request->user()->company_id;
+        $allAudits = Schema::hasTable('erp_audit_logs')
+            ? DB::table('erp_audit_logs')->where('client_id', $clientId)->latest('created_at')->get()->map(function ($log): array {
+                return [
+                    'id' => '#ERP-'.str_pad((string) $log->id, 6, '0', STR_PAD_LEFT).': '.str_replace('.', ' ', ucfirst($log->event)),
+                    'scope' => ucfirst($log->module),
+                    'auditor' => 'ERP Integration',
+                    'date' => \Illuminate\Support\Carbon::parse($log->created_at)->format('F d, Y H:i'),
+                    'score' => 'Recorded',
+                    'status' => str_ends_with($log->event, 'failed') ? 'Failed' : 'Completed',
+                    'status_class' => str_ends_with($log->event, 'failed') ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800',
+                ];
+            })
+            : collect([]);
 
         // 2. Save to session if a new audit is created via modal form submission
         if ($request->isMethod('post')) {

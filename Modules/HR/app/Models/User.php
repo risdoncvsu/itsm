@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Modules\HR\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
@@ -14,6 +14,8 @@ use Illuminate\Notifications\Notifiable;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
+    protected $connection = 'hr';
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 

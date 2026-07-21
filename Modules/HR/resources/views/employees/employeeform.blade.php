@@ -45,8 +45,8 @@
     ====================================================== -->
     <div class="my-[30px] pt-10 pb-10 relative flex justify-center items-center">
 
-        <a href="{{ route('employees.index') }}" class="absolute top-[1px] left-[120px] inline-flex items-center gap-2 py-[9px] px-[30px] bg-[#0061FF20] text-white no-underline rounded-xl text-base font-normal shadow-[0_8px_20px_rgba(0,0,0,.25)] transition-all duration-250 hover:bg-[#0063FF10] hover:-translate-y-0.5 active:scale-[.97]">
-            ← EMPLOYEE LIST
+        <a href="{{ route('hr.employees.index') }}" class="absolute top-[1px] left-[120px] inline-flex items-center gap-2 py-[9px] px-[30px] bg-[#0061FF20] text-white no-underline rounded-xl text-base font-normal shadow-[0_8px_20px_rgba(0,0,0,.25)] transition-all duration-250 hover:bg-[#0063FF10] hover:-translate-y-0.5 active:scale-[.97]">
+            â† EMPLOYEE LIST
         </a>
 
         <div class="w-full max-w-[108.1875rem] min-h-[45.375rem] relative mt-5 flex justify-center items-center rounded-[18px] overflow-hidden bg-[#0B1E3D] pb-[90px]">
@@ -148,9 +148,7 @@
                         </div>
                     </div>
 
-                    <div class="relative z-[5] flex justify-center items-center pt-[7px]">
-                        <img src="{{ asset('images/logo.png') }}" class="w-[268px] h-auto opacity-95" alt="Nexora Logo">
-                    </div>
+                   
                 </div>
 
             </div>
@@ -159,7 +157,7 @@
             <div class="absolute bottom-[25px] left-1/2 -translate-x-1/2 pb-10">
                 <button type="button" id="downloadBtn"
                     class="w-[218px] h-[61px] border-0 border-[0.1px] border-[#dcdcdc54] rounded-md bg-[#0061FF20] text-white text-[0.9375rem] font-normal tracking-[.3px] cursor-pointer shadow-[0_8px_20px_rgba(0,0,0,.25)] transition-all duration-250 hover:bg-[#0061FF10] hover:-translate-y-0.5 active:scale-[.97]">
-                    ↓ DOWNLOAD
+                    â†“ DOWNLOAD
                 </button>
             </div>
 
@@ -171,7 +169,7 @@
     ====================================================== -->
     <div class="w-full max-w-[108.1875rem] min-h-[45.375rem] ml-[90px] mr-10 mt-5 py-7 pr-2.5 pl-[60px] grid grid-cols-[68%_32%] gap-6 bg-[#122A58] rounded-[22px] shadow-[inset_5px_10px_18px_rgba(191,0,0,.03),inset_1px_0_1px_rgba(0,0,0,.20),0_18px_35px_rgba(0,0,0,.35)]">
 
-        <form action="{{ route('employees.update', $employee->id) }}" method="POST" enctype="multipart/form-data" class="contents">
+        <form action="{{ route('hr.employees.update', $employee->id) }}" method="POST" enctype="multipart/form-data" class="contents">
             @csrf
             @method('PUT')
 
@@ -395,28 +393,61 @@
 
                     <h3 class="text-[13px] font-light text-white uppercase whitespace-nowrap">Supporting Documents</h3>
 
+                    @php
+                        $docUrl = function (?string $path) {
+                            return $path ? asset('storage/'.$path) : null;
+                        };
+                        $docName = function (?string $path) {
+                            return $path ? basename($path) : null;
+                        };
+                    @endphp
+
                     <div class="relative w-[536px]">
                         <label class="absolute top-[3px] left-2.5 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">CV</label>
-                        <input type="file"
-                            class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @if($employee->curriculum_vitae)
+                            <div class="w-[536px] min-h-8 box-border py-2 px-2.5 pt-4 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[12px] flex items-center justify-between gap-2">
+                                <span class="truncate pl-0.5">{{ $docName($employee->curriculum_vitae) }}</span>
+                                <a href="{{ $docUrl($employee->curriculum_vitae) }}" target="_blank" rel="noopener"
+                                   class="shrink-0 text-[#5D8CFF] hover:text-white text-[11px] no-underline">View</a>
+                            </div>
+                        @else
+                            <input type="file" name="curriculum_vitae"
+                                class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @endif
                     </div>
 
                     <div class="relative w-[536px]">
                         <label class="absolute top-[3px] left-2.5 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Birth Certificate</label>
-                        <input type="file"
-                            class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @if($employee->birth_certificate)
+                            <div class="w-[536px] min-h-8 box-border py-2 px-2.5 pt-4 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[12px] flex items-center justify-between gap-2">
+                                <span class="truncate pl-0.5">{{ $docName($employee->birth_certificate) }}</span>
+                                <a href="{{ $docUrl($employee->birth_certificate) }}" target="_blank" rel="noopener"
+                                   class="shrink-0 text-[#5D8CFF] hover:text-white text-[11px] no-underline">View</a>
+                            </div>
+                        @else
+                            <input type="file" name="birth_certificate"
+                                class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @endif
                     </div>
 
                     <div class="relative w-[536px]">
                         <label class="absolute top-[3px] left-2.5 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Contract</label>
-                        <input type="file"
+                        <input type="file" name="contract"
                             class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
                     </div>
 
                     <div class="relative w-[536px]">
                         <label class="absolute top-[3px] left-2.5 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Valid ID</label>
-                        <input type="file"
-                            class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @if($employee->valid_id)
+                            <div class="w-[536px] min-h-8 box-border py-2 px-2.5 pt-4 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[12px] flex items-center justify-between gap-2">
+                                <span class="truncate pl-0.5">{{ $docName($employee->valid_id) }}</span>
+                                <a href="{{ $docUrl($employee->valid_id) }}" target="_blank" rel="noopener"
+                                   class="shrink-0 text-[#5D8CFF] hover:text-white text-[11px] no-underline">View</a>
+                            </div>
+                        @else
+                            <input type="file" name="valid_id"
+                                class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @endif
                     </div>
 
                 </div>
@@ -437,7 +468,7 @@
 
                 </form>
 
-               <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" id="deleteForm">
+               <form action="{{ route('hr.employees.destroy', $employee->id) }}" method="POST" id="deleteForm">
     @csrf
     @method('DELETE')
 

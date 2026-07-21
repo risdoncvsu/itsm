@@ -13,11 +13,16 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->appendToGroup('web', \App\Http\Middleware\AuditModuleAction::class);
         $middleware->alias([
             'hr.access' => \Modules\HR\Http\Middleware\EmployeeAuth::class,
             'inventory.access' => \Modules\Inventory\Http\Middleware\InventoryAccess::class,
             'procurement.access' => \Modules\Procurement\Http\Middleware\ProcurementAccess::class,
             'order-fulfillment.access' => \Modules\OrderFulfillment\Http\Middleware\OrderFulfillmentAccess::class,
+            'ecommerce.client' => \Modules\Ecommerce\Http\Middleware\ResolveStorefrontClient::class,
+            'manufacturing.access' => \Modules\Manufacturing\Http\Middleware\ManufacturingAccess::class,
+        'finance.access' => \Modules\Finance\Http\Middleware\FinanceAccess::class,
+        'bi.access' => \Modules\BusinessIntelligence\Http\Middleware\BusinessIntelligenceAccess::class,
             'root.admin' => \App\Http\Middleware\EnsureRootAdmin::class,
             'client.admin' => \App\Http\Middleware\EnsureClientAdmin::class,
         ]);

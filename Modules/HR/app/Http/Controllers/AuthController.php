@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\HR\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Employee;
-use Illuminate\Support\Facades\Hash;
+use Modules\HR\Models\Employee;
 
 class AuthController extends Controller
 {
@@ -24,23 +23,29 @@ class AuthController extends Controller
             return back()->with('error', 'Invalid email or password. Please try again.');
         }
 
-        if (! $employee->temporary_password || ! Hash::check($request->password, $employee->temporary_password)) {
+        if ($employee->temporary_password !== $request->password) {
             return back()->with('error', 'Invalid email or password. Please try again.');
         }
 
+        $department = preg_replace('/[^a-z0-9]/', '', strtolower((string) $employee->department));
+        $position = preg_replace('/[^a-z0-9]/', '', strtolower((string) $employee->position));
+        $isHrManager = in_array($department, ['humanresources', 'hr'], true)
+            && in_array($position, ['hrmanager', 'humanresourcesmanager'], true);
+
         session([
             'employee_logged_in' => true,
-            'employee_role' => 'employee',
+            'employee_role' => $isHrManager ? 'admin' : 'employee',
             'employee_id' => $employee->id,
             'employee_name' => $employee->first_name,
             'employee_email' => $employee->company_email,
             'employee_department' => $employee->department,
+            'employee_position' => $employee->position,
+            'employee_client_id' => (int) $employee->client_id,
         ]);
 
-        $department = strtolower(trim($employee->department ?? ''));
-        $route = $department === 'human resources'
-            ? 'dashboard'
-            : 'employee.dashboard';
+        $route = $isHrManager
+            ? 'hr.dashboard'
+            : 'hr.employee.dashboard';
 
         return redirect()->route($route);
     }
@@ -52,6 +57,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('signin');
+        return redirect()->route('login');
     }
 }

@@ -44,13 +44,13 @@
                   type="button"
                   class="attendance-photo-thumb inline-flex h-9 w-9 overflow-hidden rounded-md border border-white/10 bg-black/20 p-0"
                   data-photo-src="{{ $inImage }}"
-                  data-photo-label="Time In — {{ \Carbon\Carbon::parse($row->attendance_date)->format('d M Y') }}"
+                  data-photo-label="Time In â€” {{ \Carbon\Carbon::parse($row->attendance_date)->format('d M Y') }}"
                   title="View In Image"
                 >
                   <img src="{{ $inImage }}" alt="Time in photo" class="h-full w-full object-cover">
                 </button>
               @else
-                <span class="text-slate-500">—</span>
+                <span class="text-slate-500">â€”</span>
               @endif
             </td>
             <td class="px-5 py-2 whitespace-nowrap">
@@ -68,13 +68,13 @@
                   type="button"
                   class="attendance-photo-thumb inline-flex h-9 w-9 overflow-hidden rounded-md border border-white/10 bg-black/20 p-0"
                   data-photo-src="{{ $outImage }}"
-                  data-photo-label="Time Out — {{ \Carbon\Carbon::parse($row->attendance_date)->format('d M Y') }}"
+                  data-photo-label="Time Out â€” {{ \Carbon\Carbon::parse($row->attendance_date)->format('d M Y') }}"
                   title="View Out Image"
                 >
                   <img src="{{ $outImage }}" alt="Time out photo" class="h-full w-full object-cover">
                 </button>
               @else
-                <span class="text-slate-500">—</span>
+                <span class="text-slate-500">â€”</span>
               @endif
             </td>
             <td class="px-5 py-2 text-slate-300 whitespace-nowrap">{{ $row->formattedWorkHours() }}</td>

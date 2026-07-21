@@ -319,13 +319,19 @@ class HrEmployeeProfileProvisioner
 
     private function putEmployeeSession(object $employee): void
     {
+        $department = preg_replace('/[^a-z0-9]/', '', strtolower((string) ($employee->department ?? '')));
+        $position = preg_replace('/[^a-z0-9]/', '', strtolower((string) ($employee->position ?? '')));
+        $isHrManager = in_array($department, ['humanresources', 'hr'], true)
+            && in_array($position, ['hrmanager', 'humanresourcesmanager'], true);
+
         session([
             'employee_logged_in' => true,
-            'employee_role' => 'employee',
+            'employee_role' => $isHrManager ? 'admin' : 'employee',
             'employee_id' => $employee->id,
             'employee_name' => $employee->first_name ?? 'HR Manager',
             'employee_email' => $employee->company_email,
             'employee_department' => $employee->department ?? 'Human Resources',
+            'employee_position' => $employee->position ?? null,
             'employee_client_id' => (int) $employee->client_id,
         ]);
     }

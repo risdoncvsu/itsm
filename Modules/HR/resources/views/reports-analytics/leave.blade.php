@@ -79,7 +79,7 @@
         
      <div class="w-full min-h-[60px] bg-[none] rounded-[14px] px-0 py-5 mb-4 flex items-center justify-between gap-4 flex-wrap">
 
-    <form method="GET" action="{{ route('reports-analytics.leave') }}" class="flex items-center gap-3 flex-wrap" id="filterForm">
+    <form method="GET" action="{{ route('hr.reports-analytics.leave') }}" class="flex items-center gap-3 flex-wrap" id="filterForm">
         @if (request()->filled('per_page'))
             <input type="hidden" name="per_page" value="{{ request('per_page') }}">
         @endif

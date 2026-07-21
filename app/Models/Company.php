@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
     'company_name',
+    'ecommerce_slug',
     'industry',
     'company_email',
     'phone_no',

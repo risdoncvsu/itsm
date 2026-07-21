@@ -2,5 +2,9 @@
     "HR": true,
     "Inventory": true,
     "Procurement": true,
-    "OrderFulfillment": true
+    "OrderFulfillment": true,
+    "Ecommerce": true,
+    "Manufacturing": true,
+    "Finance": true,
+    "BusinessIntelligence": true
 }

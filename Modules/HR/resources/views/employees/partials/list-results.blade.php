@@ -18,7 +18,7 @@
                     <td class="p-4 text-[0.84375rem] text-center border-r border-white/[0.12] font-extralight w-[23%]">{{ $employee->department }}</td>
                     <td class="p-4 text-[0.84375rem] text-center border-r border-white/[0.12] font-extralight w-[23%]">{{ $employee->position }}</td>
                     <td class="p-4 text-[0.84375rem] text-center font-extralight w-[15%]">
-                        <a href="{{ route('employees.show', $employee->id) }}" class="inline-block bg-[#132B52] text-white no-underline px-[21px] py-1.5 rounded-xl text-[0.6875rem] transition-all duration-[250ms] hover:bg-[#2e5ca3] hover:-translate-y-px">
+                        <a href="{{ route('hr.employees.show', $employee->id) }}" class="inline-block bg-[#132B52] text-white no-underline px-[21px] py-1.5 rounded-xl text-[0.6875rem] transition-all duration-[250ms] hover:bg-[#2e5ca3] hover:-translate-y-px">
                             View
                         </a>
                     </td>

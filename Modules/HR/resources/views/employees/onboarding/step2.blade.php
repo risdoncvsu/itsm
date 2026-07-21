@@ -36,7 +36,7 @@
 @endif
 
 <form 
- action="{{ route('onboarding.storeStep2') }}"
+ action="{{ route('hr.onboarding.storeStep2') }}"
     method="POST"
     class="space-y-6 max-w-3xl" >
 
@@ -122,7 +122,7 @@
             value="{{ old('end_time', session('step2.end_time')) }}"
             class="w-[350px] h-[40px] bg-[#0d1730] text-white text-sm rounded px-3 outline-none focus:ring-1 focus:ring-blue-500"
         />
-        <p class="mt-1 text-[10px] text-slate-400">Required work hours = End Time − Start Time</p>
+        <p class="mt-1 text-[10px] text-slate-400">Required work hours = End Time âˆ’ Start Time</p>
     </div>
 </div>
 
@@ -130,7 +130,7 @@
 <div class="pt-6 flex gap-4">
 
     <!-- Back Button -->
-    <a href="{{ route('onboarding.step1') }}"
+    <a href="{{ route('hr.onboarding.step1') }}"
    class="inline-flex items-center gap-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-semibold px-6 py-2.5 rounded shadow transition">
     BACK
 </a>

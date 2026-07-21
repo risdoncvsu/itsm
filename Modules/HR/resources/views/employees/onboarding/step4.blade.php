@@ -31,7 +31,7 @@
 </h2>
 
  <form 
-action="{{ route('onboarding.storeStep4') }}" 
+action="{{ route('hr.onboarding.storeStep4') }}"
 method="POST"
 > @csrf
 
@@ -44,6 +44,12 @@ method="POST"
             </ul>
         </div>
     @endif
+
+    <div class="mb-6 w-[1335px] bg-[#0D1730] rounded-xl px-8 py-5 border border-white/10">
+        <p class="text-slate-400 text-xs uppercase tracking-wide mb-1">Company Email (auto-generated)</p>
+        <p class="text-white text-sm font-semibold">{{ $companyEmailPreview }}</p>
+        <p class="mt-1 text-[11px] text-slate-400">If another employee already has this name, a number is added after the last name.</p>
+    </div>
 
 <div class="w-[1335px] bg-[#0D1730] rounded-xl p-8 space-y-8">
 
@@ -203,7 +209,7 @@ method="POST"
 
 <div class="pt-6 flex gap-4">
 
-<a href="{{ route('onboarding.step3') }}"
+<a href="{{ route('hr.onboarding.step3') }}"
 class="inline-flex items-center gap-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-semibold px-6 py-2.5 rounded shadow transition">
 BACK
 </a>

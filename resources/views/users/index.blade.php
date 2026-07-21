@@ -43,14 +43,13 @@
                     <nav class="space-y-6 text-xl">
                         <a href="{{ $portal === 'admin' ? route('admin.itsm.clients') : route('client.itsm.employees') }}" class="block {{ $active === 'employees' || $active === 'clients' ? 'font-extrabold' : 'font-medium hover:text-[#346DCB]' }}">All {{ $portal === 'admin' ? ucfirst($entityLabelPlural) : 'Employees' }}</a>
                         @if ($portal === 'admin')
-                            <a href="#" class="block font-medium hover:text-[#346DCB]">Create New {{ ucfirst($entityLabel) }}</a>
-                            <a href="#" class="block font-medium hover:text-[#346DCB]">Pending Approvals</a>
+                            <a href="{{ route('users.pending') }}" class="block font-medium hover:text-[#346DCB]">Pending Approvals</a>
                         @else
                             <a href="{{ route('client.itsm.employees') }}" class="block font-medium hover:text-[#346DCB]">HR Sync Queue</a>
                             <a href="{{ route('client.itsm.pending-approvals') }}" class="block {{ $active === 'pending-approvals' ? 'font-extrabold text-[#346DCB]' : 'font-medium hover:text-[#346DCB]' }}">Pending Approvals</a>
                         @endif
-                        <a href="#" class="block font-medium hover:text-[#346DCB]">Roles & Permissions</a>
-                        <a href="#" class="block font-medium hover:text-[#346DCB]">Teams & Groups</a>
+                        <a href="{{ route('users.roles') }}" class="block font-medium hover:text-[#346DCB]">Roles & Permissions</a>
+
                     </nav>
                 </aside>
 
@@ -64,11 +63,7 @@
                                 <input type="text" id="tableSearch" class="w-48 border-0 bg-transparent text-xl text-slate-900 outline-none">
                             </label>
 
-                            @if ($portal === 'admin')
-                                <button type="button" id="addEntityButton" class="rounded-full bg-[#346DCB] px-6 py-3 text-xl font-semibold text-white transition hover:bg-[#2554a3]">
-                                    Add {{ $entityLabel }}
-                                </button>
-                            @endif
+                            
 
                             @if ($active !== 'pending-approvals')
                                 <button type="button" id="editSelectedButton" disabled class="rounded-full bg-slate-500 px-6 py-3 text-xl font-semibold text-white opacity-50 transition enabled:bg-[#0B1E3D] enabled:opacity-100 enabled:hover:bg-[#132B52]">
@@ -137,7 +132,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($users as $index => $user)
+                                    @forelse ($users as $user)
                                         <tr
                                             class="border-b border-slate-200"
                                             data-row-id="{{ $user->id }}"
@@ -152,7 +147,7 @@
                                             data-email="{{ $portal === 'client' ? e($user->email ?? '') : '' }}"
                                             data-department="{{ $portal === 'client' ? e($user->department ?? '') : '' }}"
                                         >
-                                            <td class="px-2 py-4">{{ $portal === 'admin' ? 'CL-' . str_pad((string) ($index + 1), 5, '0', STR_PAD_LEFT) : 'EMP-' . str_pad((string) ($index + 1), 5, '0', STR_PAD_LEFT) }}</td>
+                                            <td class="px-2 py-4">{{ $portal === 'admin' ? 'CL-' . str_pad((string) $user->id, 5, '0', STR_PAD_LEFT) : 'EMP-' . str_pad((string) $user->id, 5, '0', STR_PAD_LEFT) }}</td>
                                             <td class="px-2 py-4">{{ $portal === 'admin' ? $user->company_name : ($user->username ?? 'employee') }}</td>
                                             <td class="px-2 py-4">{{ $portal === 'admin' ? $user->admin_name : ($user->name ?? $user->full_name ?? 'Employee') }}</td>
                                             <td class="px-2 py-4">{{ $portal === 'admin' ? ($user->adminUser?->username ?? 'Not generated') : ($user->email ?? 'employee@company.com') }}</td>
@@ -220,7 +215,7 @@
                         </label>
 
                         <label class="block">
-                            <span class="mb-2 block text-sm font-semibold">New Password</span>
+                            <span class="mb-2 block text-sm font-semibold">Set Client System Admin Password</span>
                             <input type="password" name="admin_password" id="edit_admin_password" class="h-11 w-full rounded border border-slate-300 px-3" autocomplete="new-password">
                         </label>
 

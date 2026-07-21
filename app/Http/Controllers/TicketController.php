@@ -15,11 +15,15 @@ class TicketController extends Controller
         $query = ServiceTicket::query()->latest();
 
         if ($portal === 'admin') {
-            $query->where('ticket_type', 'nexora_support');
+            $query->where('ticket_type', 'nexora_support')->where('category', '!=', 'Password Reset');
         } else {
-            $query
-                ->where('company_id', Auth::user()->company_id)
-                ->where('ticket_type', $ticketType);
+            $query->where('company_id', Auth::user()->company_id);
+            if ($ticketType === 'client_password_reset') {
+                $query->where('category', 'Password Reset')
+                    ->whereIn('ticket_type', ['client_password_reset', 'nexora_support']);
+            } else {
+                $query->where('ticket_type', $ticketType);
+            }
         }
 
         return view('service.service', [
@@ -27,9 +31,9 @@ class TicketController extends Controller
             'active' => 'service-desk',
             'ticketType' => $portal === 'admin' ? 'nexora_support' : $ticketType,
             'canCreateTicket' => $portal === 'client' && $ticketType === 'nexora_support',
-            'canUpdateTicket' => $portal === 'admin' || ($portal === 'client' && $ticketType === 'erp_module'),
-            'canProcessPasswordResets' => $portal === 'client' && $ticketType === 'nexora_support',
-            'updateMode' => $portal === 'client' && $ticketType === 'erp_module' ? 'status_only' : 'full',
+            'canUpdateTicket' => $portal === 'admin' || ($portal === 'client' && in_array($ticketType, ['erp_module', 'client_password_reset'], true)),
+            'canProcessPasswordResets' => $portal === 'client' && $ticketType === 'client_password_reset',
+            'updateMode' => $portal === 'client' && $ticketType === 'erp_module' ? 'status_only' : ($ticketType === 'client_password_reset' ? 'password_reset' : 'full'),
             'title' => $this->titleFor($portal, $ticketType),
             'subtitle' => $this->subtitleFor($portal, $ticketType),
             'tickets' => $query->get(),
@@ -38,7 +42,7 @@ class TicketController extends Controller
 
     public function supportIndex()
     {
-        return $this->index('client', 'nexora_support');
+        return $this->index('client', 'client_password_reset');
     }
 
     public function store(Request $request): RedirectResponse
@@ -152,7 +156,7 @@ class TicketController extends Controller
 
         return $ticketType === 'nexora_support'
             ? 'Ask Nexora Support'
-            : 'ERP Module Tickets';
+            : ($ticketType === 'client_password_reset' ? 'Account Recovery' : 'ERP Module Tickets');
     }
 
     private function subtitleFor(string $portal, string $ticketType): string
@@ -163,6 +167,8 @@ class TicketController extends Controller
 
         return $ticketType === 'nexora_support'
             ? 'Create tickets for Nexora root admins when your company needs platform-level help, then track their status.'
-            : 'Review and resolve tickets raised by ERP modules such as HR, Business Intelligence, Finance, and Operations.';
+            : ($ticketType === 'client_password_reset'
+                ? 'Password-reset requests for employees of your client. Set a temporary password, then provide it securely to the requester.'
+                : 'Review and resolve tickets raised by ERP modules such as HR, Business Intelligence, Finance, and Operations.');
     }
 }

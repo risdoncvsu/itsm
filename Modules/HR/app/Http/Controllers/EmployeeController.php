@@ -5,8 +5,9 @@ namespace Modules\HR\Http\Controllers;
 use Modules\HR\Http\Controllers\Concerns\ResolvesPerPage;
 use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
 use Modules\HR\Models\Employee;
-use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Services\ErpIntegrationService;
 
 class EmployeeController extends Controller
 {
@@ -45,6 +46,7 @@ class EmployeeController extends Controller
             case 'position_desc':  $employees->orderBy('position', 'desc'); break;
             case 'newest':         $employees->orderBy('created_at', 'desc'); break;
             case 'oldest':         $employees->orderBy('created_at', 'asc'); break;
+            default:               $employees->orderBy('id', 'asc'); break;
         }
 
         $employees = $employees->paginate($this->perPage($request))->withQueryString();
@@ -58,15 +60,18 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        return redirect()->route('onboarding.step1');
+        return redirect()->route('hr.onboarding.step1');
     }
 
     public function store(Request $request)
     {
+        $clientId = (int) session('employee_client_id');
+        abort_unless($clientId > 0, 403);
+
         $request->validate([
             'first_name'      => 'required',
             'last_name'       => 'required',
-            'email'           => 'required|email|unique:hr.employees,email',
+            'email'           => ['required', 'email', Rule::unique('hr.employees', 'email')->where('client_id', $clientId)],
             'phone'           => 'nullable',
     'position'        => 'nullable',
     'department'      => 'required',
@@ -102,6 +107,8 @@ Employee::create([
     'marital_status' => $request->marital_status,
     'address' => $request->address,
     'profile_picture' => $imageName,
+    'client_id' => $clientId,
+    'approval_status' => 'Pending',
 ]);
         return redirect()->route('hr.dashboard')
             ->with('success', 'Employee added successfully!');
@@ -115,8 +122,10 @@ Employee::create([
 }
 public function update(Request $request, Employee $employee)
 {
+    $clientId = (int) session('employee_client_id');
+
     $request->validate([
-        'email'           => 'required|email|unique:hr.employees,email,' . $employee->id,
+        'email'           => ['required', 'email', Rule::unique('hr.employees', 'email')->where('client_id', $clientId)->ignore($employee->id)],
         'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 2MB
     ]);
 
@@ -142,7 +151,12 @@ public function update(Request $request, Employee $employee)
 
 public function destroy($id)
 {
+    abort_unless(session('employee_role') === 'admin', 403, 'Only an HR manager can delete employees.');
+
     $employee = Employee::findOrFail($id);
+    $clientId = (int) $employee->client_id;
+    $employeeId = (int) $employee->id;
+    $email = (string) $employee->email;
 
     // Delete profile picture if meron
     if ($employee->profile_picture &&
@@ -152,8 +166,9 @@ public function destroy($id)
     }
 
     $employee->delete();
+    app(ErpIntegrationService::class)->employeeRemoved($clientId, $employeeId, $email);
 
-    return redirect()->route('employees.index')
+    return redirect()->route('hr.employees.index')
     ->with('success','Employee deleted successfully!');
 }
 }

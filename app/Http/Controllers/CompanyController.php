@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\User;
 use App\Services\HrEmployeeProfileProvisioner;
+use App\Services\ErpIntegrationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
@@ -34,7 +35,10 @@ class CompanyController extends Controller
         $password = Str::random(14);
 
         DB::transaction(function () use ($validated, $username, $password): void {
-            $company = Company::create($validated + ['status' => 'Active']);
+            $company = Company::create($validated + [
+                'status' => 'Active',
+                'ecommerce_slug' => $this->uniqueEcommerceSlug($validated['company_name']),
+            ]);
 
             $admin = User::create([
                 'name' => $validated['admin_name'],
@@ -81,6 +85,10 @@ class CompanyController extends Controller
 
             if (! empty($validated['admin_password'])) {
                 $company->adminUser->update(['password' => Hash::make($validated['admin_password'])]);
+                app(ErpIntegrationService::class)->recordAudit((int) $company->id, 'client_admin.password_changed', 'ITSM', [
+                    'changed_by' => auth()->id(),
+                    'username' => $company->adminUser->username,
+                ]);
             }
 
         }
@@ -149,6 +157,21 @@ class CompanyController extends Controller
             $candidate = "{$local}{$counter}@{$domain}";
             $counter++;
         } while (User::where('username', $candidate)->exists());
+
+        return $candidate;
+    }
+
+    private function uniqueEcommerceSlug(string $companyName): string
+    {
+        $base = Str::slug($companyName);
+        $base = $base !== '' ? $base : 'store';
+        $candidate = $base;
+        $counter = 2;
+
+        while (Company::where('ecommerce_slug', $candidate)->exists()) {
+            $candidate = "{$base}-{$counter}";
+            $counter++;
+        }
 
         return $candidate;
     }

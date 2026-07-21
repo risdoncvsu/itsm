@@ -1,6 +1,6 @@
 @php
     $currentStep = (int) ($currentStep ?? 1);
-    $isSuccess = request()->routeIs('onboarding.success');
+    $isSuccess = request()->routeIs('hr.onboarding.success');
     $steps = [
         1 => 'PERSONAL',
         2 => 'EMPLOYMENT',

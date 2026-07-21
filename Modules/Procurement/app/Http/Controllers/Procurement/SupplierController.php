@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class SupplierController extends Controller
 {
@@ -88,6 +88,8 @@ class SupplierController extends Controller
             ]);
         }
 
+        app(ErpIntegrationService::class)->supplierChanged((int) session('employee_client_id'), $supplier->fresh());
+
         return response()->json(['status' => 'ok', 'data' => ['id' => $supplierId] + $validated]);
     }
 
@@ -112,12 +114,14 @@ class SupplierController extends Controller
             'updated_at' => now(),
         ]);
 
+        app(ErpIntegrationService::class)->supplierChanged((int) session('employee_client_id'), $supplier->fresh());
+
         return response()->json(['status' => 'ok']);
     }
 
     public function destroy($supplier)
     {
-        DB::table('suppliers')->where('id', $supplier)->delete();
+        $supplier->delete();
 
         return response()->json(['status' => 'ok']);
     }
