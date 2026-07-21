@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Modules\App\Models\ReturnItem;
+use Modules\OrderFulfillment\Models\ReturnItem;
 
 class ReturnController extends Controller
 {

@@ -34,6 +34,9 @@ class OrderController extends Controller
         $delivered    = Order::where('status', 'DELIVERED')->count();
         $total        = Order::count();
         $onTimeRate   = $total > 0 ? round(($delivered / $total) * 100) . '%' : '0%';
+        // The legacy Orders template uses these names for its stat cards.
+        $inPackingCount = $inPacking;
+        $ShippedCount = $shippedToday;
 
 
         // Any status other than NEW represents a change that happened after
@@ -65,7 +68,7 @@ class OrderController extends Controller
             });
 
         return view('order-fulfillment::order', compact(
-            'orders', 'ordersReceivedToday', 'inPacking', 'shippedToday', 'onTimeRate', 'recentActivity'
+            'orders', 'ordersReceivedToday', 'inPacking', 'inPackingCount', 'shippedToday', 'ShippedCount', 'onTimeRate', 'recentActivity'
         ));
     }
 

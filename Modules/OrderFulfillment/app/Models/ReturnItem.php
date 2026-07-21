@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace Modules\OrderFulfillment\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\OrderFulfillment\Models\Concerns\BelongsToClient;
 
 class ReturnItem extends Model
