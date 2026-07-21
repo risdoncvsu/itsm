@@ -215,6 +215,16 @@
           <input name="brand" placeholder="e.g. Dell, HP" required>
         </div>
         <div class="form-field full">
+          <label>Default Receiving Warehouse <span class="req">*</span></label>
+          <select name="warehouse_id" required>
+            <option value="">Select the warehouse for supplier deliveries...</option>
+            @foreach($warehouses ?? collect() as $warehouse)
+              <option value="{{ $warehouse->id }}">{{ $warehouse->name }}{{ $warehouse->address ? ' — '.$warehouse->address : '' }}</option>
+            @endforeach
+          </select>
+          <span class="hint">This is where deliveries from this supplier are normally received.</span>
+        </div>
+        <div class="form-field full">
           <label>Products</label>
           <div id="supplier-products-list" class="product-chip-list">
             <div class="product-list-empty">No products added yet.</div>    

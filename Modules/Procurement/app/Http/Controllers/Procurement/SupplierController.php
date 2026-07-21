@@ -5,6 +5,8 @@ namespace Modules\Procurement\Http\Controllers\Procurement;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Modules\Inventory\Models\Warehouse;
 
 class SupplierController extends Controller
 {
@@ -37,6 +39,7 @@ class SupplierController extends Controller
                     'id' => $s->id,
                     'name' => $s->name,
                     'brand' => $s->brand,
+                    'warehouse_id' => $s->warehouse_id,
                     'products' => $products,
                 ];
             });
@@ -61,7 +64,19 @@ class SupplierController extends Controller
             'brand'       => 'nullable|string|max:100',
             'status'      => 'nullable|string|max:20',
             'productsJson'=> 'nullable|string',
+            'warehouse_id'=> 'required|integer',
         ]);
+
+        $warehouse = Warehouse::query()
+            ->whereKey((int) $validated['warehouse_id'])
+            ->where('status', 'active')
+            ->first();
+
+        if (! $warehouse) {
+            throw ValidationException::withMessages([
+                'warehouse_id' => 'Select an active warehouse belonging to your client.',
+            ]);
+        }
 
         $products = [];
         if ($request->filled('productsJson')) {
@@ -79,6 +94,7 @@ class SupplierController extends Controller
             'phone' => $validated['phone'] ?? null,
             'address' => $validated['address'] ?? null,
             'brand' => $validated['brand'] ?? null,
+            'warehouse_id' => $warehouse->id,
             'status' => $validated['status'] ?? 'active',
             'product_items' => json_encode($products),
             'created_at' => now(),
@@ -118,7 +134,23 @@ class SupplierController extends Controller
             'phone' => 'nullable|string|max:30',
             'address' => 'nullable|string|max:255',
             'brand' => 'nullable|string|max:100',
+            'warehouse_id' => 'nullable|integer',
         ]);
+
+        if (array_key_exists('warehouse_id', $validated) && $validated['warehouse_id'] !== null) {
+            $warehouse = Warehouse::query()
+                ->whereKey((int) $validated['warehouse_id'])
+                ->where('status', 'active')
+                ->first();
+
+            if (! $warehouse) {
+                throw ValidationException::withMessages([
+                    'warehouse_id' => 'Select an active warehouse belonging to your client.',
+                ]);
+            }
+
+            $validated['warehouse_id'] = $warehouse->id;
+        }
 
         $this->table('suppliers')->where('id', $supplier)->update([
             'name' => $validated['name'] ?? DB::raw('name'),
@@ -127,6 +159,7 @@ class SupplierController extends Controller
             'phone' => $validated['phone'] ?? DB::raw('phone'),
             'address' => $validated['address'] ?? DB::raw('address'),
             'brand' => $validated['brand'] ?? DB::raw('brand'),
+            'warehouse_id' => $validated['warehouse_id'] ?? DB::raw('warehouse_id'),
             'updated_at' => now(),
         ]);
 

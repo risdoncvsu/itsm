@@ -96,7 +96,7 @@
               <div class="ts-body">
                 <div class="ts-name">{{ $supplier->name }}</div>
               </div>
-              <div class="ts-val">{{ $supplier->formatted_total_spend }}</div>
+              <div class="ts-val">{{ $supplier->formatted_total_spend ?? ('PHP ' . number_format((float) ($supplier->total_spend ?? 0), 2)) }}</div>
             </div>
             @endforeach
           </div>

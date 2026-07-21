@@ -62,7 +62,7 @@
       .map(row => {
         const supplierName = supplierNameFromCell(row.children[0]) || textFrom(row.children[0]);
         if(!supplierName) return null;
-        return { name: supplierName, brand: row.dataset.category || row.dataset.brand || '' };
+        return { name: supplierName, brand: row.dataset.category || row.dataset.brand || '', warehouseId: row.dataset.warehouseId || '' };
       })
       .filter(Boolean);
     if(supplierRows.length > 0){
@@ -70,7 +70,7 @@
       supplierField.value = supplierRows.some(s => s.name === selectedSupplier) ? selectedSupplier : '';
       // populate client-side catalog from rows
       window.SUPPLIER_CATALOG = window.SUPPLIER_CATALOG || {};
-      supplierRows.forEach(s => { if(!window.SUPPLIER_CATALOG[s.name]) window.SUPPLIER_CATALOG[s.name] = { brand: s.brand || s.name, products: [] }; });
+      supplierRows.forEach(s => { if(!window.SUPPLIER_CATALOG[s.name]) window.SUPPLIER_CATALOG[s.name] = { brand: s.brand || s.name, warehouseId: s.warehouseId || '', products: [] }; });
       populatePoItemSelect(form);
       refreshDeliverySupplierOptions();
       return Promise.resolve();
@@ -84,7 +84,7 @@
         supplierField.value = list.some(s => s.name === selectedSupplier) ? selectedSupplier : '';
         window.SUPPLIER_CATALOG = window.SUPPLIER_CATALOG || {};
         list.forEach(s => {
-          window.SUPPLIER_CATALOG[s.name] = { brand: s.brand || s.name, products: (s.products || []).map(p => ({ name: p.name, unitPrice: Number(p.price || p.unitPrice || 0) })) };
+          window.SUPPLIER_CATALOG[s.name] = { brand: s.brand || s.name, warehouseId: s.warehouse_id || '', products: (s.products || []).map(p => ({ name: p.name, unitPrice: Number(p.price || p.unitPrice || 0) })) };
         });
         populatePoItemSelect(form);
         refreshDeliverySupplierOptions();
@@ -111,6 +111,7 @@
     const supplierField = form?.querySelector('[name="supplier"]');
     const itemField = form?.querySelector('[name="item"]');
     const brandField = form?.querySelector('[name="brand"]');
+    const warehouseField = form?.querySelector('[name="warehouse_id"]');
     if(!itemField) return;
     const supplierName = (supplierField?.value || '').trim();
     const entry = getSupplierCatalogEntry(supplierName);
@@ -121,6 +122,7 @@
       return `<option value="${htmlEscape(name)}" data-unit-price="${unitPrice}">${htmlEscape(name)}</option>`;
     }).join('');
     if(brandField) brandField.value = entry?.brand || '';
+    if(warehouseField && entry?.warehouseId) warehouseField.value = String(entry.warehouseId);
     if(selectedItem){
       itemField.value = selectedItem;
     } else if(form.__poCurrentItem){
@@ -679,6 +681,7 @@
         address: d.address || '',
         brand: d.brand || '',
         status: d.status || 'active',
+        warehouse_id: d.warehouse_id || '',
         productsJson: JSON.stringify(products)
       }).toString()
     }).then(async res => {
@@ -692,6 +695,7 @@
         tr.dataset.sid = d.sid || '';
         tr.dataset.category = d.brand || '';
         tr.dataset.brand = d.brand || '';
+        tr.dataset.warehouseId = d.warehouse_id || '';
         tr.dataset.status = (d.status || 'active').replace(/^./, m => m.toUpperCase());
         tr.dataset.terms = 'Net 30';
         tr.dataset.lastActivity = 'Newly onboarded';
