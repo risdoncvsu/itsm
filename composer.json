@@ -31,7 +31,8 @@
             "Modules\\OrderFulfillment\\": "Modules/OrderFulfillment/app/",
             "Modules\\Ecommerce\\": "Modules/Ecommerce/app/",
             "Modules\\Manufacturing\\": "Modules/Manufacturing/app/",
-            "Modules\\Finance\\": "Modules/Finance/app/"
+            "Modules\\Finance\\": "Modules/Finance/app/",
+            "Modules\\BusinessIntelligence\\": "Modules/BusinessIntelligence/app/"
         }
     },
     "autoload-dev": {

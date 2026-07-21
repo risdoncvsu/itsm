@@ -8,21 +8,30 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $orders = DB::connection('order_fulfillment')->table('orders');
+
+        // Keep the dashboard in the owning module database, and never let a
+        // normal employee see another client's operational data. Root-admin
+        // module testing retains its temporary all-client view.
+        if (! (config('nexora.root_admin_module_testing') && auth()->user()?->role === 'root_admin')) {
+            $orders->where('client_id', session('employee_client_id'));
+        }
+
         // ---- Stats row ----
-        $ordersReceivedToday = DB::connection('order_fulfillment')->table('orders')->where('status', 'NEW')->count();
-        $inPackingCount      = DB::connection('order_fulfillment')->table('orders')->where('status', 'PACKING')->count();
-        $shippedTodayCount   = DB::connection('order_fulfillment')->table('orders')->where('status', 'SHIPPED')->count();
-        $deliveredCount      = DB::connection('order_fulfillment')->table('orders')->where('status', 'DELIVERED')->count();
-        $totalOrders         = DB::connection('order_fulfillment')->table('orders')->count();
+        $ordersReceivedToday = (clone $orders)->where('status', 'NEW')->count();
+        $inPackingCount      = (clone $orders)->where('status', 'PACKING')->count();
+        $shippedTodayCount   = (clone $orders)->where('status', 'SHIPPED')->count();
+        $deliveredCount      = (clone $orders)->where('status', 'DELIVERED')->count();
+        $totalOrders         = (clone $orders)->count();
         $onTimeRate          = $totalOrders > 0 ? round(($deliveredCount / $totalOrders) * 100) : 0;
 
         // ---- Board columns ----
         // The ORDERS column acts as a running log of every order, so it keeps
         // showing an order even after it moves on to packing/shipped/etc.
-        $newOrders       = DB::connection('order_fulfillment')->table('orders')->orderByDesc('created_at')->get();
-        $packingOrders   = DB::connection('order_fulfillment')->table('orders')->where('status', 'PACKING')->get();
-        $shippedOrders   = DB::connection('order_fulfillment')->table('orders')->where('status', 'SHIPPED')->get();
-        $cancelledOrders = DB::connection('order_fulfillment')->table('orders')->where('status', 'CANCELLED')->get();
+        $newOrders       = (clone $orders)->orderByDesc('created_at')->get();
+        $packingOrders   = (clone $orders)->where('status', 'PACKING')->get();
+        $shippedOrders   = (clone $orders)->where('status', 'SHIPPED')->get();
+        $cancelledOrders = (clone $orders)->where('status', 'CANCELLED')->get();
 
         // ---- Sidebar ----.
         // Alerts should only reflect brand-new orders, not the full order log above.

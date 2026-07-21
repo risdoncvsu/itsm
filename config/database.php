@@ -219,6 +219,23 @@ return [
             'sslmode' => env('FINANCE_DB_SSLMODE', 'prefer'),
         ],
 
+        // Business Intelligence owns only analytics snapshots, audit data,
+        // and future AI reports. It must never fall back to ITSM's database.
+        'business_intelligence' => [
+            'driver' => env('BUSINESS_INTELLIGENCE_DB_CONNECTION', 'pgsql'),
+            'url' => env('BUSINESS_INTELLIGENCE_DB_URL'),
+            'host' => env('BUSINESS_INTELLIGENCE_DB_HOST'),
+            'port' => env('BUSINESS_INTELLIGENCE_DB_PORT', '5432'),
+            'database' => env('BUSINESS_INTELLIGENCE_DB_DATABASE'),
+            'username' => env('BUSINESS_INTELLIGENCE_DB_USERNAME'),
+            'password' => env('BUSINESS_INTELLIGENCE_DB_PASSWORD'),
+            'charset' => env('BUSINESS_INTELLIGENCE_DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => env('BUSINESS_INTELLIGENCE_DB_SEARCH_PATH', 'public'),
+            'sslmode' => env('BUSINESS_INTELLIGENCE_DB_SSLMODE', 'prefer'),
+        ],
+
         // Staging is optional. It must be configured explicitly: falling back
         // to DB_* would silently put integration data into the ITSM database.
         'staging' => [

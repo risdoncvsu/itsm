@@ -889,7 +889,7 @@
             </thead>
             <tbody id="packingTableBody">
               @forelse ($packingOrders as $order)
-                @php $priority = \App\Helpers\OrderPriority::packing($order->created_at ?? null); @endphp
+                @php $priority = \Modules\OrderFulfillment\Helpers\OrderPriority::packing($order->created_at ?? null); @endphp
                 <tr class="packing-row"
                     data-id="{{ $order->id }}"
                     data-customer="{{ $order->customer_name }}"

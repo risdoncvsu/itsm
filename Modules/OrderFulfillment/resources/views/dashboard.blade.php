@@ -490,7 +490,7 @@
       <div class="column-body">
         @forelse ($newOrders as $order)
           @php
-            $priority = \App\Helpers\OrderPriority::dashboard($order->created_at ?? null);
+            $priority = \Modules\OrderFulfillment\Helpers\OrderPriority::dashboard($order->created_at ?? null);
             $status   = $statusMap[strtoupper($order->status)] ?? ['label' => strtoupper($order->status), 'class' => 'tag-new'];
           @endphp
           <div class="order-card">
@@ -522,7 +522,7 @@
       <div class="column-body">
         @forelse ($packingOrders as $order)
           @php
-            $priority = \App\Helpers\OrderPriority::dashboard($order->created_at ?? null);
+            $priority = \Modules\OrderFulfillment\Helpers\OrderPriority::dashboard($order->created_at ?? null);
             $status   = $statusMap[strtoupper($order->status)] ?? ['label' => strtoupper($order->status), 'class' => 'tag-packing'];
           @endphp
           <div class="order-card">
@@ -554,7 +554,7 @@
       <div class="column-body">
         @forelse ($shippedOrders as $order)
           @php
-            $priority = \App\Helpers\OrderPriority::dashboard($order->created_at ?? null);
+            $priority = \Modules\OrderFulfillment\Helpers\OrderPriority::dashboard($order->created_at ?? null);
             $status   = $statusMap[strtoupper($order->status)] ?? ['label' => strtoupper($order->status), 'class' => 'tag-shipped'];
           @endphp
           <div class="order-card">

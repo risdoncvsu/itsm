@@ -69,7 +69,7 @@ class AuthController extends Controller
                 return redirect()->route('procurement.dashboard');
             }
 
-            if (str_contains($department, 'fulfillment') || str_contains($department, 'operations')) {
+            if (str_contains($department, 'fulfillment') || str_contains($department, 'operations') || str_contains($department, 'order')) {
                 return redirect()->route('order-fulfillment.dashboard');
             }
 
@@ -116,7 +116,7 @@ class AuthController extends Controller
             return redirect()->route('procurement.dashboard');
         }
 
-        if (str_contains($department, 'fulfillment') || str_contains($department, 'operations')) {
+        if (str_contains($department, 'fulfillment') || str_contains($department, 'operations') || str_contains($department, 'order')) {
             return redirect()->route('order-fulfillment.dashboard');
         }
 
