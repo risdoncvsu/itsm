@@ -1,45 +1,47 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Procurement\Http\Controllers\Procurement\DashboardController;
-use Modules\Procurement\Http\Controllers\Procurement\DeliveryController;
-use Modules\Procurement\Http\Controllers\Procurement\PurchaseOrderController;
-use Modules\Procurement\Http\Controllers\Procurement\RequisitionController;
-use Modules\Procurement\Http\Controllers\Procurement\SupplierController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\RequisitionController;
+use App\Http\Controllers\DeliveryController;
 
-Route::prefix('procurement')->name('procurement.')->group(function (): void {
-    Route::redirect('/', '/procurement/dashboard');
+/*
+|--------------------------------------------------------------------------
+| Web Routes — Nexora ERP Procurement Suite
+|--------------------------------------------------------------------------
+| Each module (Purchase Orders, Suppliers, Requisitions, Deliveries) has
+| its own controller and its own Blade view under resources/views/pages.
+*/
 
-    Route::post('/logout', function () {
-        session()->forget([
-            'employee_logged_in', 'employee_role', 'employee_id', 'employee_name',
-            'employee_email', 'employee_department', 'employee_client_id',
-        ]);
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-        return redirect()->route('login');
-    })->name('logout');
+Route::prefix('purchase-orders')->name('purchase-orders.')->group(function () {
+    Route::get('/', [PurchaseOrderController::class, 'index'])->name('index');
+    Route::get('/approved', [PurchaseOrderController::class, 'approved'])->name('approved');
+    Route::post('/', [PurchaseOrderController::class, 'store'])->name('store');
+    Route::put('/{purchaseOrder}', [PurchaseOrderController::class, 'update'])->name('update');
+    Route::delete('/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])->name('destroy');
+});
 
-    Route::middleware('procurement.access')->group(function (): void {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::prefix('suppliers')->name('suppliers.')->group(function () {
+    Route::get('/', [SupplierController::class, 'index'])->name('index');
+    Route::post('/', [SupplierController::class, 'store'])->name('store');
+    Route::put('/{supplier}', [SupplierController::class, 'update'])->name('update');
+    Route::delete('/{supplier}', [SupplierController::class, 'destroy'])->name('destroy');
+});
 
-        Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])->name('purchase-orders');
-        Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])->name('purchase-orders.store');
-        Route::put('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'update'])->name('purchase-orders.update');
-        Route::delete('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])->name('purchase-orders.destroy');
+Route::prefix('requisitions')->name('requisitions.')->group(function () {
+    Route::get('/', [RequisitionController::class, 'index'])->name('index');
+    Route::post('/', [RequisitionController::class, 'store'])->name('store');
+    Route::put('/{requisition}', [RequisitionController::class, 'update'])->name('update');
+    Route::delete('/{requisition}', [RequisitionController::class, 'destroy'])->name('destroy');
+});
 
-        Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers');
-        Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
-        Route::put('/suppliers/{supplier}', [SupplierController::class, 'update'])->name('suppliers.update');
-        Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
-
-        Route::get('/requisitions', [RequisitionController::class, 'index'])->name('requisitions');
-        Route::post('/requisitions', [RequisitionController::class, 'store'])->name('requisitions.store');
-        Route::put('/requisitions/{requisition}', [RequisitionController::class, 'update'])->name('requisitions.update');
-        Route::delete('/requisitions/{requisition}', [RequisitionController::class, 'destroy'])->name('requisitions.destroy');
-
-        Route::get('/deliveries', [DeliveryController::class, 'index'])->name('deliveries');
-        Route::post('/deliveries', [DeliveryController::class, 'store'])->name('deliveries.store');
-        Route::put('/deliveries/{delivery}', [DeliveryController::class, 'update'])->name('deliveries.update');
-        Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
-    });
+Route::prefix('deliveries')->name('deliveries.')->group(function () {
+    Route::get('/', [DeliveryController::class, 'index'])->name('index');
+    Route::post('/', [DeliveryController::class, 'store'])->name('store');
+    Route::put('/{delivery}', [DeliveryController::class, 'update'])->name('update');
+    Route::delete('/{delivery}', [DeliveryController::class, 'destroy'])->name('destroy');
 });

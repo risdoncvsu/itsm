@@ -1,180 +1,281 @@
 <?php
 
-namespace Modules\Procurement\Http\Controllers\Procurement;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Modules\Procurement\Models\Requisition;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
 class RequisitionController extends Controller
 {
-    public function index(): View
+    private function getRequisitionConnection()
     {
-        $requisitions = Requisition::latest('date_requested')->get();
+        foreach (['orderfullfillment', 'manufacturing'] as $connectionName) {
+            try {
+                $connection = DB::connection($connectionName);
+                if ($connection->getSchemaBuilder()->hasTable('requisitions')) {
+                    return $connection;
+                }
+            } catch (\Exception $e) {
+                // ignore broken or unavailable external DB connections
+            }
+        }
 
-        $counts = [
-            'all' => $requisitions->count(),
-            'pending' => $requisitions->where('status', 'pending')->count(),
-            'approved' => $requisitions->where('status', 'processing')->count(),
-            'rejected' => $requisitions->where('status', 'rejected')->count(),
+        throw new \RuntimeException('No external requisition source is available.');
+    }
+
+    private function getRequisitionConnections(): array
+    {
+        $connections = [];
+
+        foreach (['orderfullfillment', 'manufacturing'] as $connectionName) {
+            try {
+                $connection = DB::connection($connectionName);
+                if ($connection->getSchemaBuilder()->hasTable('requisitions')) {
+                    $connections[] = $connection;
+                }
+            } catch (\Exception $e) {
+                // ignore broken or unavailable external DB connections
+            }
+        }
+
+        if ($connections === []) {
+            throw new \RuntimeException('No external requisition source is available.');
+        }
+
+        return $connections;
+    }
+
+    private function getWritableRequisitionConnection()
+    {
+        return $this->getRequisitionConnection();
+    }
+
+    /**
+     * Find which external connection (orderfullfillment or manufacturing)
+     * actually holds the requisition with this id. Previously update()/
+     * destroy() always used the first connection that had a "requisitions"
+     * table (orderfullfillment), so status changes and deletes for
+     * requisitions that actually came from "manufacturing" silently
+     * touched zero rows there instead of the real record.
+     */
+    private function findRequisitionConnectionFor($id)
+    {
+        foreach ($this->getRequisitionConnections() as $connection) {
+            if ($connection->table('requisitions')->where('id', $id)->exists()) {
+                return $connection;
+            }
+        }
+
+        // Fall back to the old behavior rather than erroring out.
+        return $this->getRequisitionConnection();
+    }
+
+    private function ensureRequisitionTable($connection): void
+    {
+        if ($connection->getSchemaBuilder()->hasTable('requisitions')) {
+            return;
+        }
+
+        throw new \RuntimeException(sprintf('The requisition table is not available on connection %s.', $connection->getName()));
+    }
+
+    private function requisitionHasColumn($connection, string $column): bool
+    {
+        try {
+            return $connection->getSchemaBuilder()->hasColumn('requisitions', $column);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+       private function isDuplicateKeyException(\Throwable $e): bool
+    {
+        $message = $e->getMessage();
+
+        return str_contains($message, 'duplicate key')
+            || str_contains($message, 'Unique violation')
+            || str_contains($message, 'SQLSTATE[23505]')
+            || str_contains($message, 'UNIQUE constraint failed');
+    }
+
+    private function makeUniqueRequisitionInsert(array $insert): array
+    {
+        $clone = $insert;
+        $suffix = now()->format('YmdHis') . '-' . random_int(1000, 9999);
+
+        if (array_key_exists('req_number', $clone) && ! empty($clone['req_number'])) {
+            $clone['req_number'] = $clone['req_number'] . '-' . $suffix;
+        } elseif (array_key_exists('req_id', $clone) && ! empty($clone['req_id'])) {
+            $clone['req_id'] = $clone['req_id'] . '-' . $suffix;
+        }
+
+        return $clone;
+    }
+
+    private function insertRequisition($connection, array $insert): int
+    {
+        $attempts = 0;
+        $currentConnection = $connection;
+        $currentInsert = $insert;
+
+        while ($attempts < 3) {
+            try {
+                return $currentConnection->table('requisitions')->insertGetId($currentInsert);
+            } catch (\Throwable $e) {
+                if ($this->isDuplicateKeyException($e)) {
+                    $currentInsert = $this->makeUniqueRequisitionInsert($currentInsert);
+                    $attempts++;
+                    continue;
+                }
+
+                throw $e;
+            }
+        }
+
+        throw new \RuntimeException('Unable to save requisition after retrying.');
+    }
+
+    private function getRequisitionSelectFields($connection): array
+    {
+        if ($connection->getName() === 'orderfullfillment') {
+            return [
+                'id',
+                'req_number as requisition_number',
+                'item',
+                'qty as qty',
+                'department',
+                'requested_by',
+                'priority',
+                DB::raw("'Pending' as status"),
+                'date_requested as request_date',
+                'notes',
+                'created_at',
+                'updated_at',
+            ];
+        }
+
+        return [
+            'id',
+            'req_id as requisition_number',
+            'part_name as item',
+            'quantity as qty',
+            'department',
+            'requested_by',
+            'priority',
+            'status',
+            'date_requested as request_date',
+            'notes',
+            'destination',
+            'created_at',
+            'updated_at',
         ];
-
-        // Next requisition sequence, derived from the highest existing
-        // "REQ-YYYY-####" number, so the "+ New Requisition" form always
-        // auto-fills the true next number instead of a hardcoded guess.
-        $nextReqSeq = ($requisitions->pluck('req_number')
-            ->map(fn (string $n) => (int) preg_replace('/\D/', '', substr($n, -4)))
-            ->max() ?? 0) + 1;
-
-        return view('procurement::procurement.partials.requisition', compact('requisitions', 'counts', 'nextReqSeq'));
     }
 
-    public function store(Request $request): JsonResponse
+    /**
+     * Requisitions list page (filters, sortable table, add requisition modal).
+     */
+    public function index(Request $request)
     {
-        $data = $request->validate([
-            'rq' => ['required', 'string', 'max:255'],
-            'requester' => ['required', 'string', 'max:255'],
-            'dept' => ['required', 'string', 'max:255'],
-            'dateReq' => ['required', 'date'],
-            'supplier' => ['required', 'string', 'max:255'],
-            'item' => ['required', 'string', 'max:255'],
-            'supplier_item' => ['nullable', 'string', 'max:255'],
-            'qty' => ['required', 'integer', 'min:1'],
-            'amount' => ['nullable', 'numeric', 'min:0'],
-            'uom' => ['nullable', 'string', 'max:50'],
-            'notes' => ['nullable', 'string'],
-        ]);
+        $requisitions = collect();
 
-        $requisition = Requisition::create([
-            'req_number' => $data['rq'],
-            'item' => $data['item'],
-            'qty' => (int) $data['qty'],
-            'amount' => (float) ($data['amount'] ?? 0),
-            'uom' => $data['uom'] ?? null,
-            'delivery_status' => 'pending',
-            'department' => $data['dept'],
-            'requested_by' => $data['requester'],
-            'status' => 'pending',
-            'date_requested' => $data['dateReq'],
-            'notes' => $this->buildRequisitionNotes($data),
-        ]);
+        foreach ($this->getRequisitionConnections() as $connection) {
+            $this->ensureRequisitionTable($connection);
+            $connectionRequisitions = $connection
+                ->table('requisitions')
+                ->select($this->getRequisitionSelectFields($connection))
+                ->orderBy('created_at', 'desc')
+                ->get();
 
-        $requisition->items()->create([
-            'supplier_product_id' => null,
-            'name' => $data['item'],
-            'qty' => (int) $data['qty'],
-            'uom' => $data['uom'] ?? null,
-            'unit_price' => $data['qty'] > 0 ? (float) (($data['amount'] ?? 0) / $data['qty']) : 0,
-            'amount' => (float) ($data['amount'] ?? 0),
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'data' => $requisition,
-            'delete_url' => route('procurement.requisitions.destroy', $requisition),
-        ], 201);
-    }
-
-    public function update(Request $request, Requisition $requisition): JsonResponse
-    {
-        $data = $request->validate([
-            'ref' => ['required', 'string', 'max:255'],
-            'requester' => ['required', 'string', 'max:255'],
-            'dept' => ['required', 'string', 'max:255'],
-            'date' => ['required', 'date'],
-            'supplier' => ['nullable', 'string', 'max:255'],
-            'item' => ['required', 'string', 'max:255'],
-            'supplier_item' => ['nullable', 'string', 'max:255'],
-            'qty' => ['required', 'integer', 'min:1'],
-            'amount' => ['nullable', 'numeric', 'min:0'],
-            'uom' => ['nullable', 'string', 'max:50'],
-            'delivery' => ['nullable', 'string', 'max:255'],
-            'status' => ['nullable', 'string', 'max:255'],
-            'notes' => ['nullable', 'string'],
-        ]);
-
-        $requisition->update([
-            'req_number' => $data['ref'],
-            'item' => $data['item'],
-            'qty' => (int) $data['qty'],
-            'amount' => (float) ($data['amount'] ?? $requisition->amount ?? 0),
-            'uom' => $data['uom'] ?? null,
-            'delivery_status' => $this->normalizeDeliveryStatus($data['delivery'] ?? null),
-            'department' => $data['dept'],
-            'requested_by' => $data['requester'],
-            'status' => $this->normalizeStatus($data['status'] ?? null),
-            'date_requested' => $data['date'],
-            'notes' => $this->buildRequisitionNotes($data, $requisition->notes),
-        ]);
-
-        $item = $requisition->items()->first();
-        if ($item) {
-            $item->update([
-                'name' => $data['item'],
-                'qty' => (int) $data['qty'],
-                'uom' => $data['uom'] ?? null,
-                'unit_price' => $data['qty'] > 0 ? (float) (($data['amount'] ?? 0) / $data['qty']) : 0,
-                'amount' => (float) ($data['amount'] ?? $requisition->amount ?? 0),
-            ]);
+            foreach ($connectionRequisitions as $req) {
+                $req->source_connection = $connection->getName();
+                $requisitions->push($req);
+            }
         }
 
-        return response()->json(['success' => true, 'data' => $requisition]);
-    }
+        $requisitions = $requisitions->sortByDesc('created_at')->values();
+        $requisitionRefs = $requisitions->pluck('requisition_number')->filter()->all();
 
-    public function destroy(Requisition $requisition): JsonResponse
-    {
-        $requisition->delete();
-
-        return response()->json(['success' => true]);
-    }
-
-    private function buildRequisitionNotes(array $data, ?string $existing = null): string
-    {
-        $notes = trim((string) ($data['notes'] ?? ''));
-        $supplier = trim((string) ($data['supplier'] ?? ''));
-        $supplierItem = trim((string) ($data['supplier_item'] ?? ''));
-
-        $segments = [];
-        if ($existing) {
-            $segments[] = $existing;
-        }
-        if ($supplier !== '') {
-            $segments[] = 'Supplier: '.$supplier;
-        }
-        if ($supplierItem !== '') {
-            $segments[] = 'Item: '.$supplierItem;
-        }
-        if ($notes !== '') {
-            $segments[] = $notes;
+        $purchaseOrders = collect();
+        foreach ($this->getRequisitionConnections() as $connection) {
+            try {
+                if ($connection->getSchemaBuilder()->hasTable('purchase_orders')) {
+                    $purchaseOrders = $connection
+                        ->table('purchase_orders')
+                        ->whereIn('requisition_reference', $requisitionRefs)
+                        ->get()
+                        ->keyBy('requisition_reference');
+                    break;
+                }
+            } catch (\Exception $e) {
+                // ignore broken or unavailable external DB connections
+            }
         }
 
-        return implode(' | ', array_filter($segments));
+        $requisitions = $requisitions->map(function ($req) use ($purchaseOrders) {
+            $ref = $req->requisition_number;
+            $po = $purchaseOrders->get($ref);
+
+            if ($po) {
+                $poStatus = strtolower(trim($po->status ?? 'pending'));
+                $currentStatus = strtolower(trim($req->status ?? 'pending'));
+                if (in_array($currentStatus, ['pending', 'processing', ''], true)) {
+                    if (in_array($poStatus, ['pending', 'approved', 'processing'], true)) {
+                        $req->status = 'Processing';
+                    } elseif ($poStatus === 'completed') {
+                        $req->status = 'Completed';
+                    }
+                }
+                $req->po_number = $po->po_number;
+                $req->po_status = $po->status;
+            }
+
+            return $req;
+        });
+
+        $statusCounts = $requisitions->map(function ($req) {
+            return strtolower(str_replace(' ', '-', $req->status ?? 'Pending'));
+        })->countBy();
+
+        return view('pages.requisitions', compact('requisitions', 'statusCounts'));
     }
 
-    private function normalizeDeliveryStatus(?string $value): string
+    /**
+     * Handle the "+ New Requisition" modal submit (submitAddReq in app-forms.js).
+     */
+    public function store(Request $request)
     {
-        return match (strtolower((string) $value)) {
-            'in transit' => 'intransit',
-            'in-transit' => 'intransit',
-            'delivered' => 'delivered',
-            'delayed' => 'delayed',
-            'scheduled' => 'pending',
-            'shipment' => 'shipment',
-            default => 'pending',
-        };
+        return response()->json(['status' => 'ok', 'message' => 'Requisition creation is disabled.']);
     }
 
-    private function normalizeStatus(?string $value): string
+    public function update(Request $request, $requisition)
     {
-        return match (strtolower((string) $value)) {
-            'approved' => 'processing',
-            'rejected' => 'cancel',
-            'pending' => 'pending',
-            'completed', 'complete' => 'completed',
-            default => 'pending',
-        };
+        $validated = $request->validate([
+            'status' => 'nullable|string|max:20',
+            'notes' => 'nullable|string',
+        ]);
+
+        $connection = $this->findRequisitionConnectionFor($requisition);
+        $update = ['updated_at' => now()];
+
+        if ($this->requisitionHasColumn($connection, 'status') && ! empty($validated['status'])) {
+            $update['status'] = $validated['status'];
+        }
+
+        if ($this->requisitionHasColumn($connection, 'notes')) {
+            $update['notes'] = $validated['notes'] ?? DB::raw('notes');
+        }
+
+        $connection->table('requisitions')->where('id', $requisition)->update($update);
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    public function destroy($requisition)
+    {
+        $connection = $this->findRequisitionConnectionFor($requisition);
+        $connection->table('requisitions')->where('id', $requisition)->delete();
+
+        return response()->json(['status' => 'ok']);
     }
 }
-

@@ -1,141 +1,124 @@
 <?php
 
-namespace Modules\Procurement\Http\Controllers\Procurement;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Modules\Procurement\Models\Supplier;
-use Modules\Procurement\Models\SupplierProduct;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
 class SupplierController extends Controller
 {
-    public function index(): View
+    /**
+     * Supplier directory page (filters, sortable table, add supplier modal).
+     */
+    public function index(Request $request)
     {
-        $suppliers = Supplier::orderBy('name')->get();
+        $suppliers = DB::table('suppliers')->orderBy('created_at', 'desc')->get();
 
-        return view('procurement::procurement.partials.suppliers', compact('suppliers'));
+        // If client expects JSON (AJAX), return suppliers as JSON with decoded product items
+        if ($request->wantsJson() || $request->ajax()) {
+            $data = $suppliers->map(function ($s) {
+                $products = [];
+                if (!empty($s->product_items)) {
+                    $decoded = json_decode($s->product_items, true);
+                    if (is_array($decoded)) $products = $decoded;
+                }
+                return [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                    'brand' => $s->brand,
+                    'products' => $products,
+                ];
+            });
+            return response()->json(['status' => 'ok', 'data' => $data]);
+        }
+
+        return view('pages.suppliers', compact('suppliers'));
     }
 
-    public function store(Request $request): JsonResponse
+    /**
+     * Handle the "+ Add Supplier" modal submit (submitAddSupplier in app-forms.js).
+     */
+    public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'contact' => ['nullable', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:255'],
-            'address' => ['nullable', 'string'],
-            'category' => ['nullable', 'string', 'max:255'],
-            'product_name' => ['nullable', 'string', 'max:255'],
-            'product_price' => ['nullable', 'numeric', 'min:0'],
-            'product_uom' => ['nullable', 'string', 'max:50'],
-            'product_qty' => ['nullable', 'integer', 'min:1'],
-            'product_items' => ['nullable', 'string'],
-            'products' => ['nullable', 'string'],
-            'status' => ['nullable', 'string', 'in:active,inactive,blacklisted'],
+        $validated = $request->validate([
+            'sid'         => 'nullable|string|max:50',
+            'name'        => 'required|string|max:150',
+            'contact'     => 'required|string|max:150',
+            'email'       => 'required|email|max:150',
+            'phone'       => 'required|string|max:30',
+            'address'     => 'required|string|max:255',
+            'brand'       => 'nullable|string|max:100',
+            'status'      => 'nullable|string|max:20',
+            'productsJson'=> 'nullable|string',
         ]);
 
-        $productRows = json_decode($data['products'] ?? '[]', true) ?: [];
-        $productItems = [];
+        $products = [];
+        if ($request->filled('productsJson')) {
+            $decoded = json_decode($request->input('productsJson'), true);
+            if (is_array($decoded)) {
+                $products = $decoded;
+            }
+        }
 
-        $supplier = Supplier::create([
-            'name' => $data['name'],
-            'contact_person' => $data['contact'] ?? null,
-            'email' => $data['email'] ?? null,
-            'phone' => $data['phone'] ?? null,
-            'address' => $data['address'] ?? null,
-            'category' => $data['category'] ?? null,
-            'product_items' => null,
-            'status' => $data['status'] ?? 'active',
+        $supplierId = DB::table('suppliers')->insertGetId([
+            'name' => $validated['name'],
+            'contact_person' => $validated['contact'] ?? null,
+            'email' => $validated['email'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'brand' => $validated['brand'] ?? null,
+            'status' => $validated['status'] ?? 'active',
+            'product_items' => json_encode($products),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
-        foreach ($productRows as $productRow) {
-            if (empty($productRow['name'])) {
+        foreach ($products as $product) {
+            if (empty($product['name'])) {
                 continue;
             }
 
-            $sku = trim((string) ($productRow['sku'] ?? ''));
-            $unitPrice = isset($productRow['supply_price']) ? (float) $productRow['supply_price'] : 0.0;
-
-            SupplierProduct::create([
-                'supplier_id' => $supplier->id,
-                'name' => $productRow['name'],
-                'sku' => $sku ?: null,
-                'unit_price' => $unitPrice,
-                'uom' => null,
-                'metadata' => null,
+            DB::table('supplier_products')->insert([
+                'supplier_id' => $supplierId,
+                'name' => $product['name'],
+                'sku' => $product['sku'] ?? null,
+                'unit_price' => $product['price'] ?? 0,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
-
-            $productItems[] = trim($productRow['name'] . ($unitPrice > 0 ? ' @ â‚±' . number_format($unitPrice, 2) : ''));
         }
 
-        if (! empty($productItems)) {
-            $supplier->update(['product_items' => implode(' | ', $productItems)]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $supplier,
-            'delete_url' => route('procurement.suppliers.destroy', $supplier),
-        ], 201);
+        return response()->json(['status' => 'ok', 'data' => ['id' => $supplierId] + $validated]);
     }
 
-    public function update(Request $request, Supplier $supplier): JsonResponse
+    public function update(Request $request, $supplier)
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'contact' => ['nullable', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:255'],
-            'address' => ['nullable', 'string'],
-            'category' => ['nullable', 'string', 'max:255'],
-            'product_name' => ['nullable', 'string', 'max:255'],
-            'product_price' => ['nullable', 'numeric', 'min:0'],
-            'product_uom' => ['nullable', 'string', 'max:50'],
-            'product_qty' => ['nullable', 'integer', 'min:1'],
-            'product_items' => ['nullable', 'string'],
-            'status' => ['nullable', 'string', 'in:active,inactive,blacklisted'],
-            'terms' => ['nullable', 'string', 'max:255'],
-            'lastActivity' => ['nullable', 'string', 'max:255'],
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:150',
+            'contact' => 'nullable|string|max:150',
+            'email' => 'nullable|email|max:150',
+            'phone' => 'nullable|string|max:30',
+            'address' => 'nullable|string|max:255',
+            'brand' => 'nullable|string|max:100',
         ]);
 
-        $productItems = $data['product_items'] ?? '';
-        if (! empty($data['product_name'])) {
-            $parts = [];
-            $parts[] = $data['product_name'];
-            if (! empty($data['product_qty'])) {
-                $parts[] = "Ã— {$data['product_qty']}";
-            }
-            if (! empty($data['product_uom'])) {
-                $parts[] = $data['product_uom'];
-            }
-            if (! empty($data['product_price'])) {
-                $parts[] = "@ â‚±" . number_format($data['product_price'], 2);
-            }
-            $line = implode(' ', array_filter($parts));
-            $productItems = trim($line . ($productItems ? ' | ' . $productItems : ''));
-        }
-
-        $supplier->update([
-            'name' => $data['name'],
-            'contact_person' => $data['contact'] ?? null,
-            'email' => $data['email'] ?? null,
-            'phone' => $data['phone'] ?? null,
-            'address' => $data['address'] ?? null,
-            'category' => $data['category'] ?? null,
-            'product_items' => $productItems ?: null,
-            'status' => $data['status'] ?? 'active',
+        DB::table('suppliers')->where('id', $supplier)->update([
+            'name' => $validated['name'] ?? DB::raw('name'),
+            'contact_person' => $validated['contact'] ?? DB::raw('contact_person'),
+            'email' => $validated['email'] ?? DB::raw('email'),
+            'phone' => $validated['phone'] ?? DB::raw('phone'),
+            'address' => $validated['address'] ?? DB::raw('address'),
+            'brand' => $validated['brand'] ?? DB::raw('brand'),
+            'updated_at' => now(),
         ]);
 
-        return response()->json(['success' => true, 'data' => $supplier]);
+        return response()->json(['status' => 'ok']);
     }
 
-    public function destroy(Supplier $supplier): JsonResponse
+    public function destroy($supplier)
     {
-        $supplier->delete();
+        DB::table('suppliers')->where('id', $supplier)->delete();
 
-        return response()->json(['success' => true]);
+        return response()->json(['status' => 'ok']);
     }
 }
-

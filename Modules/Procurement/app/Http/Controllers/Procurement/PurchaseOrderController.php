@@ -1,248 +1,203 @@
 <?php
 
-namespace Modules\Procurement\Http\Controllers\Procurement;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Modules\Procurement\Models\PurchaseOrder;
-use Modules\Procurement\Models\PurchaseOrderItem;
-use Modules\Procurement\Models\Requisition;
-use Modules\Procurement\Models\RequisitionItem;
-use Modules\Procurement\Models\Supplier;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderController extends Controller
 {
-    public function index(): View
+    /**
+     * Detect a unique-constraint violation (e.g. a duplicate po_number),
+     * regardless of which database driver raised it.
+     */
+    private function isDuplicateKeyException(\Throwable $e): bool
     {
-        $purchaseOrders = PurchaseOrder::with('supplier')->latest('order_date')->get();
+        $message = $e->getMessage();
 
-        $counts = [
-            'all' => $purchaseOrders->count(),
-            'pending' => $purchaseOrders->where('status', 'pending')->count(),
-            'processing' => $purchaseOrders->where('status', 'processing')->count(),
-            'cancel' => $purchaseOrders->where('status', 'cancel')->count(),
-            'completed' => $purchaseOrders->where('status', 'completed')->count(),
+        return str_contains($message, 'duplicate key')
+            || str_contains($message, 'Unique violation')
+            || str_contains($message, 'SQLSTATE[23505]')
+            || str_contains($message, 'UNIQUE constraint failed');
+    }
+
+    /**
+     * Insert the purchase order, automatically regenerating the po_number
+     * if it collides with one that already exists. This is what was making
+     * "Submit for Approval" silently fail: the browser pre-fills the PO
+     * number from an in-memory counter that resets on every page load, so
+     * once real PO numbers passed that counter, every new submission hit
+     * a duplicate po_number and the insert was rejected by the database.
+     */
+    private function insertPurchaseOrder(array $insert): int
+    {
+        $attempts = 0;
+        $currentInsert = $insert;
+
+        while ($attempts < 3) {
+            try {
+                return DB::table('purchase_orders')->insertGetId($currentInsert);
+            } catch (\Throwable $e) {
+                if ($this->isDuplicateKeyException($e)) {
+                    $suffix = now()->format('YmdHis') . '-' . random_int(1000, 9999);
+                    $currentInsert['po_number'] = $insert['po_number'] . '-' . $suffix;
+                    $attempts++;
+                    continue;
+                }
+
+                throw $e;
+            }
+        }
+
+        throw new \RuntimeException('Unable to save purchase order after retrying.');
+    }
+
+    /**
+     * Purchase Orders list page (filters, sortable table, add PO modal).
+     */
+    public function index(Request $request)
+    {
+        $purchaseOrders = DB::table('purchase_orders')
+            ->leftJoin('suppliers', 'purchase_orders.supplier_id', '=', 'suppliers.id')
+            ->select('purchase_orders.*', 'suppliers.name as supplier_name')
+            ->orderBy('purchase_orders.created_at', 'desc')
+            ->limit(8)
+            ->get();
+
+        $suppliers = DB::table('suppliers')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $statusCounts = DB::table('purchase_orders')
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->mapWithKeys(function ($total, $status) {
+                return [strtolower(str_replace([' ', '_'], '-', $status ?? 'pending')) => $total];
+            });
+
+        return view('pages.purchase-orders', compact('purchaseOrders', 'suppliers', 'statusCounts'));
+    }
+
+    public function approved(Request $request)
+    {
+        $approvedPurchaseOrders = DB::table('purchase_orders')
+            ->leftJoin('suppliers', 'purchase_orders.supplier_id', '=', 'suppliers.id')
+            ->select('purchase_orders.*', 'suppliers.name as supplier_name')
+            ->where('purchase_orders.status', 'approved')
+            ->orderBy('purchase_orders.order_date', 'desc')
+            ->get();
+
+        return response()->json($approvedPurchaseOrders);
+    }
+
+    /**
+     * Handle the "+ New PO" modal submit (submitAddPO in app-forms.js).
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'po' => 'required|string|max:50',
+            'supplier' => 'required|string|max:150',
+            'brand' => 'nullable|string|max:100',
+            'item' => 'nullable|string|max:150',
+            'qty' => 'nullable|integer|min:1',
+            'unitPrice' => 'nullable|numeric|min:0',
+            'amount' => 'nullable|numeric|min:0',
+            'priority' => 'nullable|string|max:20',
+            'expected' => 'nullable|date',
+            'createdBy' => 'nullable|string|max:150',
+            'remarks' => 'nullable|string',
+            'reqRef' => 'nullable|string|max:50',
+        ]);
+
+        $supplier = DB::table('suppliers')->where('name', $validated['supplier'])->first();
+        $supplierId = $supplier?->id;
+
+        if (! $supplierId) {
+            $supplierId = DB::table('suppliers')->insertGetId([
+                'name' => $validated['supplier'],
+                'contact_person' => 'Auto-imported',
+                'email' => 'auto@example.com',
+                'phone' => 'N/A',
+                'address' => 'Auto-imported',
+                'brand' => $validated['brand'] ?? null,
+                'status' => 'active',
+                'product_items' => '[]',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $insert = [
+            'po_number' => $validated['po'],
+            'supplier_id' => $supplierId,
+            'qty' => (int) ($validated['qty'] ?? 1),
+            'amount' => (float) ($validated['amount'] ?? 0),
+            'status' => 'pending',
+            'priority' => strtolower($validated['priority'] ?? 'normal'),
+            'order_date' => now()->toDateString(),
+            'expected_delivery_date' => $validated['expected'] ?? null,
+            'created_by' => $validated['createdBy'] ?? null,
+            'remarks' => $validated['remarks'] ?? null,
+            'item' => $validated['item'] ?? null,
+            'brand' => $validated['brand'] ?? null,
+            'unit_price' => (float) ($validated['unitPrice'] ?? 0),
+            'requisition_reference' => $validated['reqRef'] ?? null,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
 
-        // Next PO number's sequence, derived from the highest existing
-        // "NXR-PO-#####" number, so the "+ New PO" form always auto-fills
-        // the true next number instead of a hardcoded guess.
-        $nextPoSeq = ($purchaseOrders->pluck('po_number')
-            ->map(fn (string $n) => (int) preg_replace('/\D/', '', $n))
-            ->max() ?? 0) + 1;
+        $poId = $this->insertPurchaseOrder($insert);
+        $savedPoNumber = DB::table('purchase_orders')->where('id', $poId)->value('po_number');
 
-        return view('procurement::procurement.partials.purchase-orders', compact('purchaseOrders', 'counts', 'nextPoSeq'));
-    }
-
-    public function store(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'po' => ['required', 'string', 'max:255'],
-            'supplier' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:255'],
-            'qty' => ['required', 'integer', 'min:1'],
-            'orderDate' => ['required', 'date'],
-            'expected' => ['required', 'date'],
-            'item' => ['required', 'string', 'max:255'],
-            'uom' => ['required', 'string', 'max:50'],
-            'amount' => ['required', 'numeric', 'min:0'],
-            'remarks' => ['nullable', 'string'],
-            'req' => ['nullable', 'string', 'max:255'],
-            'createdBy' => ['nullable', 'string', 'max:255'],
-        ]);
-
-        $supplier = Supplier::where('name', $data['supplier'])->first();
-
-        if (! $supplier) {
-            $supplier = Supplier::create([
-                'name' => $data['supplier'],
-                'contact_person' => 'Pending',
-                'email' => null,
-                'phone' => null,
-                'address' => null,
-                'category' => $data['category'],
-                'status' => 'active',
-            ]);
-        }
-
-        $requisition = null;
-        $requisitionId = null;
-        $requisitionReference = null;
-
-        if (! empty($data['req'])) {
-            $requisition = Requisition::where('req_number', $data['req'])->first();
-            $requisitionId = $requisition?->id;
-            $requisitionReference = $data['req'];
-        }
-
-        $remarks = $data['remarks'] ?? null;
-        if (! empty($requisitionReference)) {
-            $remarks = trim(($remarks ? $remarks . ' ' : '') . "(Requisition: {$requisitionReference})");
-        }
-
-        $purchaseOrder = PurchaseOrder::create([
-            'po_number' => $data['po'],
-            'supplier_id' => $supplier->id,
-            'category' => $data['category'],
-            'item' => $data['item'],
-            'qty' => (int) $data['qty'],
-            'uom' => $data['uom'],
-            'amount' => (float) $data['amount'],
-            'delivery_status' => 'pending',
-            'status' => 'pending',
-            'order_date' => $data['orderDate'],
-            'expected_delivery_date' => $data['expected'],
-            'created_by' => $data['createdBy'] ?? null,
-            'remarks' => $remarks,
-            'requisition_id' => $requisitionId,
-            'requisition_reference' => $requisitionReference,
-        ]);
-
-        PurchaseOrderItem::create([
-            'purchase_order_id' => $purchaseOrder->id,
-            'requisition_item_id' => $requisition?->items()->first()?->id,
+        DB::table('purchase_order_items')->insert([
+            'purchase_order_id' => $poId,
             'supplier_product_id' => null,
-            'name' => $data['item'],
-            'qty' => (int) $data['qty'],
-            'uom' => $data['uom'],
-            'unit_price' => $data['qty'] > 0 ? (float) ($data['amount'] / $data['qty']) : 0,
-            'amount' => (float) $data['amount'],
+            'name' => $validated['item'] ?? 'Item',
+            'qty' => (int) ($validated['qty'] ?? 1),
+            'unit_price' => (float) ($validated['unitPrice'] ?? 0),
+            'amount' => (float) ($validated['amount'] ?? 0),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
-        if ($requisition) {
-            $purchaseOrder->update([
-                'requisition_id' => $requisition->id,
-                'requisition_reference' => $requisition->req_number,
-            ]);
+        $validated['po'] = $savedPoNumber;
 
-            $requisition->update([
-                'status' => 'processing',
-                'delivery_status' => 'shipment',
-                'amount' => (float) $purchaseOrder->amount,
-            ]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $purchaseOrder,
-            'delete_url' => route('procurement.purchase-orders.destroy', $purchaseOrder),
-            'update_url' => route('procurement.purchase-orders.update', $purchaseOrder),
-        ], 201);
+        return response()->json(['status' => 'ok', 'data' => $validated, 'id' => $poId, 'po_number' => $savedPoNumber]);
     }
 
-    public function update(Request $request, PurchaseOrder $purchaseOrder): JsonResponse
+    public function update(Request $request, $purchaseOrder)
     {
-        $data = $request->validate([
-            'po' => ['required', 'string', 'max:255'],
-            'supplier' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:255'],
-            'qty' => ['required', 'integer', 'min:1'],
-            'orderDate' => ['required', 'date'],
-            'expected' => ['nullable', 'date'],
-            'item' => ['required', 'string', 'max:255'],
-            'uom' => ['nullable', 'string', 'max:50'],
-            'amount' => ['required', 'numeric', 'min:0'],
-            'status' => ['nullable', 'string', 'max:255'],
-            'delivery' => ['nullable', 'string', 'max:255'],
-            'remarks' => ['nullable', 'string'],
+        $validated = $request->validate([
+            'status' => 'nullable|string|max:20',
+            'amount' => 'nullable|numeric|min:0',
+            'remarks' => 'nullable|string',
         ]);
 
-        $supplier = Supplier::where('name', $data['supplier'])->first();
-        if (! $supplier) {
-            $supplier = Supplier::create([
-                'name' => $data['supplier'],
-                'contact_person' => 'Pending',
-                'email' => null,
-                'phone' => null,
-                'address' => null,
-                'category' => $data['category'],
-                'status' => 'active',
-            ]);
-        }
-
-        $newStatus = $this->normalizeStatus($data['status'] ?? null);
-
-        if ($newStatus === 'cancel') {
-            $purchaseOrder->deliveries()->update(['status' => 'cancel', 'stage' => 0]);
-        }
-
-        $purchaseOrder->update([
-            'po_number' => $data['po'],
-            'supplier_id' => $supplier->id,
-            'category' => $data['category'],
-            'item' => $data['item'],
-            'qty' => (int) $data['qty'],
-            'uom' => $data['uom'] ?? null,
-            'amount' => (float) $data['amount'],
-            'delivery_status' => $this->normalizeDeliveryStatus($data['delivery'] ?? null),
-            'status' => $newStatus,
-            'order_date' => $data['orderDate'],
-            'expected_delivery_date' => $data['expected'] ?? $purchaseOrder->expected_delivery_date,
-            'remarks' => $data['remarks'] ?? null,
-        ]);
-
-        $shouldCancelRequisition = $newStatus === 'cancel' || $this->normalizeDeliveryStatus($data['delivery'] ?? null) === 'cancel';
-        if ($shouldCancelRequisition) {
-            $requisition = $purchaseOrder->requisition
-                ?? Requisition::where('req_number', trim((string) $purchaseOrder->requisition_reference))->first();
-            if (! $requisition) {
-                $item = $purchaseOrder->items()->with('requisitionItem.requisition')->first();
-                $requisition = $item?->requisitionItem?->requisition;
-            }
-            if ($requisition) {
-                $requisition->update(['status' => 'cancel', 'delivery_status' => 'cancel']);
+        $status = $validated['status'] ?? null;
+        if ($status !== null) {
+            $status = strtolower(trim($status));
+            $allowed = ['pending', 'approved', 'rejected', 'cancelled', 'processing', 'completed'];
+            if (!in_array($status, $allowed, true)) {
+                $status = null;
             }
         }
 
-        $item = $purchaseOrder->items()->first();
-        if ($item) {
-            $item->update([
-                'name' => $data['item'],
-                'qty' => (int) $data['qty'],
-                'uom' => $data['uom'] ?? null,
-                'unit_price' => $data['qty'] > 0 ? (float) ($data['amount'] / $data['qty']) : 0,
-                'amount' => (float) $data['amount'],
-            ]);
-        }
+        DB::table('purchase_orders')->where('id', $purchaseOrder)->update([
+            'status' => $status ?? DB::raw('status'),
+            'amount' => $validated['amount'] ?? DB::raw('amount'),
+            'remarks' => $validated['remarks'] ?? DB::raw('remarks'),
+            'updated_at' => now(),
+        ]);
 
-        return response()->json(['success' => true, 'data' => $purchaseOrder]);
+        return response()->json(['status' => 'ok']);
     }
 
-    public function destroy(PurchaseOrder $purchaseOrder): JsonResponse
+    public function destroy($purchaseOrder)
     {
-        $purchaseOrder->delete();
+        DB::table('purchase_orders')->where('id', $purchaseOrder)->delete();
 
-        return response()->json(['success' => true]);
-    }
-
-    private function normalizeDeliveryStatus(?string $value): string
-    {
-        return match (strtolower((string) $value)) {
-            'pending' => 'pending',
-            'partial' => 'intransit',
-            'complete' => 'complete',
-            'delivered' => 'delivered',
-            'in transit' => 'intransit',
-            'in-transit' => 'intransit',
-            'shipment' => 'shipment',
-            'scheduled' => 'pending',
-            'cancel' => 'cancel',
-            default => 'pending',
-        };
-    }
-
-    private function normalizeStatus(?string $value): string
-    {
-        return match (strtolower((string) $value)) {
-            'approved' => 'processing',
-            'rejected' => 'cancel',
-            'completed' => 'completed',
-            'processing' => 'processing',
-            'pending' => 'pending',
-            default => 'pending',
-        };
+        return response()->json(['status' => 'ok']);
     }
 }
-
