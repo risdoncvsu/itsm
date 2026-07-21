@@ -433,18 +433,13 @@
 
   <!-- Navbar -->
   <div class="navbar">
-<<<<<<< Updated upstream
     <a href="{{ route('order-fulfillment.dashboard') }}" class="brand">
     <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
-=======
-    <div class="brand brand-logo">
-    <img class="logo" src="{{ asset('orderfulfillment/logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
->>>>>>> Stashed changes
     <div class="brand-text">
         <div class="title">NEXORA</div>
         <div class="subtitle">ENTERPRISE RESOURCE PLANNING</div>
     </div>
-  </div>
+    </a>
     <div class="nav-links">
       <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
       <a href="{{ route('order-fulfillment.orders') }}" class="active">Orders</a>

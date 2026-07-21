@@ -9,7 +9,7 @@ use Modules\OrderFulfillment\Models\Shipment;
 use Modules\OrderFulfillment\Models\DeliveryMan;
 use Modules\OrderFulfillment\Models\ReturnItem;
 use Modules\OrderFulfillment\App\Helpers\OrderStatus;
-use Modules\OrderFulfillment\Models\OrderItem;
+use App\Models\OrderItem;
 use Illuminate\Support\Str;
 
 class ShippingController extends Controller

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexora | Compliance Tracking</title>
+    <title>Nexora | Compliance Reference</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('images/nexora-icon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Lucide Icons for clean tab and action styling -->
@@ -17,7 +17,7 @@
             :nav-items="[
                 ['label' => 'Employee Management', 'route' => route('client.itsm.employees'), 'key' => 'employees'],
                 ['label' => 'Service Desk', 'route' => route('client.itsm.service-desk'), 'key' => 'service-desk'],
-                ['label' => 'Compliance Tracking', 'route' => route('client.itsm.compliance'), 'key' => 'compliance'],
+                ['label' => 'Compliance', 'route' => route('client.itsm.compliance'), 'key' => 'compliance'],
                 ['label' => 'Risk Management', 'route' => route('client.itsm.risk'), 'key' => 'risk'],
             ]"
         />
@@ -28,9 +28,9 @@
 
             <section class="relative z-10 mx-auto w-full max-w-[1760px] space-y-5">
                 
-                <!-- Compliance Tracking Header (Sleek, Wide Banner) -->
+                <!-- Compliance Reference Header (Sleek, Wide Banner) -->
                 <div class="rounded-[2rem] bg-[#DDE4EC] px-10 py-6 text-slate-950 shadow-sm flex justify-between items-center">
-                    <h1 class="text-4xl font-bold tracking-tight">Compliance Tracking</h1>
+                    <h1 class="text-4xl font-bold tracking-tight">Compliance Reference</h1>
                     
                     @if(session('success'))
                         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-1.5 rounded-full text-xs font-semibold">
@@ -39,16 +39,16 @@
                     @endif
                 </div>
 
-                <!-- Main Content Workspace Console (Added min-h-[75vh] to stretch downward) -->
+                <!-- Main Content Workspace Console -->
                 <div class="flex flex-col min-h-[75vh] overflow-hidden rounded-[2rem] bg-[#C9D6E4] shadow-2xl text-slate-900 pb-10">
                     
                     <!-- Subtabs Bar (Stretches Full Width using flex-1 for buttons) -->
                     <div class="flex w-full border-b border-slate-300/80 bg-white pt-4 text-sm font-semibold text-slate-500">
                         <button class="flex flex-1 items-center justify-center gap-2 border-b-4 border-[#132B52] pb-3.5 text-[#132B52]">
-                            <i data-lucide="clipboard-check" class="h-4.5 w-4.5"></i> Compliance Requirements
+                            <i data-lucide="clipboard-check" class="h-4.5 w-4.5"></i> Reference Items
                         </button>
                         <a href="{{ route('client.itsm.audit') }}" class="flex flex-1 items-center justify-center gap-2 border-b-4 border-transparent pb-3.5 hover:border-slate-300 hover:text-slate-800 transition">
-                            <i data-lucide="shield-alert" class="h-4.5 w-4.5"></i> Audits & Inspections
+                            <i data-lucide="shield-alert" class="h-4.5 w-4.5"></i> Audit Trail
                         </a>
                         <a href="{{ route('client.itsm.permit') }}" class="flex flex-1 items-center justify-center gap-2 border-b-4 border-transparent pb-3.5 hover:border-slate-300 hover:text-slate-800 transition">
                             <i data-lucide="file-badge" class="h-4.5 w-4.5"></i> Permits & Licenses
@@ -63,9 +63,9 @@
 
                     <!-- Filter & Search Action Bar Form -->
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-10 py-6">
-                        <!-- Add New Button triggers dynamic JS modal -->
-                        <button type="button" onclick="openModal()" class="inline-flex items-center justify-center gap-2 rounded-full bg-[#1A73E8] px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-700 transition">
-                            <span class="text-lg leading-none">+</span> Add new
+                            <!-- Add New Button triggers dynamic JS modal -->
+                            <button type="button" onclick="openModal()" class="inline-flex items-center justify-center gap-2 rounded-full bg-[#1A73E8] px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-700 transition">
+                                <span class="text-lg leading-none">+</span> Add reference
                         </button>
                         
                         <div class="flex items-center gap-5">
@@ -76,7 +76,7 @@
                                 </span>
                                 <!-- Pinanatili ang dating filtered query states kung mayroon man -->
                                 <input type="hidden" name="status" value="{{ request('status') }}">
-                                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search" class="w-72 rounded-full border border-slate-300/60 bg-white/80 py-2 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()" />
+                                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search references" class="w-72 rounded-full border border-slate-300/60 bg-white/80 py-2 pl-10 pr-4 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()" />
                             </form>
 
                             <!-- Filter Controls (Dynamic Text Context Dropdown) -->
@@ -134,7 +134,7 @@
                             <!-- Border Dashed Empty State framework fallback -->
                             <div class="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-400 p-12 text-center bg-white/20">
                                 <p class="text-base font-bold text-slate-800">No records found.</p>
-                                <p class="text-xs text-slate-600 mt-1">Try adding a new requirement.</p>
+                                <p class="text-xs text-slate-600 mt-1">Try adding a reference item.</p>
                             </div>
                         @endforelse
                     </div>
@@ -148,7 +148,7 @@
         <div class="w-full max-w-md scale-95 transform rounded-[2rem] bg-white p-8 text-slate-900 shadow-2xl transition-transform duration-300 ease-out">
             <div class="flex items-center justify-between border-b border-slate-200 pb-4">
                 <h3 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                    <i data-lucide="file-plus" class="text-blue-600 h-5 w-5"></i> Add Requirement
+                    <i data-lucide="file-plus" class="text-blue-600 h-5 w-5"></i> Add Reference Item
                 </h3>
                 <button type="button" onclick="closeModal()" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus:outline-none">
                     <i data-lucide="x" class="h-5 w-5"></i>
@@ -158,18 +158,18 @@
             <form action="{{ route('client.itsm.compliance.store') }}" method="POST" class="mt-5 space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Requirement Title</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Reference Title</label>
                     <input type="text" name="title" required placeholder="e.g., Data Privacy Enforcement" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Target Audience</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Audience</label>
                     <input type="text" name="audience" required placeholder="e.g., All Staff, IT Department" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Status Type</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Status</label>
                         <select name="status" required class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white font-semibold">
                             <option value="Active">Active</option>
                             <option value="Urgent">Urgent</option>
@@ -184,11 +184,11 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-3 border-t border-slate-100 pt-5 mt-6">
-                    <button type="button" onclick="closeModal()" class="rounded-full bg-slate-100 px-5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 transition">
+                        <button type="button" onclick="closeModal()" class="rounded-full bg-slate-100 px-5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 transition">
                         Cancel
                     </button>
                     <button type="submit" class="rounded-full bg-[#1A73E8] px-6 py-2 text-xs font-bold text-white hover:bg-blue-700 shadow-sm transition">
-                        Save Item
+                        Save Reference
                     </button>
                 </div>
             </form>

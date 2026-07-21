@@ -1,6 +1,13 @@
 <?php
 
 use App\Providers\AppServiceProvider;
+use Modules\Inventory\Providers\InventoryServiceProvider;
+use Modules\Procurement\Providers\ProcurementServiceProvider;
+use Modules\OrderFulfillment\Providers\OrderFulfillmentServiceProvider;
+use Modules\Ecommerce\Providers\EcommerceServiceProvider;
+use Modules\Manufacturing\Providers\ManufacturingServiceProvider;
+use Modules\Finance\Providers\FinanceServiceProvider;
+use Modules\BusinessIntelligence\Providers\BusinessIntelligenceServiceProvider;
 
 // Composer rebuilds the module namespace during deployment. This fallback
 // keeps local CLI commands usable before that rebuild.
@@ -40,4 +47,11 @@ require_once __DIR__.'/../Modules/BusinessIntelligence/app/Providers/BusinessInt
 
 return [
     AppServiceProvider::class,
+    InventoryServiceProvider::class,
+    ProcurementServiceProvider::class,
+    OrderFulfillmentServiceProvider::class,
+    EcommerceServiceProvider::class,
+    ManufacturingServiceProvider::class,
+    FinanceServiceProvider::class,
+    BusinessIntelligenceServiceProvider::class,
 ];

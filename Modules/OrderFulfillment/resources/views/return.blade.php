@@ -575,7 +575,6 @@
 
     <!-- Navbar -->
     <div class="navbar">
-<<<<<<< Updated upstream
       <a href="{{ route('order-fulfillment.dashboard') }}" class="brand">
         <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
         <div class="brand-text">
@@ -583,15 +582,6 @@
             <div class="subtitle">ENTERPRISE RESOURCE PLANNING</div>
         </div>
       </a>
-=======
-      <div class="brand brand-logo">
-    <img class="logo" src="{{ asset('orderfulfillment/logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
-    <div class="brand-text">
-        <div class="title">NEXORA</div>
-        <div class="subtitle">ENTERPRISE RESOURCE PLANNING</div>
-    </div>
-</div>
->>>>>>> Stashed changes
       <div class="nav-links">
         <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
         <a href="{{ route('order-fulfillment.orders') }}">Orders</a>

@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\OrderFulfillment\Http\Controllers;
 
-use Modules\App\Models\ReturnItem;
+use App\Models\ReturnItem;
+use Illuminate\Support\Facades\View;
 
 class ReturnController extends Controller
 {
-public function index()
-{
+    public function index()
+    {
     // Orders that were cancelled after they'd already left for delivery
     // ("Cancelled while shipping") start out as In Transit to Warehouse /
     // Pending. Once they've had a day to make it back, auto-close them out
@@ -29,10 +30,10 @@ public function index()
     )->where('status', 'Refunded')
      ->count();
 
-    return view('order-fulfillment::return', compact(
-    'returns',
-    'pendingReturns',
-    'refundedToday'
-));
-}
+        return view('order-fulfillment::return', compact(
+            'returns',
+            'pendingReturns',
+            'refundedToday'
+        ));
+    }
 }

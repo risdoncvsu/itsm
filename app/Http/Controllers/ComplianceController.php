@@ -72,6 +72,6 @@ class ComplianceController extends Controller
         session(['compliance_items' => $currentItems]);
 
         return redirect()->route('client.itsm.compliance')
-                         ->with('success', 'Compliance requirement added successfully!');
+                         ->with('success', 'Reference item added successfully!');
     }
 }
