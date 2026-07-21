@@ -2,13 +2,6 @@
 
 <<<<<<< Updated upstream
 use App\Providers\AppServiceProvider;
-use Modules\Inventory\Providers\InventoryServiceProvider;
-use Modules\Procurement\Providers\ProcurementServiceProvider;
-use Modules\OrderFulfillment\Providers\OrderFulfillmentServiceProvider;
-use Modules\Ecommerce\Providers\EcommerceServiceProvider;
-use Modules\Manufacturing\Providers\ManufacturingServiceProvider;
-use Modules\Finance\Providers\FinanceServiceProvider;
-use Modules\BusinessIntelligence\Providers\BusinessIntelligenceServiceProvider;
 
 // Composer rebuilds the module namespace during deployment. This fallback
 // keeps local CLI commands usable before that rebuild.
@@ -55,10 +48,4 @@ return [
     ManufacturingServiceProvider::class,
     FinanceServiceProvider::class,
     BusinessIntelligenceServiceProvider::class,
-=======
-return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\Filament\AdminPanelProvider::class,
-    Modules\Ecommerce\Providers\EcommerceServiceProvider::class,
->>>>>>> Stashed changes
 ];

@@ -4,32 +4,6 @@
     'active' => null,
 ])
 
-@php
-    $navItems = collect($navItems)
-        ->map(function (array $item): array {
-            if (($item['key'] ?? null) === 'compliance') {
-                $item['label'] = 'Compliance';
-            }
-
-            return $item;
-        })
-        ->values();
-
-    if ($navItems->contains(fn (array $item): bool => ($item['key'] ?? null) === 'compliance') && ! $navItems->contains(fn (array $item): bool => ($item['key'] ?? null) === 'audit')) {
-        $auditItem = [
-            'label' => 'Audit Trail',
-            'route' => route('client.itsm.audit'),
-            'key' => 'audit',
-        ];
-
-        $complianceIndex = $navItems->search(fn (array $item): bool => ($item['key'] ?? null) === 'compliance');
-
-        $navItems = $complianceIndex === false
-            ? $navItems->push($auditItem)
-            : $navItems->slice(0, $complianceIndex)->merge([$auditItem])->merge($navItems->slice($complianceIndex))->values();
-    }
-@endphp
-
 <header class="flex h-32 items-center justify-between bg-[#0B1E3D] pl-4 pr-12 shadow-lg">
     <a href="{{ $homeRoute }}" class="block h-24 transition hover:scale-[1.02]">
         <img src="{{ asset('images/Banner Transparent.png') }}" alt="Nexora Logo" class="h-full object-contain">

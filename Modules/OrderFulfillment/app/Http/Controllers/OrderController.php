@@ -30,7 +30,6 @@ class OrderController extends Controller
         $orders       = Order::with('items')->orderByDesc('created_at')->get();
         $ordersReceivedToday  = Order::where('status', 'NEW')->count();
         $inPacking    = Order::where('status', 'PACKING')->count();
-        $inPackingCount = $inPacking;
         $shippedToday = Order::where('status', 'SHIPPED')->count();
         $delivered    = Order::where('status', 'DELIVERED')->count();
         $total        = Order::count();
@@ -66,7 +65,7 @@ class OrderController extends Controller
             });
 
         return view('order-fulfillment::order', compact(
-            'orders', 'ordersReceivedToday', 'inPacking', 'inPackingCount', 'shippedToday', 'onTimeRate', 'recentActivity'
+            'orders', 'ordersReceivedToday', 'inPacking', 'shippedToday', 'onTimeRate', 'recentActivity'
         ));
     }
 
