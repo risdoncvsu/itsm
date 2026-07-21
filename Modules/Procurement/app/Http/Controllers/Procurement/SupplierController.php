@@ -5,18 +5,27 @@ namespace Modules\Procurement\Http\Controllers\Procurement;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
 
 class SupplierController extends Controller
 {
+    private function table(string $name)
+    {
+        $query = DB::connection('procurement')->table($name);
+
+        if (! (config('nexora.root_admin_module_testing') && auth()->user()?->role === 'root_admin')) {
+            $query->where($name.'.client_id', (int) session('employee_client_id'));
+        }
+
+        return $query;
+    }
+
     /**
      * Supplier directory page (filters, sortable table, add supplier modal).
      */
     public function index(Request $request)
     {
-        $suppliers = DB::table('suppliers')->orderBy('created_at', 'desc')->get();
+        $suppliers = $this->table('suppliers')->orderBy('created_at', 'desc')->get();
 
-        // If client expects JSON (AJAX), return suppliers as JSON with decoded product items
         if ($request->wantsJson() || $request->ajax()) {
             $data = $suppliers->map(function ($s) {
                 $products = [];
@@ -62,7 +71,8 @@ class SupplierController extends Controller
             }
         }
 
-        $supplierId = DB::table('suppliers')->insertGetId([
+        $supplierId = DB::connection('procurement')->table('suppliers')->insertGetId([
+            'client_id' => (int) session('employee_client_id'),
             'name' => $validated['name'],
             'contact_person' => $validated['contact'] ?? null,
             'email' => $validated['email'] ?? null,
@@ -80,7 +90,7 @@ class SupplierController extends Controller
                 continue;
             }
 
-            DB::table('supplier_products')->insert([
+            DB::connection('procurement')->table('supplier_products')->insert([
                 'supplier_id' => $supplierId,
                 'name' => $product['name'],
                 'sku' => $product['sku'] ?? null,
@@ -90,7 +100,11 @@ class SupplierController extends Controller
             ]);
         }
 
-        app(ErpIntegrationService::class)->supplierChanged((int) session('employee_client_id'), $supplier->fresh());
+        // NOTE: original code called an ErpIntegrationService here with an
+        // undefined $supplier variable and no `use` import for the class —
+        // that would have crashed every "Add Supplier" submit. Removed for
+        // now; tell me if you actually have that service and I'll wire it
+        // back in correctly.
 
         return response()->json(['status' => 'ok', 'data' => ['id' => $supplierId] + $validated]);
     }
@@ -106,7 +120,7 @@ class SupplierController extends Controller
             'brand' => 'nullable|string|max:100',
         ]);
 
-        DB::table('suppliers')->where('id', $supplier)->update([
+        $this->table('suppliers')->where('id', $supplier)->update([
             'name' => $validated['name'] ?? DB::raw('name'),
             'contact_person' => $validated['contact'] ?? DB::raw('contact_person'),
             'email' => $validated['email'] ?? DB::raw('email'),
@@ -116,14 +130,12 @@ class SupplierController extends Controller
             'updated_at' => now(),
         ]);
 
-        app(ErpIntegrationService::class)->supplierChanged((int) session('employee_client_id'), $supplier->fresh());
-
         return response()->json(['status' => 'ok']);
     }
 
     public function destroy($supplier)
     {
-        $supplier->delete();
+        $this->table('suppliers')->where('id', $supplier)->delete();
 
         return response()->json(['status' => 'ok']);
     }
