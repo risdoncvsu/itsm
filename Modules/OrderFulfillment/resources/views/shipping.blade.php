@@ -448,27 +448,34 @@
   .overlay.active { display: flex; }
 
   .modal {
-    width: 620px;
+    width: 520px;
     max-width: 90vw;
+    max-height: 85vh;
     background: #16305c;
     border-radius: 14px;
-    overflow: hidden;
+    overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    scrollbar-width: none;      /* Firefox */
+    -ms-overflow-style: none;   /* old Edge/IE */
   }
 
-  .modal-header { background: #0f2549; padding: 20px 28px; }
-  .modal-header h2 { margin: 0; color: #fff; font-size: 18px; }
-  .modal-header p { margin: 4px 0 0; color: #8ea3cc; font-size: 13px; }
+  .modal::-webkit-scrollbar {
+    display: none;              /* Chrome/Safari/new Edge */
+  }
+
+  .modal-header { background: #0f2549; padding: 16px 24px; }
+  .modal-header h2 { margin: 0; color: #fff; font-size: 16px; }
+  .modal-header p { margin: 3px 0 0; color: #8ea3cc; font-size: 12px; }
 
   .modal-body {
-    padding: 24px 28px;
+    padding: 18px 24px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px 20px;
+    gap: 14px 18px;
   }
 
-  .modal-body .field-label { margin: 0 0 6px; font-size: 12px; color: #8ea3cc; }
-  .modal-body .field-value { margin: 0; font-size: 15px; color: #fff; font-weight: 600; }
+  .modal-body .field-label { margin: 0 0 4px; font-size: 11px; color: #8ea3cc; }
+  .modal-body .field-value { margin: 0; font-size: 14px; color: #fff; font-weight: 600; }
 
   .modal-body .status-pill {
     display: inline-block;
@@ -487,18 +494,110 @@
   .modal-body .status-pill.tag-cancelled { background: #4A1E1E; color: #F3A9A9; }
 
   .assign-banner {
-    margin: 0 28px 20px;
+    margin: 0 24px 16px;
     background: #3a3016;
     border: 1px solid #6b5a24;
     border-radius: 8px;
-    padding: 14px 18px;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
     color: #f3d98a;
-    font-size: 13px;
+    font-size: 12.5px;
   }
+
+  /* ===== Order items breakdown (order modal + assign-driver modal) ===== */
+  .items-section {
+    background: #0f2549;
+    border: 1px solid var(--pill-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+
+  .items-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .items-badge {
+    background: var(--pill);
+    border: 1px solid var(--pill-border);
+    color: var(--text-light);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 190px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .items-list::-webkit-scrollbar {
+    width: 8px;
+  }
+  .items-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .items-list::-webkit-scrollbar-thumb {
+    background: var(--pill-border);
+    border-radius: 8px;
+  }
+  .items-list::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+
+  .items-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+  }
+
+  .items-row-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .items-row-qty {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .items-row-amount {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .items-total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #1b3a6b;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #fff;
+  }
+  /* ===== end order items breakdown ===== */
+
 
   .assign-banner.hidden { display: none; }
 
@@ -519,16 +618,16 @@
   .modal-footer {
     display: flex;
     gap: 12px;
-    padding: 20px 28px;
+    padding: 16px 24px;
     border-top: 1px solid rgba(255,255,255,0.08);
   }
 
   .btn {
     flex: 1;
-    padding: 12px;
+    padding: 10px;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13.5px;
     cursor: pointer;
   }
 
@@ -537,6 +636,25 @@
 
   .btn-cancel { background: #7a2340; color: #f9c3d3; }
   .btn-cancel:hover { background: #8f2a4b; }
+
+  /* Footer button swaps to this when the order is ready-to-ship / in the
+     assign-driver flow, replacing "Cancel order" (see openShippingModal). */
+  .btn-assign-driver-footer { background: #6B4A1E; color: #FBD38D; }
+  .btn-assign-driver-footer:hover { background: #7d5824; }
+
+  /* ===== Cancel confirmation modal ===== */
+  .confirm-modal { width: 420px; }
+  .confirm-modal .modal-body {
+    display: block;
+    padding: 22px 28px 6px;
+  }
+  .confirm-text {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: #dbe4f5;
+    line-height: 1.6;
+  }
+  .confirm-text strong { color: #fff; }
 
   /* ============================================
      Driver selection modal
@@ -640,7 +758,7 @@
 
     <!-- Navbar -->
     <div class="navbar">
-      <a href="{{ route('order-fulfillment.logout') }}" class="brand logout-logo" title="Logout">
+      <a href="{{ route('logout') }}" class="brand logout-logo" title="Logout">
     <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
     <div class="brand-text">
         <div class="title">NEXORA</div>
@@ -648,11 +766,11 @@
     </div>
 </a>
       <div class="nav-links">
-      <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
-      <a href="{{ route('order-fulfillment.orders') }}">Orders</a>
-      <a href="{{ route('order-fulfillment.packing') }}">Packing</a>
-      <a href="{{ route('order-fulfillment.shipping') }}" class="active">Shipping</a>
-      <a href="{{ route('order-fulfillment.return') }}">Returns</a>
+      <a href="{{ route('dashboard') }}">Dashboard</a>
+      <a href="{{ route('orders') }}">Orders</a>
+      <a href="{{ route('packing') }}">Packing</a>
+      <a href="{{ route('shipping') }}" class="active">Shipping</a>
+      <a href="{{ route('return') }}">Returns</a>
       </div>
     </div>
 
@@ -680,15 +798,15 @@
 
       <div class="panel order-queue">
         <div class="panel-header">
-          <div class="title">Ã°Å¸â€œÂ¦ Shipment tracking</div>
+          <div class="title">📦 Shipment tracking</div>
           <div class="actions">
             <div class="search-wrap">
-              <span class="search-icon">Ã°Å¸â€Â</span>
+              <span class="search-icon">🔍</span>
               <input type="text" id="shippingSearch" placeholder="Search..." autocomplete="off">
             </div>
 
             <button id="filterBtn" class="filter-btn">
-              Filter <span class="caret">Ã¢â€“Â¾</span>
+              Filter <span class="caret">▾</span>
               <span id="filterBadge" class="filter-badge">1</span>
             </button>
 
@@ -725,9 +843,9 @@
         <table>
           <thead>
             <tr>
-              <th>Order Id</th>
+              <th>Shipment Id</th>
               <th>Customer</th>
-              <th>Product</th>
+              <th>Items</th>
               <th>Tracking no.</th>
               <th class="th-status">Status</th>
               <th>Destination</th>
@@ -759,7 +877,7 @@
     class="shipping-row"
     data-id="{{ $shipment->shipment_id }}"
     data-customer="{{ $shipment->customer_name }}"
-    data-product="{{ $shipment->product_name }}"
+    data-product="{{ collect($shipment->items ?? [])->pluck('product_name')->implode(', ') }}"
     data-tracking="{{ $shipment->tracking_number }}"
     data-status="{{ $statusRaw }}"
     data-destination="{{ $shipment->address }}"
@@ -769,7 +887,7 @@
 
     <td class="order-id">{{ $shipment->shipment_id }}</td>
     <td class="customer">{{ $shipment->customer_name }}</td>
-    <td class="product">{{ $shipment->product_name }}</td>
+    <td class="product">{{ $shipment->items_count ?? 0 }} {{ ($shipment->items_count ?? 0) === 1 ? 'item' : 'items' }}</td>
     <td class="tracking">{{ $shipment->tracking_number }}</td>
 
     <td class="status-cell">
@@ -801,18 +919,19 @@
 
       <div class="panel activity">
         <div class="panel-header">
-          <div class="title">Ã°Å¸â€â€ Delivery alerts</div>
+          <div class="title">🔔 Delivery alerts</div>
         </div>
-        <div class="activity-list">
-          <div class="activity-item">
-            <span class="activity-icon"></span>
+        <div class="activity-list" id="deliveryAlertsList">
+          @forelse($deliveryAlerts as $alert)
+          <div class="activity-item" data-alert-id="{{ $alert->id }}">
+            <span class="activity-icon">{{ $alert->icon }}</span>
+            <span class="activity-message">{{ $alert->message }}</span>
           </div>
+          @empty
           <div class="activity-item">
-            <span class="activity-icon"></span>
+            <span class="activity-message" style="color: var(--text-muted);">No recent activity.</span>
           </div>
-          <div class="activity-item">
-            <span class="activity-icon"></span>
-          </div>
+          @endforelse
         </div>
       </div>
 
@@ -828,42 +947,55 @@
   <div class="overlay" id="packingOverlay">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="modalOrderId">Ã¢â‚¬â€</h2>
+        <h2 id="modalOrderId">—</h2>
         <p>Website order</p>
       </div>
 
       <div class="modal-body">
         <div>
           <p class="field-label">Customer</p>
-          <p class="field-value" id="modalCustomer">Ã¢â‚¬â€</p>
+          <p class="field-value" id="modalCustomer">—</p>
         </div>
         <div>
           <p class="field-label">Status</p>
-          <span class="status-pill tag-packing" id="modalStatus">Ã¢â‚¬â€</span>
+          <span class="status-pill tag-packing" id="modalStatus">—</span>
         </div>
         <div>
-          <p class="field-label">Product</p>
-          <p class="field-value" id="modalItem">Ã¢â‚¬â€</p>
+          <p class="field-label">Items</p>
+          <p class="field-value" id="modalItem">—</p>
         </div>
         <div>
           <p class="field-label">Tracing no.</p>
-          <p class="field-value" id="modalTracking">Ã¢â‚¬â€</p>
+          <p class="field-value" id="modalTracking">—</p>
         </div>
         <div>
           <p class="field-label">Courier</p>
-          <p class="field-value" id="modalCourier">Ã¢â‚¬â€</p>
+          <p class="field-value" id="modalCourier">—</p>
         </div>
         <div>
           <p class="field-label">Amount</p>
-          <p class="field-value" id="modalAmount">Ã¢â‚¬â€</p>
+          <p class="field-value" id="modalAmount">—</p>
         </div>
         <div>
           <p class="field-label">Due date</p>
-          <p class="field-value" id="modalDue">Ã¢â‚¬â€</p>
+          <p class="field-value" id="modalDue">—</p>
         </div>
         <div style="grid-column: 1 / -1;">
           <p class="field-label">Delivery Address</p>
-          <p class="field-value" id="modalAddress">Ã¢â‚¬â€</p>
+          <p class="field-value" id="modalAddress">—</p>
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <div class="items-section">
+            <div class="items-section-header">
+              <p class="field-label" style="margin:0;">Items in this order</p>
+              <span class="items-badge" id="modalItemsBadge">0 items</span>
+            </div>
+            <div class="items-list" id="modalItemsList"></div>
+            <div class="items-total-row">
+              <span>Total amount</span>
+              <span id="modalItemsTotal">—</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -874,7 +1006,7 @@
 
       <div class="modal-footer">
         <button class="btn btn-close" onclick="closePackingModal()">Close</button>
-        <button class="btn btn-cancel">Cancel order</button>
+        <button class="btn btn-cancel" id="modalActionBtn" onclick="requestCancelOrder()">Cancel order</button>
       </div>
     </div>
   </div>
@@ -900,6 +1032,25 @@
     </div>
   </div>
 
+  <!-- Cancel-order confirmation modal -->
+  <div class="overlay" id="cancelConfirmOverlay">
+    <div class="modal confirm-modal">
+      <div class="modal-header">
+        <h2>Cancel this order?</h2>
+        <p>This can't be undone</p>
+      </div>
+      <div class="modal-body">
+        <p class="confirm-text">
+          Are you sure you want to cancel order <strong id="cancelConfirmOrderId">—</strong>?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-close" onclick="closeCancelConfirm()">Keep order</button>
+        <button class="btn btn-cancel" id="confirmCancelBtn" onclick="confirmCancelOrder()">Yes, cancel order</button>
+      </div>
+    </div>
+  </div>
+
   <div class="filter-overlay" id="filterOverlay"></div>
 
   <div class="assign-toast" id="assignToast">Driver assigned successfully</div>
@@ -910,7 +1061,7 @@
     // works no matter where this app is actually mounted (e.g. served
     // from a subfolder like /dashboard/OrderFullfillment/public rather
     // than the domain root).
-    const SHIPPING_BASE_URL = "{{ url('/order-fulfillment/shipping') }}";
+    const SHIPPING_BASE_URL = "{{ url('/shipping') }}";
 
     const orders = @json($shipments->keyBy('shipment_id'));
     const statusLabels = {
@@ -932,12 +1083,65 @@
     let currentOrderId = null;
     let selectedDriverId = null;
 
+    function formatCurrency(n) {
+      const num = Number(n) || 0;
+      return '₱' + num.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Title-cases a status string like "OUT_FOR_DELIVERY"/"OUT FOR DELIVERY"
+    // for use inline in a sentence (the all-caps pill labels only look right
+    // as small badges, not sitting in "... is now OUT FOR DELIVERY").
+    function toSentenceStatus(str) {
+      return String(str)
+        .replace(/_/g, ' ')
+        .toLowerCase()
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    // Renders an order's line items + total into the given list/badge/total
+    // elements. Shared by the order-detail modal and the assign-driver modal
+    // so both stay in sync with the same $shipment->items payload.
+    function renderOrderItems(order, listElId, badgeElId, totalElId) {
+      const listEl = document.getElementById(listElId);
+      const badgeEl = document.getElementById(badgeElId);
+      const totalEl = document.getElementById(totalElId);
+      const items = (order && order.items) || [];
+
+      listEl.innerHTML = '';
+
+      if (!items.length) {
+        listEl.innerHTML = '<p style="color: var(--text-muted); margin: 0; padding: 4px 0;">No item details available.</p>';
+      } else {
+        items.forEach(function (item) {
+          const row = document.createElement('div');
+          row.className = 'items-row';
+          row.innerHTML = `
+            <div>
+              <div class="items-row-name">${item.product_name}</div>
+              <div class="items-row-qty">Qty ${item.qty}</div>
+            </div>
+            <div class="items-row-amount">${formatCurrency(item.line_total)}</div>
+          `;
+          listEl.appendChild(row);
+        });
+      }
+
+      badgeEl.textContent = items.length + (items.length === 1 ? ' item' : ' items');
+
+      // Sum the line items rather than trusting order.amount — that column
+      // on the shipments table isn't actually populated (defaults to 0), so
+      // relying on it was showing ₱0.00 even when items had real amounts.
+      const total = items.reduce((sum, it) => sum + (Number(it.line_total) || 0), 0);
+      totalEl.textContent = formatCurrency(total);
+    }
+
     function openShippingModal(orderId, showBanner) {
       const order = orders[orderId];
       if (order) {
         document.getElementById('modalOrderId').textContent = orderId;
         document.getElementById('modalCustomer').textContent = order.customer_name;
-        document.getElementById('modalItem').textContent = order.product_name;
+        const itemCount = order.items_count ?? (order.items ? order.items.length : 0);
+        document.getElementById('modalItem').textContent = itemCount + (itemCount === 1 ? ' item' : ' items');
         document.getElementById('modalTracking').textContent = order.tracking_number;
         const modalStatusEl = document.getElementById('modalStatus');
         modalStatusEl.textContent = statusLabels[order.status] || order.status;
@@ -947,17 +1151,31 @@
         document.getElementById('modalDue').textContent = order.due_date;
         document.getElementById('modalAddress').textContent = order.address;
 
-        // Amount may come from the shipment JSON, or fall back to the
-        // clicked row's data-amount attribute if the JSON doesn't have it.
-        const rowEl = document.querySelector('.shipping-row[data-id="' + orderId + '"]');
-        const rawAmount = order.amount ?? (rowEl ? rowEl.dataset.amount : null);
-        document.getElementById('modalAmount').textContent =
-          rawAmount != null ? 'Ã¢â€šÂ±' + rawAmount : 'Ã¢â‚¬â€';
+        // The shipments table's amount column isn't populated (defaults to
+        // 0), so the real total comes from summing the order's line items —
+        // same figure used for the "Total amount" row in the items section.
+        const itemsTotal = (order.items || []).reduce((sum, it) => sum + (Number(it.line_total) || 0), 0);
+        document.getElementById('modalAmount').textContent = formatCurrency(itemsTotal);
+
+        renderOrderItems(order, 'modalItemsList', 'modalItemsBadge', 'modalItemsTotal');
       }
 
       // Only reveal the yellow "assign a driver" banner when the modal was
-      // opened via the Assign Driver button Ã¢â‚¬â€ not from a plain row click.
+      // opened via the Assign Driver button — not from a plain row click.
       document.getElementById('assignBanner').classList.toggle('hidden', !showBanner);
+
+      // Same condition drives the footer's action button. The banner
+      // already has its own "Assign driver" button, so when it's showing,
+      // just hide the footer action button instead of duplicating it.
+      const actionBtn = document.getElementById('modalActionBtn');
+      if (showBanner) {
+        actionBtn.style.display = 'none';
+      } else {
+        actionBtn.style.display = '';
+        actionBtn.textContent = 'Cancel order';
+        actionBtn.className = 'btn btn-cancel';
+        actionBtn.onclick = requestCancelOrder;
+      }
 
       currentOrderId = orderId;
       document.getElementById('pageContent').classList.add('blurred');
@@ -985,7 +1203,7 @@
       const list = document.getElementById('driverList');
       selectedDriverId = null;
       document.getElementById('confirmAssignBtn').disabled = true;
-      list.innerHTML = '<p style="color: var(--text-muted); padding: 8px 4px;">Loading available driversÃ¢â‚¬Â¦</p>';
+      list.innerHTML = '<p style="color: var(--text-muted); padding: 8px 4px;">Loading available drivers…</p>';
 
       try {
         const res = await fetch(`${SHIPPING_BASE_URL}/${orderId}/drivers`, {
@@ -1026,7 +1244,7 @@
         card.innerHTML = `
           <div>
             <div class="driver-name">${driver.name}</div>
-            <div class="driver-sub">${driver.vehicle_type} Ã‚Â· Plate ${driver.plate_number}</div>
+            <div class="driver-sub">${driver.vehicle_type} · Plate ${driver.plate_number}</div>
           </div>
           <span class="driver-avail">Available</span>
         `;
@@ -1047,12 +1265,85 @@
       document.getElementById('packingOverlay').classList.add('active');
     }
 
+    // ===================== Cancel order flow =====================
+
+    function requestCancelOrder() {
+      if (!currentOrderId) return;
+
+      document.getElementById('cancelConfirmOrderId').textContent = currentOrderId;
+      document.getElementById('packingOverlay').classList.remove('active');
+      document.getElementById('cancelConfirmOverlay').classList.add('active');
+    }
+
+    function closeCancelConfirm() {
+      document.getElementById('cancelConfirmOverlay').classList.remove('active');
+      document.getElementById('packingOverlay').classList.add('active');
+    }
+
+    async function confirmCancelOrder() {
+      if (!currentOrderId) return;
+
+      const btn = document.getElementById('confirmCancelBtn');
+      btn.disabled = true;
+      btn.textContent = 'Cancelling…';
+
+      try {
+        const res = await fetch(`${SHIPPING_BASE_URL}/${currentOrderId}/cancel`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+          }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showAssignToast(data.message || 'Could not cancel order.', true);
+          return;
+        }
+
+        removeShippingRow(currentOrderId);
+        pushDeliveryAlert(currentOrderId, 'CANCELLED', 'moved to Returns');
+
+        document.getElementById('cancelConfirmOverlay').classList.remove('active');
+        document.getElementById('pageContent').classList.remove('blurred');
+
+        showAssignToast(data.message || 'Order cancelled and moved to Returns.');
+
+        currentOrderId = null;
+      } catch (err) {
+        showAssignToast('Network error — please try again.', true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Yes, cancel order';
+      }
+    }
+
+    // Cancelled shipments no longer belong on the Shipping page at all
+    // (they now live on the Returns page), so drop the row entirely
+    // rather than just updating its status pill.
+    function removeShippingRow(orderId) {
+      delete orders[orderId];
+
+      const row = document.querySelector('.shipping-row[data-id="' + orderId + '"]');
+      if (row) row.remove();
+
+      const idx = shippingRows.findIndex(r => r.dataset.id === orderId);
+      if (idx !== -1) shippingRows.splice(idx, 1);
+
+      applyShippingFilters();
+    }
+
+    // ===================== end cancel order flow =====================
+
     async function confirmDriverAssignment() {
       if (!selectedDriverId || !currentOrderId) return;
 
       const confirmBtn = document.getElementById('confirmAssignBtn');
       confirmBtn.disabled = true;
-      confirmBtn.textContent = 'AssigningÃ¢â‚¬Â¦';
+      confirmBtn.textContent = 'Assigning…';
 
       try {
         const res = await fetch(`${SHIPPING_BASE_URL}/${currentOrderId}/assign-driver`, {
@@ -1075,6 +1366,7 @@
         }
 
         applyAssignmentToRow(currentOrderId, data.status);
+        pushDeliveryAlert(currentOrderId, data.status);
 
         document.getElementById('driverOverlay').classList.remove('active');
         document.getElementById('pageContent').classList.remove('blurred');
@@ -1084,7 +1376,7 @@
         currentOrderId = null;
         selectedDriverId = null;
       } catch (err) {
-        showAssignToast('Network error Ã¢â‚¬â€ please try again.', true);
+        showAssignToast('Network error — please try again.', true);
       } finally {
         confirmBtn.disabled = false;
         confirmBtn.textContent = 'Confirm Assignment';
@@ -1113,6 +1405,37 @@
       if (actionCell) actionCell.innerHTML = '';
     }
 
+    // Mirrors the message format ShippingController@index builds for
+    // $deliveryAlerts, so a freshly-assigned shipment shows up immediately
+    // instead of waiting for the next full page load.
+    function pushDeliveryAlert(orderId, newStatus, customMessage) {
+      const list = document.getElementById('deliveryAlertsList');
+      if (!list) return;
+
+      // Drop the "No recent activity." placeholder if it's the only thing there.
+      const placeholder = list.querySelector('.activity-item:not([data-alert-id])');
+      if (placeholder && list.children.length === 1) placeholder.remove();
+
+      const message = customMessage
+        ? `${orderId} ${customMessage}`
+        : `${orderId} is now ${toSentenceStatus(statusLabels[newStatus] || newStatus)}`;
+
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      item.dataset.alertId = orderId;
+      item.innerHTML = `
+        <span class="activity-icon">🔔</span>
+        <span class="activity-message">${message}</span>
+      `;
+
+      list.prepend(item);
+
+      // Keep it capped at 10, same as the controller's ->take(10).
+      while (list.children.length > 10) {
+        list.removeChild(list.lastElementChild);
+      }
+    }
+
     function showAssignToast(message, isError = false) {
       const toast = document.getElementById('assignToast');
       toast.textContent = message;
@@ -1123,11 +1446,12 @@
     }
 
     // Click outside either modal (on the dim backdrop) to close everything
-    ['packingOverlay', 'driverOverlay'].forEach(function (id) {
+    ['packingOverlay', 'driverOverlay', 'cancelConfirmOverlay'].forEach(function (id) {
       document.getElementById(id).addEventListener('click', function (e) {
         if (e.target.id === id) {
           document.getElementById('packingOverlay').classList.remove('active');
           document.getElementById('driverOverlay').classList.remove('active');
+          document.getElementById('cancelConfirmOverlay').classList.remove('active');
           document.getElementById('pageContent').classList.remove('blurred');
           currentOrderId = null;
           selectedDriverId = null;

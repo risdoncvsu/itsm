@@ -558,20 +558,42 @@
     width: 620px;
     max-width: 90vw;
     background: #16305c;
-    border-radius: 14px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    box-shadow: 0 24px 70px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-scroll {
+    overflow-y: auto;
+  }
+
+  .modal-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  .modal-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .modal-scroll::-webkit-scrollbar-thumb {
+    background: var(--pill-border, #2c4373);
+    border-radius: 6px;
   }
 
   .modal-header {
     background: #0f2549;
-    padding: 20px 28px;
+    padding: 22px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
   }
 
   .modal-header h2 {
     margin: 0;
     color: #fff;
-    font-size: 18px;
+    font-size: 19px;
+    letter-spacing: 0.2px;
   }
 
   .modal-header p {
@@ -581,23 +603,142 @@
   }
 
   .modal-body {
-    padding: 24px 28px;
+    padding: 22px 28px 4px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px 20px;
+    gap: 18px 20px;
   }
 
-  .modal-body .field-label {
+.field-label {
     margin: 0 0 6px;
-    font-size: 12px;
-    color: #8ea3cc;
-  }
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #7691c2;
+    font-weight: 700;
+}
 
   .modal-body .field-value {
     margin: 0;
     font-size: 15px;
     color: #fff;
     font-weight: 600;
+  }
+
+  .section-label {
+    margin: 0 0 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #7691c2;
+    font-weight: 700;
+    padding: 0 28px;
+  }
+
+  .items-section {
+    padding: 4px 28px 20px;
+  }
+
+  .items-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .items-header .field-label {
+    margin: 0;
+  }
+
+  .items-count-badge {
+    background: var(--pill, #16305c);
+    border: 1px solid var(--pill-border, #2c4373);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .items-list {
+    max-height: 190px;
+    overflow-y: auto;
+    background: #0f2549;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .items-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  .items-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .items-list::-webkit-scrollbar-thumb {
+    background: var(--pill-border, #2c4373);
+    border-radius: 6px;
+  }
+
+  .item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .item-row:last-child {
+    border-bottom: none;
+  }
+
+  .item-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #fff;
+  }
+
+  .item-qty {
+    font-size: 12px;
+    color: #8ea3cc;
+    margin-top: 2px;
+  }
+
+  .item-price {
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .items-empty {
+    padding: 16px;
+    font-size: 13px;
+    color: #8ea3cc;
+  }
+
+  .items-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    margin-top: 8px;
+    background: #24437a;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .items-total .label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #cfdcf2;
+  }
+
+  .items-total .value {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
   }
 
   .box-options {
@@ -610,24 +751,26 @@
     flex: 1;
     background: #1c3766;
     border: 2px solid transparent;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 14px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: space-between;
     color: #fff;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
   }
 
+  .box-option:hover { background: #22406f; }
   .box-option.selected { border-color: #3B82F6; background: #24437a; }
   .box-option .box-name { font-weight: 700; font-size: 14px; }
-  .box-option .box-stock { font-size: 12px; color: #9FB3D1; }
+  .box-option .box-stock { font-size: 12px; color: #9FB3D1; margin-top: 2px; }
   .box-option .box-icon { font-size: 22px; }
 
   .courier-options {
     display: flex;
     gap: 12px;
-    padding: 0 28px 20px;
+    padding: 0 28px 24px;
   }
 
   .courier-option {
@@ -636,12 +779,15 @@
     align-items: center;
     gap: 12px;
     border: 2px solid transparent;
-    border-radius: 8px;
-    padding: 10px 18px;
+    border-radius: 10px;
+    padding: 12px 18px;
     cursor: pointer;
     font-weight: 700;
     text-align: left;
+    transition: border-color 0.15s ease, filter 0.15s ease;
   }
+
+  .courier-option:hover { filter: brightness(1.05); }
 
   .courier-option .courier-logo {
     width: 28px;
@@ -660,8 +806,10 @@
   .modal-footer {
     display: flex;
     gap: 12px;
-    padding: 20px 28px;
+    padding: 18px 28px;
     border-top: 1px solid rgba(255,255,255,0.08);
+    background: #132c54;
+    flex-shrink: 0;
   }
 
 .request-modal { width: 480px; }
@@ -794,7 +942,7 @@
 
     <!-- Navbar -->
     <div class="navbar">
-     <a href="{{ route('order-fulfillment.logout') }}" class="brand logout-logo" title="Logout">
+     <a href="{{ route('logout') }}" class="brand logout-logo" title="Logout">
     <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
     <div class="brand-text">
         <div class="title">NEXORA</div>
@@ -802,11 +950,11 @@
     </div>
 </a>
       <div class="nav-links">
-     <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
-     <a href="{{ route('order-fulfillment.orders') }}">Orders</a>
-      <a href="{{ route('order-fulfillment.packing') }}" class="active">Packing</a>
-      <a href="{{ route('order-fulfillment.shipping') }}">Shipping</a>
-      <a href="{{ route('order-fulfillment.return') }}">Returns</a>
+     <a href="{{ route('dashboard') }}">Dashboard</a>
+     <a href="{{ route('orders') }}">Orders</a>
+      <a href="{{ route('packing') }}" class="active">Packing</a>
+      <a href="{{ route('shipping') }}">Shipping</a>
+      <a href="{{ route('return') }}">Returns</a>
       </div>
     </div>
 
@@ -834,15 +982,15 @@
 
       <div class="panel order-queue">
         <div class="panel-header">
-          <div class="title">Ã°Å¸â€œÂ¦ Packing queue</div>
+          <div class="title">📦 Packing queue</div>
           <div class="actions">
             <div class="search-wrap">
-              <span class="search-icon">Ã°Å¸â€Â</span>
+              <span class="search-icon">🔍</span>
               <input type="text" id="packingSearch" placeholder="Search..." autocomplete="off">
             </div>
 
             <button id="filterBtn" class="filter-btn">
-              Filter <span class="caret">Ã¢â€“Â¾</span>
+              Filter <span class="caret">▾</span>
               <span id="filterBadge" class="filter-badge">1</span>
             </button>
 
@@ -881,30 +1029,29 @@
               <tr>
                 <th class="th-order">Order Id</th>
                 <th class="th-customer">Customer</th>
-                <th class="th-item">Item</th>
-                <th class="th-qty">Qty</th>
+                <th class="th-item">Items</th>
+                <th class="th-qty">Amount</th>
                 <th class="th-priority">Priority</th>
                 <th></th>
               </tr>
             </thead>
             <tbody id="packingTableBody">
-              @forelse ($packingOrders as $order)
-                @php $priority = \Modules\OrderFulfillment\Helpers\OrderPriority::packing($order->created_at ?? null); @endphp
+              @forelse ($packingOrdersJson as $orderId => $data)
                 <tr class="packing-row"
-                    data-id="{{ $order->id }}"
-                    data-customer="{{ $order->customer_name }}"
-                    data-item="{{ $order->product_name }}"
-                    data-qty="{{ $order->qty }}"
-                    data-priority="{{ $priority['key'] }}"
-                    data-priority-class="{{ $priority['class'] }}"
-                    data-amount="{{ number_format($order->amount, 2) }}"
-                    data-address="{{ $order->address ?? '' }}">
-                  <td class="order-id">{{ $order->id }}</td>
-                  <td class="customer">{{ $order->customer_name }}</td>
-                  <td class="product">{{ $order->product_name }}</td>
-                  <td class="qty-cell">{{ $order->qty }}</td>
-                  <td class="priority-cell"><span class="{{ $priority['class'] }}">{{ $priority['label'] }}</span></td>
-                  <td class="action-cell"><button class="btn-prepare" onclick="openPackingModal('{{ $order->id }}', this.closest('tr'))">Process</button></td>
+                    data-id="{{ $orderId }}"
+                    data-customer="{{ $data['customer'] }}"
+                    data-item="{{ $data['item'] }}"
+                    data-qty="{{ $data['qty'] }}"
+                    data-priority="{{ $data['priorityKey'] }}"
+                    data-priority-class="{{ $data['priorityClass'] }}"
+                    data-amount="{{ $data['amount'] }}"
+                    data-address="{{ $data['address'] }}">
+                  <td class="order-id">{{ $orderId }}</td>
+                  <td class="customer">{{ $data['customer'] }}</td>
+                  <td class="product">{{ $data['itemCount'] }} {{ $data['itemCount'] == 1 ? 'item' : 'items' }}</td>
+                  <td class="qty-cell">₱{{ $data['amount'] }}</td>
+                  <td class="priority-cell"><span class="{{ $data['priorityClass'] }}">{{ $data['priority'] }}</span></td>
+                  <td class="action-cell"><button class="btn-prepare" onclick="openPackingModal('{{ $orderId }}', this.closest('tr'))">Prepare</button></td>
                 </tr>
               @empty
                 <tr class="empty-row"><td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted);">Nothing in packing right now.</td></tr>
@@ -920,7 +1067,7 @@
 
       <div class="panel activity">
         <div class="panel-header">
-          <div class="title">Ã°Å¸â€œâ€¹ Packing materials</div>
+          <div class="title">📋 Packing materials</div>
           <button class="btn-request-material" onclick="openRequestModal()">
           <span>+</span> Request material
           </button>
@@ -931,18 +1078,18 @@
               $isLow = isset($material->stock_qty, $material->low_stock_threshold)
                   && $material->stock_qty <= $material->low_stock_threshold;
               if (!empty($material->is_box)) {
-                  $icon = $material->icon ?? 'Ã°Å¸â€œÂ¦';
+                  $icon = $material->icon ?? '📦';
               } else {
-                  $icon = $material->icon ?? ($isLow ? 'Ã¢Å¡Â Ã¯Â¸Â' : 'Ã¢Å“â€¦');
+                  $icon = $material->icon ?? ($isLow ? '⚠️' : '✅');
               }
             @endphp
             <div class="activity-item">
               <span class="activity-icon">{{ $icon }}</span>
-              <span>{{ $material->name }} Ã¢â‚¬â€ {{ $material->stock_label ?? ($material->stock_qty . ' left') }}</span>
+              <span>{{ $material->name }} — {{ $material->stock_label ?? ($material->stock_qty . ' left') }}</span>
             </div>
           @empty
             <div class="activity-item">
-              <span class="activity-icon">Ã°Å¸â€œÂ¦</span>
+              <span class="activity-icon">📦</span>
               <span style="color: var(--text-muted);">No material data yet.</span>
             </div>
           @endforelse
@@ -956,65 +1103,72 @@
   <div class="overlay" id="packingOverlay">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="modalOrderId">Ã¢â‚¬â€</h2>
+        <h2 id="modalOrderId">—</h2>
         <p>Website order</p>
       </div>
 
-      <div class="modal-body">
-        <div>
-          <p class="field-label">Customer</p>
-          <p class="field-value" id="modalCustomer">Ã¢â‚¬â€</p>
-        </div>
-        <div>
-          <p class="field-label">Priority</p>
-          <span class="priority-low" id="modalPriority">Ã¢â‚¬â€</span>
-        </div>
-        <div>
-          <p class="field-label">Items</p>
-          <p class="field-value" id="modalItem">Ã¢â‚¬â€</p>
-        </div>
-        <div>
-          <p class="field-label">Quantity</p>
-          <p class="field-value" id="modalQty">Ã¢â‚¬â€</p>
-        </div>
-        <div>
-          <p class="field-label">Amount</p>
-          <p class="field-value" id="modalAmount">Ã¢â‚¬â€</p>
-        </div>
-        <div style="grid-column: 1 / -1;">
-          <p class="field-label">Delivery Address</p>
-          <p class="field-value" id="modalAddress">Ã¢â‚¬â€</p>
-        </div>
-      </div>
-
-      <div class="box-options">
-        @forelse ($boxMaterials as $box)
-          <div class="box-option" data-box="{{ $box->box_size }}" onclick="selectBox(this)">
-            <div>
-              <div class="box-name">{{ $box->name }}</div>
-              <div class="box-stock">{{ $box->stock_label ?? ($box->stock_qty . ' left') }}</div>
-            </div>
-            <div class="box-icon">Ã°Å¸â€œÂ¦</div>
+      <div class="modal-scroll">
+        <div class="modal-body">
+          <div>
+            <p class="field-label">Customer</p>
+            <p class="field-value" id="modalCustomer">—</p>
           </div>
-        @empty
-          <div class="box-option" style="opacity:0.5; pointer-events:none;">
-            <div>
-              <div class="box-name">No box sizes configured</div>
-              <div class="box-stock">Add rows to packing_materials</div>
-            </div>
-            <div class="box-icon">Ã°Å¸â€œÂ¦</div>
+          <div>
+            <p class="field-label">Priority</p>
+            <span class="priority-low" id="modalPriority">—</span>
           </div>
-        @endforelse
-      </div>
-
-      <div class="courier-options">
-        <div class="courier-option jt" data-courier="J&T" onclick="selectCourier(this)">
-          <img src="{{ asset('logo/jt-logo.png') }}" alt="J&T Express" class="courier-logo">
-          <span class="courier-name">J &amp; T Express</span>
         </div>
-        <div class="courier-option flash" data-courier="FLASH" onclick="selectCourier(this)">
-          <img src="{{ asset('logo/flash-logo.png') }}" alt="Flash Express" class="courier-logo">
-          <span class="courier-name">FLASH Express</span>
+
+        <div class="items-section">
+          <div class="items-header">
+            <p class="field-label">Items</p>
+            <span class="items-count-badge" id="modalItemCount">0 items</span>
+          </div>
+          <div class="items-list" id="modalItemsList">
+            <!-- populated by openPackingModal() -->
+          </div>
+          <div class="items-total">
+            <span class="label">Total amount</span>
+            <span class="value" id="modalTotalAmount">₱0.00</span>
+          </div>
+        </div>
+
+        <div class="items-section" style="padding-top: 0;">
+          <p class="field-label">Delivery address</p>
+          <p class="field-value" id="modalAddress">—</p>
+        </div>
+
+        <p class="section-label">Box size</p>
+        <div class="box-options">
+          @forelse ($boxMaterials as $box)
+            <div class="box-option" data-box="{{ $box->box_size }}" onclick="selectBox(this)">
+              <div>
+                <div class="box-name">{{ $box->name }}</div>
+                <div class="box-stock">{{ $box->stock_label ?? ($box->stock_qty . ' left') }}</div>
+              </div>
+              <div class="box-icon">📦</div>
+            </div>
+          @empty
+            <div class="box-option" style="opacity:0.5; pointer-events:none;">
+              <div>
+                <div class="box-name">No box sizes configured</div>
+                <div class="box-stock">Add rows to packing_materials</div>
+              </div>
+              <div class="box-icon">📦</div>
+            </div>
+          @endforelse
+        </div>
+
+        <p class="section-label">Courier</p>
+        <div class="courier-options">
+          <div class="courier-option jt" data-courier="J&T" onclick="selectCourier(this)">
+            <img src="{{ asset('logo/jt-logo.png') }}" alt="J&T Express" class="courier-logo">
+            <span class="courier-name">J &amp; T Express</span>
+          </div>
+          <div class="courier-option flash" data-courier="FLASH" onclick="selectCourier(this)">
+            <img src="{{ asset('logo/flash-logo.png') }}" alt="Flash Express" class="courier-logo">
+            <span class="courier-name">FLASH Express</span>
+          </div>
         </div>
       </div>
 
@@ -1030,7 +1184,7 @@
   <div class="overlay" id="packingFailedOverlay">
     <div class="modal error-modal">
       <div class="modal-header">
-        <span class="error-icon">Ã¢Å¡Â Ã¯Â¸Â</span>
+        <span class="error-icon">⚠️</span>
         <div>
           <h2>Packing Failed</h2>
           <p>This order could not be packed</p>
@@ -1049,10 +1203,10 @@
     <div class="modal request-modal">
       <div class="modal-header request-modal-header">
         <div>
-          <h2>Ã°Å¸Å¡Å¡ Request material</h2>
+          <h2>🚚 Request material</h2>
           <p>Sent to the procurement department for approval.</p>
         </div>
-        <span class="modal-close" onclick="closeRequestModal()">Ã¢Å“â€¢</span>
+        <span class="modal-close" onclick="closeRequestModal()">✕</span>
       </div>
 
       <div class="request-form-body">
@@ -1123,7 +1277,7 @@
 
   <script>
     // Order data keyed by order id, rendered straight from the DB
-    // ($packingOrders, queried in the controller) Ã¢â‚¬â€ nothing hardcoded.
+    // ($packingOrders, queried in the controller) — nothing hardcoded.
     const orders = @json($packingOrdersJson);
     let currentOrderId = null;
     let selectedBox = null;
@@ -1157,7 +1311,7 @@
     if (!payload.qty || payload.qty <= 0) { alert('Enter a valid quantity'); return; }
     if (!payload.requested_by) { alert('Enter your name'); return; }
 
-    const response = await fetch(`{{ route('order-fulfillment.material-requests.store') }}`, {
+    const response = await fetch(`{{ url('/material-requests') }}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1175,6 +1329,52 @@
       }
     }
 
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str ?? '';
+      return div.innerHTML;
+    }
+
+    function renderModalItems(order, rowEl) {
+      const listEl  = document.getElementById('modalItemsList');
+      const countEl = document.getElementById('modalItemCount');
+      const totalEl = document.getElementById('modalTotalAmount');
+
+      // Prefer the multi-item array from the order payload. Fall back to
+      // the single item/qty/amount fields (or the clicked row's data
+      // attributes) so older/single-product orders still render a list.
+      let items = Array.isArray(order.items) ? order.items : null;
+
+      if (!items || items.length === 0) {
+        const fallbackAmount = order.amount ?? (rowEl ? rowEl.dataset.amount : null);
+        items = [{
+          name: order.item ?? 'Item',
+          qty: order.qty ?? 1,
+          amount: fallbackAmount,
+        }];
+      }
+
+      countEl.textContent = items.length + (items.length === 1 ? ' item' : ' items');
+
+      listEl.innerHTML = items.map(function (item) {
+        const price = item.amount != null ? '₱' + item.amount : '—';
+        return `
+          <div class="item-row">
+            <div>
+              <div class="item-name">${escapeHtml(item.name)}</div>
+              <div class="item-qty">Qty ${escapeHtml(item.qty)}</div>
+            </div>
+            <div class="item-price">${price}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Total amount for the whole order — computed server-side from the
+      // real line items, falls back to the row's data-amount if missing.
+      const totalAmount = order.amount ?? (rowEl ? rowEl.dataset.amount : null);
+      totalEl.textContent = totalAmount != null ? '₱' + totalAmount : '—';
+    }
+
     function openPackingModal(orderId, rowEl) {
       currentOrderId = orderId;
       const order = orders[orderId];
@@ -1184,19 +1384,13 @@
       if (order) {
         document.getElementById('modalOrderId').textContent = orderId;
         document.getElementById('modalCustomer').textContent = order.customer;
-        document.getElementById('modalItem').textContent = order.item;
-        document.getElementById('modalQty').textContent = order.qty;
         document.getElementById('modalAddress').textContent = order.address;
-
-        // Amount may come from the order JSON, or fall back to the
-        // clicked row's data-amount attribute if the JSON doesn't have it.
-        const rawAmount = order.amount ?? (rowEl ? rowEl.dataset.amount : null);
-        document.getElementById('modalAmount').textContent =
-          rawAmount != null ? 'Ã¢â€šÂ±' + rawAmount : 'Ã¢â‚¬â€';
 
         const priorityEl = document.getElementById('modalPriority');
         priorityEl.textContent = order.priority;
         priorityEl.className = order.priorityClass;
+
+        renderModalItems(order, rowEl);
       }
 
       // reset box/courier selection each time the modal opens
@@ -1327,7 +1521,7 @@
     }
 
     const response = await fetch(
-         `{{ url('/order-fulfillment/packing/process') }}/${encodeURIComponent(currentOrderId)}`,
+         `{{ url('/packing/process') }}/${encodeURIComponent(currentOrderId)}`,
         {
             method:'POST',
 

@@ -18,7 +18,7 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $order = Order::findOrFail($id);
+        $order = Order::with('items')->findOrFail($id);
         return view('orders.show', compact('order'));
     }
 
@@ -27,7 +27,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders       = Order::orderByDesc('created_at')->get();
+        $orders       = Order::with('items')->orderByDesc('created_at')->get();
         $ordersToday  = Order::where('status', 'NEW')->count();
         $inPacking    = Order::where('status', 'PACKING')->count();
         $shippedToday = Order::where('status', 'SHIPPED')->count();
@@ -36,28 +36,35 @@ class OrderController extends Controller
         $onTimeRate   = $total > 0 ? round(($delivered / $total) * 100) . '%' : '0%';
 
 
-        $recentActivity = Order::whereIn('status', ['PACKING', 'SHIPPED', 'CANCELLED'])
+        // Any status other than NEW represents a change that happened after
+        // the order was placed, so surface all of them here (not just a
+        // hardcoded subset) — that's what keeps this feed in sync with
+        // whatever the order's current status actually is.
+        $recentActivity = Order::where('status', '!=', 'NEW')
             ->orderByDesc('updated_at')
             ->limit(10)
             ->get()
             ->map(function ($o) {
                 $status = strtoupper($o->status);
 
-                if ($status === 'SHIPPED') {
-                    $o->activity_icon    = 'Ã°Å¸Å¡Å¡';
-                    $o->activity_message = "Order {$o->id} has been shipped";
-                } elseif ($status === 'CANCELLED') {
-                    $o->activity_icon    = 'Ã¢ÂÅ’';
-                    $o->activity_message = "Order {$o->id} has been cancelled";
-                } else {
-                    $o->activity_icon    = 'Ã°Å¸â€œÂ¦';
-                    $o->activity_message = "Order {$o->id} moved to packing";
-                }
+                $activityMap = [
+                    'PACKING'          => ['📦', "Order {$o->id} moved to packing"],
+                    'READY_TO_SHIP'    => ['📦', "Order {$o->id} is ready for delivery"],
+                    'OUT_FOR_DELIVERY' => ['🚚', "Order {$o->id} is out for delivery"],
+                    'SHIPPED'          => ['🚚', "Order {$o->id} has been shipped"],
+                    'DELIVERED'        => ['✅', "Order {$o->id} has been delivered"],
+                    'CANCELLED'        => ['❌', "Order {$o->id} has been cancelled"],
+                ];
+
+                [$icon, $message] = $activityMap[$status] ?? ['🔄', "Order {$o->id} status changed to " . strtolower(str_replace('_', ' ', $status))];
+
+                $o->activity_icon    = $icon;
+                $o->activity_message = $message;
 
                 return $o;
             });
 
-        return view('order-fulfillment::order', compact(
+        return view('order', compact(
             'orders', 'ordersToday', 'inPacking', 'shippedToday', 'onTimeRate', 'recentActivity'
         ));
     }
@@ -72,12 +79,12 @@ class OrderController extends Controller
         $packingErrorToday = 0; // TODO: hook up to a packing_errors table once one exists
 
         // packing_materials lives on the separate "inventory" connection,
-        // not the default one Ã¢â‚¬â€ must go through the PackingMaterial model
+        // not the default one — must go through the PackingMaterial model
         // (which declares that connection) rather than DB::table(), or this
         // silently queries the wrong database and returns nothing.
         $materials = PackingMaterial::all();
 
-        return view('order-fulfillment::packing', compact(
+        return view('packing', compact(
             'packingOrders', 'readyToShipCount', 'packingErrorToday', 'materials'
         ));
     }

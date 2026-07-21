@@ -77,4 +77,3 @@ class OrderPriority
         return ['label' => 'Low', 'class' => 'priority-low', 'key' => 'Low'];
     }
 }
-
