@@ -28,7 +28,6 @@ class PasswordResetController extends Controller
         $employee = null;
 
         $user = User::query()
-            ->where('company_id', $ticket->company_id)
             ->where(fn ($query) => $query->where('email', $identifier)->orWhere('username', $identifier))
             ->first();
         if ($user?->company_id) {
@@ -73,7 +72,10 @@ class PasswordResetController extends Controller
         ]);
         $identifier = $ticket->requester;
         $password = $validated['temporary_password'];
-        $user = User::query()->where('email', $identifier)->orWhere('username', $identifier)->first();
+        $user = User::query()
+            ->where('company_id', $ticket->company_id)
+            ->where(fn ($query) => $query->where('email', $identifier)->orWhere('username', $identifier))
+            ->first();
 
         if ($user) {
             $user->forceFill(['password' => Hash::make($password)])->save();
