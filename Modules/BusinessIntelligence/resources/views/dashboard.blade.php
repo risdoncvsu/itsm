@@ -1,59 +1,362 @@
-@extends('bi::layouts.app')
+@extends('layouts.app')
 
 @section('content')
-<div class="tab-content active-tab" style="display:block">
-    <div class="subheader-bar">
-        <div class="subheader-title">
-            <h3>Executive Dashboard</h3>
-            <p>Live, client-scoped metrics from your connected Nexora modules.</p>
-        </div>
-        <div class="subheader-controls">
-            @if($clientId)<span class="control-date-selector">Client #{{ $clientId }}</span>@else<span class="control-date-selector">Choose a client to test BI</span>@endif
-            <a href="{{ route('bi.live-monitor') }}" class="control-btn" title="View activity"><i data-lucide="activity" class="control-icon"></i></a>
-        </div>
-    </div>
-    <div class="content-container">
-        @if(! $clientId)
-            <div class="ui-card" style="padding:1.25rem"><strong>BI is ready.</strong> Root-admin testing requires a client scope, e.g. <code>/bi/dashboard?client_id=23</code>. Employee accounts are scoped automatically.</div>
-        @endif
-        <section class="kpi-grid">
-            <div class="kpi-card"><div class="kpi-icon-container"><i data-lucide="dollar-sign" class="kpi-icon"></i></div><div class="kpi-details"><div class="kpi-label">Revenue collected</div><div class="kpi-value">₱{{ number_format($metrics['revenue'], 2) }}</div><div class="kpi-change change-up">Finance</div></div></div>
-            <div class="kpi-card"><div class="kpi-icon-container"><i data-lucide="wallet" class="kpi-icon"></i></div><div class="kpi-details"><div class="kpi-label">Net after expenses</div><div class="kpi-value">₱{{ number_format($metrics['profit'], 2) }}</div><div class="kpi-change {{ $metrics['profit'] >= 0 ? 'change-up' : 'change-down' }}">Live calculation</div></div></div>
-            <div class="kpi-card"><div class="kpi-icon-container"><i data-lucide="package" class="kpi-icon"></i></div><div class="kpi-details"><div class="kpi-label">Inventory items</div><div class="kpi-value">{{ number_format($metrics['inventory_items']) }}</div><div class="kpi-change {{ $metrics['inventory_low_stock'] ? 'change-down' : 'change-up' }}">{{ $metrics['inventory_low_stock'] }} low-stock alerts</div></div></div>
-            <div class="kpi-card"><div class="kpi-icon-container"><i data-lucide="shopping-cart" class="kpi-icon"></i></div><div class="kpi-details"><div class="kpi-label">Fulfillment orders</div><div class="kpi-value">{{ number_format($metrics['fulfillment_orders']) }}</div><div class="kpi-change change-up">Order Fulfillment</div></div></div>
-            <div class="kpi-card"><div class="kpi-icon-container"><i data-lucide="factory" class="kpi-icon"></i></div><div class="kpi-details"><div class="kpi-label">Active work orders</div><div class="kpi-value">{{ number_format($metrics['manufacturing_active']) }}</div><div class="kpi-change change-up">Manufacturing</div></div></div>
-        </section>
-        <div class="dashboard-layout-grid">
-            <div class="section-column">
-                <div class="ui-card"><div class="card-header"><div class="card-title">Invoice Revenue Trend</div><select id="salesRange" class="control-date-selector"><option value="7d">7 Days</option><option value="1m">1 Month</option><option value="1y">1 Year</option></select></div><div class="placeholder-graph-box chart-box"><canvas id="salesTrendChart"></canvas></div></div>
+    <div id="ai-insights-view" class="tab-content active-tab" style="display:block;">
+        <div class="subheader-bar">
+            <div class="subheader-title">
+                <h3>AI Insights Center</h3>
+                <p>AI-generated business insights, recommendations, and alerts.</p>
             </div>
-            <div class="section-column">
-                <div class="ui-card"><div class="card-header"><div class="card-title">Connected Module Health</div></div>
-                    <div class="op-metrics-grid" style="padding:1rem">
-                        <div class="op-metric-item"><span class="op-metric-label">Open Purchase Orders</span><span class="op-metric-val">{{ $metrics['procurement_open'] }}</span></div>
-                        <div class="op-metric-item"><span class="op-metric-label">Overdue Invoices</span><span class="op-metric-val">{{ $metrics['finance_overdue'] }}</span></div>
-                        <div class="op-metric-item"><span class="op-metric-label">Delayed Shipments</span><span class="op-metric-val">{{ $metrics['fulfillment_delayed'] }}</span></div>
-                        <div class="op-metric-item"><span class="op-metric-label">Catalog Records</span><span class="op-metric-val">{{ $metrics['ecommerce_products'] }}</span></div>
+            <div class="subheader-controls">
+                <div class="control-date-selector">
+                    <i data-lucide="calendar" class="control-icon-sm"></i>
+                    {{ now()->format('M d') }} - {{ now()->addDays(7)->format('M d, Y') }}
+                </div>
+                <button class="control-btn" title="Refresh Data">
+                    <i data-lucide="refresh-cw" class="control-icon"></i>
+                </button>
+            </div>
+        </div>
+        <div class="content-container">
+
+            {{-- System Alerts --}}
+            <div class="insight-card" id="alertsCard">
+                <div class="alerts-header-row">
+                    <h3>Recent System Alerts</h3>
+                </div>
+                <p style="font-size:11px; color: var(--slate-500); margin-bottom: 0.75rem;">Full details for all active
+                    alerts</p>
+                <div class="alerts-scroll-row">
+                    @forelse($alerts as $alert)
+                        <div class="alert-square alert-square-{{ $alert['type'] }}">
+                            <div class="alert-square-icon"><i data-lucide="{{ $alert['icon'] }}"></i></div>
+                            <strong>{{ $alert['title'] }}</strong>
+                            <span class="alert-square-time">{{ $alert['time'] }} • {{ $alert['priority'] }}</span>
+                            <p>{{ $alert['description'] }}</p>
+                            @if(!empty($alert['details']))
+                                <table>
+                                    @foreach($alert['details'] as $row)
+                                        <tr>
+                                            @foreach($row as $cell)
+                                                <td>{{ $cell }}</td>
+                                            @endforeach
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            @endif
+                            <p class="alert-square-action">{{ $alert['action'] }}</p>
+                        </div>
+                    @empty
+                        <p style="color: var(--slate-500); font-size: 11px;">No active alerts at this time.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="ai-insights-grid">
+                {{-- Executive Summary --}}
+                <div class="insight-card">
+                    <h3>Executive Summary <span class="info-dot"
+                            data-tooltip="AI-generated overview of the most critical business metrics and performance indicators across all modules.">i</span>
+                    </h3>
+                    <div class="card-subtitle">{{ empty($executiveSummary) ? 'No data available' : 'AI-powered analysis' }}
                     </div>
-                    <p style="padding:0 1rem 1rem;color:var(--slate-500);font-size:12px">No data is copied into ITSM. This dashboard reads only the current client’s records from each owning module database.</p>
+                    <div class="insight-list">
+                        @forelse($executiveSummary as $item)
+                            <div class="insight-item">
+                                <div class="insight-icon-circle bg-icon-{{ $item['color'] }}">
+                                    <i data-lucide="{{ $item['icon'] }}" class="insight-icon-sm"></i>
+                                </div>
+                                <div class="insight-text-wrapper">
+                                    <p>{{ $item['text'] }}</p>
+                                    @if(!empty($item['sub_text']))
+                                        <div class="sub-text">{{ $item['sub_text'] }}</div>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <div class="insight-item">
+                                <div class="insight-text-wrapper">
+                                    <p style="color: var(--slate-500);">AI insights will appear here once connected to data
+                                        sources.</p>
+                                </div>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- Top Recommendations --}}
+                <div class="insight-card">
+                    <h3>Top Recommendations <span class="info-dot"
+                            data-tooltip="Prioritized actionable recommendations generated by the AI engine.">i</span></h3>
+                    <div class="card-subtitle">&nbsp;</div>
+                    <div class="insight-list">
+                        @forelse($recommendations as $index => $rec)
+                            <div class="insight-item">
+                                <div class="insight-icon-circle bg-icon-num">{{ $index + 1 }}</div>
+                                <div class="insight-text-wrapper">
+                                    <p><strong>{{ $rec['title'] }}</strong></p>
+                                    <div class="sub-text">{{ $rec['description'] }}</div>
+                                </div>
+                                <span class="mock-badge mb-{{ strtolower($rec['impact']) }}-impact">{{ $rec['impact'] }}
+                                    Impact</span>
+                            </div>
+                        @empty
+                            <div class="insight-item">
+                                <div class="insight-text-wrapper">
+                                    <p style="color: var(--slate-500);">Recommendations will be generated once AI is connected
+                                        to data sources.</p>
+                                </div>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- Risk Detection --}}
+                <div class="insight-card">
+                    <h3>Risk Detection <span class="info-dot"
+                            data-tooltip="Automated risk monitoring across supply chain, operations, and financial domains.">i</span>
+                    </h3>
+                    <div class="card-subtitle">&nbsp;</div>
+                    <div class="insight-list">
+                        @forelse($risks as $risk)
+                            <div class="insight-item">
+                                <div class="insight-icon-circle bg-icon-{{ $risk['color'] }}">
+                                    <i data-lucide="{{ $risk['icon'] }}" class="insight-icon-sm"></i>
+                                </div>
+                                <div class="insight-text-wrapper">
+                                    <p><strong>{{ $risk['title'] }}</strong></p>
+                                    <div class="sub-text">{{ $risk['description'] }}</div>
+                                </div>
+                                <span class="mock-badge mb-{{ strtolower($risk['level']) }}">{{ $risk['level'] }}</span>
+                            </div>
+                        @empty
+                            <div class="insight-item">
+                                <div class="insight-text-wrapper">
+                                    <p style="color: var(--slate-500);">Risk assessment will appear once AI is connected to data
+                                        sources.</p>
+                                </div>
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('scripts')
-<script>
-let salesChart;
-const clientScope = @json(request()->integer('client_id') ?: null);
-async function loadSalesTrend() {
-    const range = document.getElementById('salesRange').value;
-    const response = await fetch(@json(route('bi.sales-forecast')).concat('?range=', range, clientScope ? '&client_id=' + clientScope : ''));
-    const data = await response.json();
-    salesChart?.destroy();
-    salesChart = new Chart(document.getElementById('salesTrendChart'), {type: 'line', data: {labels: data.labels, datasets: [{label: 'Invoice revenue', data: data.sales, borderColor: '#1B6FC8', backgroundColor: 'rgba(27,111,200,.12)', fill: true, tension: .35}]}, options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}}, scales: {y: {beginAtZero: true}}}});
-}
-document.getElementById('salesRange').addEventListener('change', loadSalesTrend); loadSalesTrend();
-</script>
+    <script>
+        let salesTrendChart;
+
+        const verticalLinePlugin = {
+            id: 'verticalLine',
+            afterDraw(chart) {
+                if (chart.tooltip?._active?.length) {
+                    const activePoint = chart.tooltip._active[0];
+                    const ctx = chart.ctx;
+                    const x = activePoint.element.x;
+                    const topY = chart.scales.y.top;
+                    const bottomY = chart.scales.y.bottom;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, topY);
+                    ctx.lineTo(x, bottomY);
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = '#1B6FC8';
+                    ctx.setLineDash([4, 4]);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        };
+
+        function timeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000);
+            if (seconds < 10) return 'Just now';
+            if (seconds < 60) return seconds + 's ago';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return minutes + 'm ago';
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return hours + 'h ago';
+            return Math.floor(hours / 24) + 'd ago';
+        }
+
+        async function syncAllDepartments() {
+            const btn = document.getElementById('syncNowBtn');
+            const icon = btn.querySelector('.control-icon');
+            btn.disabled = true;
+            icon.classList.add('spin-icon');
+            try {
+                const res = await fetch('/api/sync-all', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                });
+                const data = await res.json();
+                if (!res.ok && res.status !== 207) {
+                    throw new Error(data.message || 'Sync failed.');
+                }
+                window.location.reload();
+            } catch (e) {
+                btn.disabled = false;
+                icon.classList.remove('spin-icon');
+                alert('Sync failed: ' + e.message);
+            }
+        }
+
+        async function fetchOpRisks() {
+            try {
+                const res = await fetch('/api/live-feed');
+                const data = await res.json();
+                updateOpRisks(data);
+            } catch (e) { }
+        }
+
+        function updateOpRisks(data) {
+            const total = data.summary.critical + data.summary.warning + data.summary.info;
+            document.getElementById('opRisksTotal').textContent = total + ' Active';
+            const counts = document.querySelectorAll('#opRisksCounts .op-risk-count-num');
+            if (counts[0]) counts[0].textContent = data.summary.critical;
+            if (counts[1]) counts[1].textContent = data.summary.warning;
+            if (counts[2]) counts[2].textContent = data.summary.info;
+            const totalSev = total > 0 ? total : 1;
+            const bar = document.getElementById('opRisksBar');
+            bar.innerHTML = `
+                        <div class="op-severity-seg health-red" style="width:${Math.round((data.summary.critical / totalSev) * 100)}%;"></div>
+                        <div class="op-severity-seg health-orange" style="width:${Math.round((data.summary.warning / totalSev) * 100)}%;"></div>
+                        <div class="op-severity-seg health-blue" style="width:${Math.round((data.summary.info / totalSev) * 100)}%;"></div>`;
+            document.getElementById('opRisksLegend').innerHTML = `
+                        <span><span class="op-legend-dot health-red"></span>Critical ${Math.round((data.summary.critical / totalSev) * 100)}%</span>
+                        <span><span class="op-legend-dot health-orange"></span>Warning ${Math.round((data.summary.warning / totalSev) * 100)}%</span>
+                        <span><span class="op-legend-dot health-blue"></span>Info ${Math.round((data.summary.info / totalSev) * 100)}%</span>`;
+            const miniGrid = document.getElementById('opRisksMini');
+            if (data.alerts && data.alerts.length > 0) {
+                miniGrid.innerHTML = data.alerts.slice(0, 3).map(a => `
+                            <div class="op-risk-mini-card op-risk-mini-${a.severity}">
+                                <div class="op-risk-mini-header">
+                                    <span class="op-risk-mini-category">${a.department}</span>
+                                    <span class="op-risk-mini-days" data-timestamp="${a.timestamp}">${timeAgo(a.timestamp)}</span>
+                                </div>
+                                <p class="op-risk-mini-issue">${a.title}</p>
+                            </div>`).join('');
+            }
+        }
+
+        function initSalesChart() {
+            const ctx = document.getElementById('salesTrendChart');
+            if (!ctx) return;
+            salesTrendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Sales',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: '#1B6FC8',
+                        backgroundColor: 'rgba(27,111,200,0.15)',
+                        tension: 0.35,
+                        fill: true,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#1B6FC8',
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#fff',
+                            titleColor: '#0B1E3D',
+                            bodyColor: '#0B1E3D',
+                            borderColor: '#E2E8F0',
+                            borderWidth: 1,
+                            cornerRadius: 6,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#E2E8F0' },
+                            border: { display: true, color: '#E2E8F0' },
+                            ticks: { precision: 0 },
+                            grace: '10%'
+                        },
+                        x: {
+                            grid: { display: false },
+                            border: { display: true, color: '#E2E8F0' }
+                        }
+                    }
+                },
+                plugins: [verticalLinePlugin]
+            });
+            changeSalesRange();
+
+            // Apply dark mode colors if needed
+            if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                const gridColor = '#64748B';
+                salesTrendChart.options.scales.y.grid.color = gridColor;
+                salesTrendChart.options.scales.y.border.color = gridColor;
+                salesTrendChart.options.scales.x.border.color = gridColor;
+                salesTrendChart.options.scales.y.ticks.color = '#94A3B8';
+                salesTrendChart.options.scales.x.ticks.color = '#94A3B8';
+                salesTrendChart.update();
+            }
+        }
+
+        async function changeSalesRange() {
+            const range = document.getElementById('salesRange')?.value || '7d';
+            try {
+                const res = await fetch(`/api/sales-forecast?range=${range}`);
+                const data = await res.json();
+                if (salesTrendChart) {
+                    salesTrendChart.data.labels = data.labels;
+                    salesTrendChart.data.datasets[0].data = data.sales;
+
+                    if (data.year) {
+                        salesTrendChart.options.plugins.title = {
+                            display: true,
+                            text: data.year.toString(),
+                            position: 'top',
+                            align: 'end',
+                            font: { size: 11 },
+                            color: '#64748B'
+                        };
+                    } else {
+                        salesTrendChart.options.plugins.title = { display: false };
+                    }
+
+                    salesTrendChart.update();
+                }
+            } catch (e) { }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initSalesChart();
+            fetchOpRisks();
+            setInterval(fetchOpRisks, 30000);
+            setInterval(() => {
+                document.querySelectorAll('.op-risk-mini-days').forEach(el => {
+                    const ts = el.getAttribute('data-timestamp');
+                    if (ts) el.textContent = timeAgo(ts);
+                });
+            }, 10000);
+        });
+
+        let salesChart;
+        const clientScope = @json(request()->integer('client_id') ?: null);
+        async function loadSalesTrend() {
+            const range = document.getElementById('salesRange').value;
+            const response = await fetch(@json(route('bi.sales-forecast')).concat('?range=', range, clientScope ? '&client_id=' + clientScope : ''));
+            const data = await response.json();
+            salesChart?.destroy();
+            salesChart = new Chart(document.getElementById('salesTrendChart'), { type: 'line', data: { labels: data.labels, datasets: [{ label: 'Invoice revenue', data: data.sales, borderColor: '#1B6FC8', backgroundColor: 'rgba(27,111,200,.12)', fill: true, tension: .35 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+        }
+        document.getElementById('salesRange').addEventListener('change', loadSalesTrend); loadSalesTrend();
+    </script>
 @endsection
