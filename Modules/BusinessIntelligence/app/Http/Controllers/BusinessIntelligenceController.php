@@ -7,6 +7,8 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 class BusinessIntelligenceController
@@ -38,6 +40,78 @@ class BusinessIntelligenceController
     public function aiInsights(): View
     {
         return view('bi::ai-insights');
+    }
+
+    public function aiChat(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'message' => ['required', 'string', 'max:1500'],
+        ]);
+
+        $clientId = $this->clientId($request);
+        if (! $clientId) {
+            return response()->json(['message' => 'Select a client before requesting BI insights.'], 422);
+        }
+
+        $key = config('services.digitalocean_inference.key');
+        $model = config('services.digitalocean_inference.model');
+        if (! $key || ! $model) {
+            return response()->json(['message' => 'AI Insights is not configured yet. Contact your system administrator.'], 503);
+        }
+
+        $metrics = $this->metrics($clientId);
+        $this->recordSnapshot($clientId, $metrics);
+
+        $systemPrompt = <<<PROMPT
+You are Nexora BI, a business analyst. Answer only from the client-scoped aggregate metrics supplied below. Do not claim access to raw data, other clients, credentials, personal information, or system internals. If the metrics cannot answer the question, say so plainly and suggest a safe next metric to add. Keep the answer practical and concise.
+
+Client-scoped metrics: %s
+PROMPT;
+
+        try {
+            $response = Http::withToken($key)
+                ->acceptJson()
+                ->timeout(30)
+                ->post(rtrim((string) config('services.digitalocean_inference.base_url'), '/').'/chat/completions', [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => sprintf($systemPrompt, json_encode($metrics, JSON_THROW_ON_ERROR))],
+                        ['role' => 'user', 'content' => $validated['message']],
+                    ],
+                    'temperature' => 0.2,
+                    'max_tokens' => 500,
+                ]);
+
+            if ($response->failed()) {
+                Log::warning('DigitalOcean BI inference request failed.', [
+                    'client_id' => $clientId,
+                    'status' => $response->status(),
+                ]);
+
+                return response()->json(['message' => 'AI Insights is temporarily unavailable. Please try again shortly.'], 502);
+            }
+
+            $message = data_get($response->json(), 'choices.0.message.content');
+            if (is_array($message)) {
+                $message = collect($message)->pluck('text')->filter()->implode("\n");
+            }
+            $message = trim((string) $message);
+            if ($message === '') {
+                return response()->json(['message' => 'AI Insights returned no answer. Please try again.'], 502);
+            }
+
+            $this->recordConversation($clientId, 'user', $validated['message'], true);
+            $this->recordConversation($clientId, 'assistant', $message, true);
+
+            return response()->json(['message' => $message]);
+        } catch (\Throwable $exception) {
+            Log::warning('DigitalOcean BI inference request threw an exception.', [
+                'client_id' => $clientId,
+                'exception' => $exception->getMessage(),
+            ]);
+
+            return response()->json(['message' => 'AI Insights is temporarily unavailable. Please try again shortly.'], 502);
+        }
     }
 
     public function salesForecast(Request $request): JsonResponse
@@ -351,6 +425,31 @@ class BusinessIntelligenceController
         } catch (\Throwable) {
             // BI must remain read-only and available when its optional
             // snapshot store is temporarily unavailable.
+        }
+    }
+
+    private function recordConversation(int $clientId, string $role, string $message, bool $usedAi): void
+    {
+        if (! config('database.connections.business_intelligence.url')) {
+            return;
+        }
+
+        try {
+            if (! Schema::connection('business_intelligence')->hasTable('bi_ai_conversations')) {
+                return;
+            }
+
+            DB::connection('business_intelligence')->table('bi_ai_conversations')->insert([
+                'client_id' => $clientId,
+                'employee_id' => session('employee_id'),
+                'role' => $role,
+                'message' => $message,
+                'used_ai' => $usedAi,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Throwable) {
+            // Conversation auditing must not prevent the client from using BI.
         }
     }
 }

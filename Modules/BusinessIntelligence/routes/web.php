@@ -10,6 +10,7 @@ Route::middleware('bi.access')->name('bi.')->group(function (): void {
     Route::get('/department-analytics', [BusinessIntelligenceController::class, 'departmentAnalytics'])->name('department-analytics');
     Route::get('/live-monitor', [BusinessIntelligenceController::class, 'liveMonitor'])->name('live-monitor');
     Route::get('/ai-insights', [BusinessIntelligenceController::class, 'aiInsights'])->name('ai-insights');
+    Route::post('/api/ai/chat', [BusinessIntelligenceController::class, 'aiChat'])->name('ai.chat');
 
     Route::get('/api/live-feed', [BusinessIntelligenceController::class, 'liveFeed'])->name('live-feed');
     Route::get('/api/department/{department}', [BusinessIntelligenceController::class, 'departmentData'])

@@ -39,4 +39,10 @@ return [
         'dashboard_url' => env('HR_MODULE_URL'),
     ],
 
+    'digitalocean_inference' => [
+        'key' => env('DO_INFERENCE_API_KEY'),
+        'model' => env('DO_INFERENCE_MODEL'),
+        'base_url' => env('DO_INFERENCE_BASE_URL', 'https://inference.do-ai.run/v1'),
+    ],
+
 ];
