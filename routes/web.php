@@ -16,6 +16,10 @@ use App\Http\Controllers\DocumentController; // Imported DocumentController
 use App\Http\Controllers\NewUserSetupController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\RolesAndPermissionController;
+use App\Http\Controllers\ApprovalController;
+use App\Http\Controllers\KnowledgeBaseController;
+use App\Http\Controllers\ServiceController;
 
 Route::get('/login', function () {
     return view('auth.login');
@@ -129,23 +133,19 @@ Route::get('/users/index', function () {
     return view('users.index');
 })->name('users.index');
 
-Route::get('/users/roles', function () {
-    return view('users.rolesandpermission');
-})->name('users.roles');
-
 Route::get('/users/roles', [RolesAndPermissionController::class, 'index'])
     ->name('users.roles');
 
-Route::post('/roles/bulk-delete', [RoleController::class, 'bulkDelete'])
+Route::post('/roles/bulk-delete', [RolesAndPermissionController::class, 'bulkDelete'])
     ->name('roles.bulk-delete');
 
-Route::post('/roles/store', [RoleController::class, 'store'])
+Route::post('/roles/store', [RolesAndPermissionController::class, 'store'])
     ->name('roles.store');
 
-Route::patch('/roles/{role}', [RoleController::class, 'update'])
+Route::patch('/roles/{role}', [RolesAndPermissionController::class, 'update'])
     ->name('roles.update');
 
-Route::delete('/roles/{role}', [RoleController::class, 'destroy'])
+Route::delete('/roles/{role}', [RolesAndPermissionController::class, 'destroy'])
     ->name('roles.destroy');
 
 
@@ -173,7 +173,3 @@ Route::get('/client/itsm/service-desk/knowledge-base', [ServiceController::class
 
 Route::post('/knowledge-base/store', [KnowledgeBaseController::class, 'store'])
     ->name('knowledge-base.store');
-
-Route::post('/roles/store', [RoleController::class, 'store'])->name('roles.store');
-
-

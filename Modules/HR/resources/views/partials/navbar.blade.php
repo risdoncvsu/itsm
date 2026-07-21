@@ -5,11 +5,11 @@
     $dropActive = 'bg-[#f3f6fb] text-[#2D7EFF]';
 
     $isDashboard = request()->routeIs('hr.dashboard');
-    $isWorkforce = request()->routeIs('employees.*') || request()->routeIs('departments.*');
+    $isWorkforce = request()->routeIs('hr.employees.*') || request()->routeIs('hr.departments.*');
     $isEmployees = request()->routeIs('hr.employees.index') || request()->routeIs('hr.employees.show') || request()->routeIs('hr.employees.create');
-    $isDepartments = request()->routeIs('departments.*');
-    $isOnboarding = request()->routeIs('onboarding.*');
-    $isReports = request()->routeIs('reports-analytics.*');
+    $isDepartments = request()->routeIs('hr.departments.*');
+    $isOnboarding = request()->routeIs('hr.onboarding.*');
+    $isReports = request()->routeIs('hr.reports-analytics.*');
     $isAttendance = request()->routeIs('hr.reports-analytics.attendance-overview') || request()->routeIs('hr.reports-analytics.employee-attendance');
     $isLeave = request()->routeIs('hr.reports-analytics.leave');
 @endphp
