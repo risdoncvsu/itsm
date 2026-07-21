@@ -5,94 +5,14 @@ namespace Modules\Procurement\Http\Controllers\Procurement;
 use App\Http\Controllers\Controller;
 use Modules\Procurement\Models\Delivery;
 use Modules\Procurement\Models\PurchaseOrder;
+use Modules\Procurement\Models\Requisition;
 use Modules\Procurement\Models\Supplier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DeliveryController extends Controller
 {
-    /**
-     * Requisitions live on external connections (orderfullfillment /
-     * manufacturing), NOT on the procurement DB, so we look them up with
-     * raw queries the same way RequisitionController does. Returns a small
-     * object holding the connection name + row id, or null if not found.
-     */
-    private function findRequisition($purchaseOrder): ?object
-    {
-        if (! $purchaseOrder) {
-            return null;
-        }
-
-        foreach (['orderfullfillment', 'manufacturing'] as $name) {
-            try {
-                $conn = DB::connection($name);
-                if (! $conn->getSchemaBuilder()->hasTable('requisitions')) {
-                    continue;
-                }
-
-                $row = null;
-                if (! empty($purchaseOrder->requisition_reference)) {
-                    $row = $conn->table('requisitions')
-                        ->where('req_number', $purchaseOrder->requisition_reference)
-                        ->first();
-                }
-                if (! $row && ! empty($purchaseOrder->requisition_id)) {
-                    $row = $conn->table('requisitions')
-                        ->where('id', $purchaseOrder->requisition_id)
-                        ->first();
-                }
-
-                if ($row) {
-                    return (object) ['connection' => $name, 'id' => $row->id];
-                }
-            } catch (\Exception $e) {
-                // ignore broken / unavailable external connections
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Update a requisition row on whichever external connection it lives on.
-     * Silently skips columns/tables that don't exist so a schema mismatch
-     * never crashes delivery logging.
-     */
-    private function updateRequisition(?object $requisition, array $values): void
-    {
-        if (! $requisition) {
-            return;
-        }
-
-        try {
-            $conn = DB::connection($requisition->connection);
-
-            // Only keep columns that actually exist on the external table.
-            $filtered = [];
-            foreach ($values as $column => $value) {
-                if ($conn->getSchemaBuilder()->hasColumn('requisitions', $column)) {
-                    $filtered[$column] = $value;
-                }
-            }
-
-            if ($filtered === []) {
-                return;
-            }
-
-            if ($conn->getSchemaBuilder()->hasColumn('requisitions', 'updated_at')) {
-                $filtered['updated_at'] = now();
-            }
-
-            $conn->table('requisitions')
-                ->where('id', $requisition->id)
-                ->update($filtered);
-        } catch (\Exception $e) {
-            // ignore if the external connection can't be written
-        }
-    }
-
     public function index(): View
     {
         $deliveries = Delivery::with(['supplier', 'purchaseOrder'])->orderBy('delivery_date')->get();
@@ -140,6 +60,7 @@ class DeliveryController extends Controller
                 'email' => null,
                 'phone' => null,
                 'address' => null,
+                'category' => 'General Procurement',
                 'status' => 'active',
             ]);
         }
@@ -148,19 +69,32 @@ class DeliveryController extends Controller
             'shipment_number' => $data['dr'],
             'purchase_order_id' => $purchaseOrder?->id,
             'supplier_id' => $supplier->id,
+            'stage' => 1,
             'status' => 'shipment',
             'qty' => (int) $data['qty'],
             'qty_expected' => (int) $data['qty'],
+            'timer_minutes' => (int) $data['timer_minutes'],
             'items' => $data['items'],
             'remarks' => $data['remarks'] ?? null,
             'delivery_date' => $data['delDate'],
+            'started_at' => now(),
         ]);
 
         if ($purchaseOrder) {
-            $purchaseOrder->update(['status' => 'processing']);
+            $purchaseOrder->update(['delivery_status' => 'shipment', 'status' => 'processing']);
 
-            $requisition = $this->findRequisition($purchaseOrder);
-            $this->updateRequisition($requisition, ['delivery_status' => 'shipment']);
+            $requisition = null;
+            if (! empty($purchaseOrder->requisition_reference)) {
+                $requisition = Requisition::where('req_number', $purchaseOrder->requisition_reference)->first();
+            }
+
+            if (! $requisition && $purchaseOrder->requisition_id) {
+                $requisition = Requisition::find($purchaseOrder->requisition_id);
+            }
+
+            if ($requisition) {
+                $requisition->update(['delivery_status' => 'shipment']);
+            }
         }
 
         return response()->json([
@@ -196,13 +130,24 @@ class DeliveryController extends Controller
                 'email' => null,
                 'phone' => null,
                 'address' => null,
+                'category' => 'General Procurement',
                 'status' => 'active',
             ]);
         }
 
         $status = strtolower((string) ($data['status'] ?? $delivery->status));
+        $stageMap = [
+            'pending' => 0,
+            'shipment' => 1,
+            'intransit' => 2,
+            'delivered' => 3,
+            'complete' => 4,
+            'delayed' => 2,
+            'cancel' => 0,
+        ];
 
         $updateData = [
+            'stage' => $stageMap[$status] ?? 0,
             'status' => $status,
         ];
 
@@ -225,10 +170,20 @@ class DeliveryController extends Controller
         $delivery->update($updateData);
 
         if ($purchaseOrder && $status === 'complete') {
-            $purchaseOrder->update(['status' => 'completed']);
+            $purchaseOrder->update(['status' => 'completed', 'delivery_status' => 'complete']);
 
-            $requisition = $this->findRequisition($purchaseOrder);
-            $this->updateRequisition($requisition, ['status' => 'completed', 'delivery_status' => 'complete']);
+            $requisition = null;
+            if (! empty($purchaseOrder->requisition_reference)) {
+                $requisition = Requisition::where('req_number', $purchaseOrder->requisition_reference)->first();
+            }
+
+            if (! $requisition && $purchaseOrder->requisition_id) {
+                $requisition = Requisition::find($purchaseOrder->requisition_id);
+            }
+
+            if ($requisition) {
+                $requisition->update(['status' => 'completed', 'delivery_status' => 'complete']);
+            }
         }
 
         return response()->json(['success' => true, 'data' => $delivery]);
@@ -241,3 +196,4 @@ class DeliveryController extends Controller
         return response()->json(['success' => true]);
     }
 }
+
