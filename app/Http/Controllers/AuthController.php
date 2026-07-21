@@ -59,7 +59,9 @@ class AuthController extends Controller
                 return redirect()->route('hr.first-login.password');
             }
 
-            return redirect()->route($this->employeeModuleRoute());
+            $this->signInEcommerceAdmin();
+
+            return redirect()->to($this->employeeModuleDestination());
         }
 
         return back()->withErrors(['username' => $hrLogin['message']]);
@@ -84,7 +86,9 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route($this->employeeModuleRoute());
+        $this->signInEcommerceAdmin();
+
+        return redirect()->to($this->employeeModuleDestination());
     }
 
     private function companyAdminDestination($user): string
@@ -108,32 +112,67 @@ class AuthController extends Controller
      * department as "Order Management" and store Shipping Coordinator only
      * in the position field. Both are Order Fulfillment accounts.
      */
-    private function employeeModuleRoute(): string
+    private function employeeModuleDestination(): string
     {
         $department = strtolower((string) session('employee_department', ''));
         $position = strtolower((string) session('employee_position', ''));
         $assignment = $department.' '.$position;
 
         if (str_contains($assignment, 'inventory') || str_contains($assignment, 'warehouse')) {
-            return 'inventory.index';
+            return route('inventory.index');
         }
 
         if (str_contains($assignment, 'procurement') || str_contains($assignment, 'purchasing')) {
-            return 'procurement.dashboard';
+            return route('procurement.dashboard');
         }
 
         if (str_contains($assignment, 'fulfillment') || str_contains($assignment, 'operations') || str_contains($assignment, 'order') || str_contains($assignment, 'shipping')) {
-            return 'order-fulfillment.dashboard';
+            return route('order-fulfillment.dashboard');
         }
 
         if (str_contains($assignment, 'manufacturing') || str_contains($assignment, 'production')) {
-            return 'manufacturing.dashboard';
+            return route('manufacturing.dashboard');
         }
 
         if (str_contains($assignment, 'finance') || str_contains($assignment, 'accounting')) {
-            return 'finance.dashboard';
+            return route('finance.dashboard');
         }
 
-        return 'hr.dashboard';
+        if (
+            str_contains($assignment, 'e-commerce')
+            || str_contains($assignment, 'ecommerce')
+            || str_contains($assignment, 'electronic commerce')
+            || str_contains($assignment, 'crm')
+        ) {
+            return $this->ecommerceAdminUrl();
+        }
+
+        return route('hr.dashboard');
+    }
+
+    private function signInEcommerceAdmin(): void
+    {
+        if (! class_exists(\Filament\Panel::class)) {
+            return;
+        }
+
+        $employeeId = (int) session('employee_id');
+        $clientId = (int) session('employee_client_id');
+
+        $admin = $employeeId && $clientId
+            ? \Modules\Ecommerce\Models\EcommerceAdmin::query()
+                ->whereKey($employeeId)
+                ->where('client_id', $clientId)
+                ->first()
+            : null;
+
+        if ($admin && $admin->isEcommerceEmployee()) {
+            Auth::guard('ecommerce_admin')->login($admin);
+        }
+    }
+
+    private function ecommerceAdminUrl(): string
+    {
+        return url('/ecommerce-admin');
     }
 }

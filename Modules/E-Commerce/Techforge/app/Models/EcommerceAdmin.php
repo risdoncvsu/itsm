@@ -6,27 +6,34 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Hash;
 
 class EcommerceAdmin extends Authenticatable implements FilamentUser, HasName
 {
     protected $connection = 'hr';
-    protected $table = 'ecommerce';
+    protected $table = 'employees';
 
-    // Disable timestamps as this is a view
-    public $timestamps = false;
-
-    // All records in the ecommerce view are considered admins
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        return $this->isEcommerceEmployee();
     }
 
-    public function getAuthPassword()
+    public function isEcommerceEmployee(): bool
     {
-        // The view contains a plaintext 'temporary_password'.
-        // We hash it dynamically so Laravel's default Auth Hash::check() succeeds.
-        return Hash::make($this->temporary_password);
+        return (int) $this->client_id > 0
+            && strtolower((string) $this->approval_status) === 'active'
+            && in_array(strtolower(trim((string) $this->department)), [
+                'e-commerce', 'ecommerce', 'electronic commerce', 'crm',
+            ], true);
+    }
+
+    public function getAuthPassword(): string
+    {
+        return (string) $this->temporary_password;
+    }
+
+    public function getAuthPasswordName(): string
+    {
+        return 'temporary_password';
     }
 
     public function getFilamentName(): string
@@ -37,9 +44,8 @@ class EcommerceAdmin extends Authenticatable implements FilamentUser, HasName
     /**
      * Look up the Company record for this admin via hr_employee_id.
      */
-    public function getCompany(): ?Company
+    public function getCompany(): ?\App\Models\Company
     {
-        return Company::forHrEmployee($this->id);
+        return \App\Models\Company::find($this->client_id);
     }
 }
-

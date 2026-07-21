@@ -19,7 +19,7 @@ class LatestOrders extends TableWidget
     {
         return $table
             ->query(
-                fn (): Builder => Order::withoutGlobalScope('ecommerce-client')
+                fn (): Builder => Order::query()
                     ->latest()
                     ->limit(10)
             )

@@ -79,7 +79,7 @@ return [
             'model' => \Modules\Ecommerce\Models\User::class,
         ],
         'ecommerce_admins' => [
-            'driver' => 'eloquent',
+            'driver' => 'ecommerce-admin-employees',
             'model' => \Modules\Ecommerce\Models\EcommerceAdmin::class,
         ],
 

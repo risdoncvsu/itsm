@@ -15,13 +15,12 @@ class StatsOverview extends StatsOverviewWidget
 {
     protected function getStats(): array
     {
-        // Remove the client scope so admins see all data across all clients.
-        $totalOrders = Order::withoutGlobalScope('ecommerce-client')->count();
-        $totalRevenue = Order::withoutGlobalScope('ecommerce-client')
+        $totalOrders = Order::count();
+        $totalRevenue = Order::query()
             ->where('payment_status', 'paid')
             ->sum('total');
-        $totalCustomers = User::withoutGlobalScope('ecommerce-client')->count();
-        $pendingOrders = Order::withoutGlobalScope('ecommerce-client')
+        $totalCustomers = User::count();
+        $pendingOrders = Order::query()
             ->where('status', 'pending')
             ->count();
 
