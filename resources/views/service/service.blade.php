@@ -163,10 +163,17 @@
                                             @if ($canUpdateTicket)
                                                 <td class="py-4 text-right">
                                                     @if ($canProcessPasswordResets && $ticket->category === 'Password Reset' && $ticket->status !== 'Resolved')
-                                                        <form method="POST" action="{{ route('client.itsm.service-desk.support.reset-password', $ticket) }}" class="mb-2" onsubmit="return confirm('Generate a one-time password for this account?')">
-                                                            @csrf
-                                                            <button type="submit" class="rounded-md bg-[#346DCB] px-3 py-1 font-semibold text-white hover:bg-[#2554a3]">Reset password</button>
-                                                        </form>
+                                                        <details class="mb-2 text-left">
+                                                            <summary class="cursor-pointer rounded-md bg-[#346DCB] px-3 py-1 text-center font-semibold text-white hover:bg-[#2554a3]">Set temporary password</summary>
+                                                            <form method="POST" action="{{ route('client.itsm.service-desk.support.reset-password', $ticket) }}" class="mt-2 w-64 rounded border border-slate-200 bg-slate-50 p-3">
+                                                                @csrf
+                                                                <label class="mb-1 block text-xs font-semibold text-slate-700">Temporary password</label>
+                                                                <input type="password" name="temporary_password" minlength="10" required autocomplete="new-password" class="mb-2 h-9 w-full rounded border border-slate-300 px-2 text-xs">
+                                                                <label class="mb-1 block text-xs font-semibold text-slate-700">Confirm password</label>
+                                                                <input type="password" name="temporary_password_confirmation" minlength="10" required autocomplete="new-password" class="mb-2 h-9 w-full rounded border border-slate-300 px-2 text-xs">
+                                                                <button type="submit" class="w-full rounded bg-[#132B52] px-2 py-1.5 text-xs font-semibold text-white hover:bg-[#0b1e3d]">Reset and resolve</button>
+                                                            </form>
+                                                        </details>
                                                     @endif
                                                     <button type="button" class="edit-ticket rounded-md border border-slate-300 px-3 py-1 font-semibold hover:bg-slate-100">
                                                         {{ $updateMode === 'status_only' ? 'Resolve' : 'Edit' }}

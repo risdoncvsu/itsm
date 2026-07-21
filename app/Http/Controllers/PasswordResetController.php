@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\ServiceTicket;
 use App\Models\User;
+use App\Services\ErpIntegrationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PasswordResetController extends Controller
@@ -27,7 +27,10 @@ class PasswordResetController extends Controller
         $company = null;
         $employee = null;
 
-        $user = User::query()->where('email', $identifier)->orWhere('username', $identifier)->first();
+        $user = User::query()
+            ->where('company_id', $ticket->company_id)
+            ->where(fn ($query) => $query->where('email', $identifier)->orWhere('username', $identifier))
+            ->first();
         if ($user?->company_id) {
             $company = Company::find($user->company_id);
         }
@@ -63,17 +66,21 @@ class PasswordResetController extends Controller
     {
         abort_unless($ticket->ticket_type === 'nexora_support' && $ticket->category === 'Password Reset', 404);
         abort_unless(Auth::user()?->role === 'company_admin' && Auth::user()?->company_id === $ticket->company_id, 403);
+        abort_if($ticket->status === 'Resolved', 422, 'This password-reset request has already been resolved.');
 
+        $validated = request()->validate([
+            'temporary_password' => ['required', 'string', 'min:10', 'max:128', 'confirmed'],
+        ]);
         $identifier = $ticket->requester;
-        $password = Str::password(16, symbols: true);
+        $password = $validated['temporary_password'];
         $user = User::query()->where('email', $identifier)->orWhere('username', $identifier)->first();
 
         if ($user) {
             $user->forceFill(['password' => Hash::make($password)])->save();
         } else {
             $employee = DB::connection('hr')->table('employees')
-                ->where('company_email', $identifier)
-                ->orWhere('email', $identifier)
+                ->where('client_id', $ticket->company_id)
+                ->where(fn ($query) => $query->where('company_email', $identifier)->orWhere('email', $identifier))
                 ->where('approval_status', 'Active')
                 ->first();
 
@@ -89,6 +96,11 @@ class PasswordResetController extends Controller
         }
 
         $ticket->update(['status' => 'Resolved']);
+        app(ErpIntegrationService::class)->recordAudit((int) $ticket->company_id, 'password.reset_resolved', 'ITSM', [
+            'ticket_id' => $ticket->id,
+            'requester' => $identifier,
+            'module' => $ticket->module,
+        ]);
 
         return back()->with('reset_credentials', [
             'username' => $identifier,

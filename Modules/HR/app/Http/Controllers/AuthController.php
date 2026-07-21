@@ -14,19 +14,6 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (
-    $request->company_email === 'admin@nexora.com' &&
-    $request->password === 'Admin123'
-) {
-    session([
-        'employee_logged_in' => true,
-        'employee_role' => 'admin',
-        'employee_name' => 'Administrator',
-    ]);
-
-    return redirect()->route('hr.dashboard');
-}
-
         $employee = Employee::where(
             'company_email',
             $request->company_email
@@ -40,8 +27,10 @@ class AuthController extends Controller
             return back()->with('error', 'Invalid email or password. Please try again.');
         }
 
-        $isHrManager = strtolower(trim((string) $employee->department)) === 'human resources'
-            && strtolower(trim((string) $employee->position)) === 'hr manager';
+        $department = preg_replace('/[^a-z0-9]/', '', strtolower((string) $employee->department));
+        $position = preg_replace('/[^a-z0-9]/', '', strtolower((string) $employee->position));
+        $isHrManager = in_array($department, ['humanresources', 'hr'], true)
+            && in_array($position, ['hrmanager', 'humanresourcesmanager'], true);
 
         session([
             'employee_logged_in' => true,
@@ -50,9 +39,9 @@ class AuthController extends Controller
             'employee_name' => $employee->first_name,
             'employee_email' => $employee->company_email,
             'employee_department' => $employee->department,
+            'employee_client_id' => (int) $employee->client_id,
         ]);
 
-        $department = strtolower(trim($employee->department ?? ''));
         $route = $isHrManager
             ? 'hr.dashboard'
             : 'hr.employee.dashboard';
