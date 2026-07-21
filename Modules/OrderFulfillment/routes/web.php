@@ -6,7 +6,6 @@ use Modules\OrderFulfillment\Http\Controllers\OrderController;
 use Modules\OrderFulfillment\Http\Controllers\PackingController;
 use Modules\OrderFulfillment\Http\Controllers\ShippingController;
 use Modules\OrderFulfillment\Http\Controllers\MaterialRequestController;
-use Modules\OrderFulfillment\Http\Controllers\ActivityController;
 
 // Protected order-fulfillment routes
 Route::prefix('order-fulfillment')->name('order-fulfillment.')->middleware('order-fulfillment.access')->group(function (): void {
@@ -38,8 +37,6 @@ Route::prefix('order-fulfillment')->name('order-fulfillment.')->middleware('orde
     Route::post('/shipping/{shipmentId}/cancel', [ShippingController::class, 'cancel'])->name('shipping.cancel');
 
     Route::post('/material-requests', [MaterialRequestController::class, 'store'])->name('material-requests.store');
-
-    Route::get('/activity/recent', [ActivityController::class, 'recent'])->name('activity.recent');
 
     Route::view('/returns', 'order-fulfillment::return')->name('return');
 });

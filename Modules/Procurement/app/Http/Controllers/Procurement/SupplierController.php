@@ -34,7 +34,7 @@ class SupplierController extends Controller
             return response()->json(['status' => 'ok', 'data' => $data]);
         }
 
-        return view('pages.suppliers', compact('suppliers'));
+        return view('procurement::pages.suppliers', compact('suppliers'));
     }
 
     /**

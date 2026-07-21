@@ -83,7 +83,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('pages.dashboard', [
+        return view('procurement::pages.dashboard', [
             'poCount' => $poCount,
             'poStatusBreakdown' => $poStatusBreakdown,
             'supplierCount' => $supplierCount,

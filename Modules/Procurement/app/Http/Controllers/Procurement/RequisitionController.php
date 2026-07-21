@@ -238,7 +238,7 @@ class RequisitionController extends Controller
             return strtolower(str_replace(' ', '-', $req->status ?? 'Pending'));
         })->countBy();
 
-        return view('pages.requisitions', compact('requisitions', 'statusCounts'));
+        return view('procurement::pages.requisitions', compact('requisitions', 'statusCounts'));
     }
 
     /**

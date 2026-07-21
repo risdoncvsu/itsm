@@ -16,28 +16,30 @@ class DashboardController extends Controller
         if (! (config('nexora.root_admin_module_testing') && auth()->user()?->role === 'root_admin')) {
             $orders->where('client_id', session('employee_client_id'));
         }
- // ---- Stats row ----
-        $ordersReceivedToday = DB::table('orders')->where('status', 'NEW')->count();
-        $inPackingCount      = DB::table('orders')->where('status', 'PACKING')->count();
-        $shippedTodayCount   = DB::table('orders')->where('status', 'SHIPPED')->count();
-        $deliveredCount      = DB::table('orders')->where('status', 'DELIVERED')->count();
-        $totalOrders         = DB::table('orders')->count();
+        // All data below must remain on the dedicated Order Fulfillment
+        // connection. The prior DB::table calls silently switched back to
+        // ITSM's main database.
+        $ordersReceivedToday = (clone $orders)->where('status', 'NEW')->count();
+        $inPackingCount      = (clone $orders)->where('status', 'PACKING')->count();
+        $shippedTodayCount   = (clone $orders)->where('status', 'SHIPPED')->count();
+        $deliveredCount      = (clone $orders)->where('status', 'DELIVERED')->count();
+        $totalOrders         = (clone $orders)->count();
         $onTimeRate          = $totalOrders > 0 ? round(($deliveredCount / $totalOrders) * 100) : 0;
 
         // ---- Board columns ----
         // The ORDERS column acts as a running log of every order, so it keeps
         // showing an order even after it moves on to packing/shipped/etc.
-        $newOrders       = DB::table('orders')->orderByDesc('created_at')->get();
-        $packingOrders   = DB::table('orders')->where('status', 'PACKING')->get();
+        $newOrders       = (clone $orders)->orderByDesc('created_at')->get();
+        $packingOrders   = (clone $orders)->where('status', 'PACKING')->get();
         // Widened per SETUP_NOTES item 3 (plus READY_TO_SHIP, found afterward):
         // once an order leaves PACKING it should keep showing here all the way
         // through delivery, not just for the literal 'SHIPPED' status — otherwise
         // a READY_TO_SHIP order shows in neither the PACKING nor SHIPPED column.
-        $shippedOrders   = DB::table('orders')
+        $shippedOrders   = (clone $orders)
             ->whereIn('status', ['READY_TO_SHIP', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'])
             ->orderByDesc('created_at')
             ->get();
-        $cancelledOrders = DB::table('orders')->where('status', 'CANCELLED')->get();
+        $cancelledOrders = (clone $orders)->where('status', 'CANCELLED')->get();
 
         // ---- Sidebar ----.
         // Alerts should only reflect brand-new orders, not the full order log above.
@@ -80,7 +82,7 @@ class DashboardController extends Controller
             ->sortByDesc('activity_time')
             ->values();
 
-        return view('dashboard', compact(
+        return view('order-fulfillment::dashboard', compact(
             'ordersReceivedToday',
             'inPackingCount',
             'shippedTodayCount',

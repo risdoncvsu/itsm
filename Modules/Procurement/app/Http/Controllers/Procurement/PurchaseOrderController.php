@@ -88,7 +88,7 @@ class PurchaseOrderController extends Controller
                 return [strtolower(str_replace([' ', '_'], '-', $status ?? 'pending')) => $total];
             });
 
-        return view('pages.purchase-orders', compact('purchaseOrders', 'suppliers', 'statusCounts'));
+        return view('procurement::pages.purchase-orders', compact('purchaseOrders', 'suppliers', 'statusCounts'));
     }
 
     public function approved(Request $request)

@@ -9,18 +9,18 @@
 </head>
 <body>
 
-@include('partials.topnav')
+@include('procurement::partials.topnav')
 
 <div class="app">
-  @include('partials.sidebar')
+  @include('procurement::partials.sidebar')
 
   <main class="main">
     @yield('content')
   </main>
 </div>
 
-@include('partials.modals')
-@include('partials.toast')
+@include('procurement::partials.modals')
+@include('procurement::partials.toast')
 
 {{-- Shared scripts, split by concern so no single file is too long --}}
 <script src="{{ asset('js/Procurement_JS/app-core.js') }}"></script>       {{-- page/notif/toast/stat helpers --}}

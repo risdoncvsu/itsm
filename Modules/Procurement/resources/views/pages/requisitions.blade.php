@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('procurement::layouts.app')
 
 @section('title', 'Nexora ERP — Requisitions')
 
