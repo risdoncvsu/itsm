@@ -27,7 +27,7 @@ class DepartmentController extends Controller
 
         $departments = $query->orderBy('department_name')->get();
 
-        return view('hr.departments.index', compact('departments'));
+        return view('departments.index', compact('departments'));
     }
 
 
@@ -105,7 +105,7 @@ class DepartmentController extends Controller
             );
         }
 
-        return view('hr.departments.show', compact(
+        return view('departments.show', compact(
             'departments',
             'departmentName'
         ));

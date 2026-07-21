@@ -4,10 +4,26 @@ namespace Modules\HR\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Employee extends Model
 {
     protected $connection = 'hr';
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('client', function (Builder $query): void {
+            if ($clientId = (int) session('employee_client_id')) {
+                $query->where($query->getModel()->qualifyColumn('client_id'), $clientId);
+            }
+        });
+
+        static::creating(function (self $employee): void {
+            if (! $employee->client_id && ($clientId = (int) session('employee_client_id'))) {
+                $employee->client_id = $clientId;
+            }
+        });
+    }
 
     public function attendances()
     {
@@ -33,6 +49,9 @@ class Employee extends Model
         'email',
         'company_email',
         'temporary_password',
+        'must_change_password',
+        'client_id',
+        'approval_status',
         'birth_certificate',
         'curriculum_vitae',
         'valid_id',

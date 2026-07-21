@@ -76,7 +76,7 @@
             <!-- Temporary Password -->
             <div>
                 <label class="block text-slate-300 text-xs mb-1">
-                    Temporary Password
+                    Temporary Password (pending ITSM approval)
                 </label>
 
                 <input

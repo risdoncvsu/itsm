@@ -5,6 +5,7 @@ namespace Modules\HR\Http\Controllers;
 use Illuminate\Http\Request;
 use Modules\HR\Models\Employee;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeOnboardingController extends Controller
 {
@@ -175,11 +176,14 @@ class EmployeeOnboardingController extends Controller
             'policy_6' => 'accepted',
         ]);
 
+        $clientId = (int) session('employee_client_id');
+        abort_unless($clientId > 0, 403, 'A client-scoped HR session is required to create an employee.');
+
         $companyEmail = self::generateUniqueCompanyEmail(
             $step1['first_name'],
             $step1['last_name']
         );
-        $password = 'NEX-' . Str::upper(Str::random(6));
+        $plainPassword = 'NEX-' . Str::upper(Str::random(6));
 
     $employee = Employee::create([
         'first_name' => $step1['first_name'],
@@ -202,7 +206,10 @@ class EmployeeOnboardingController extends Controller
         'valid_id' => $step3['valid_id'] ?? null,
         'medical_certificate' => $step3['medical_certificate'] ?? null,
         'company_email' => $companyEmail,
-        'temporary_password' => $password,
+        'temporary_password' => Hash::make($plainPassword),
+        'must_change_password' => true,
+        'client_id' => $clientId,
+        'approval_status' => 'Pending',
     ]);
 
     // Ngayon meron na tayong auto-increment id, gamitin natin siya
@@ -210,6 +217,9 @@ class EmployeeOnboardingController extends Controller
     $employee->save();
 
     session()->forget(['step1', 'step2', 'step3']);
+    // Keep the one-time credential available only for the success screen;
+    // the HR database stores a hash and ITSM controls activation.
+    $employee->temporary_password = $plainPassword;
     session(['employee' => $employee]);
 
     return redirect()->route('hr.onboarding.success');

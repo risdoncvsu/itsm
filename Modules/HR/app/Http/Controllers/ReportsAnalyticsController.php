@@ -78,7 +78,7 @@ class ReportsAnalyticsController extends Controller
         }
 
         return view(
-            'hr.reports-analytics.attendance-overview',
+            'reports-analytics.attendance-overview',
             compact('employees', 'employeeCount', 'totalPresentDays', 'totalAbsentDays', 'totalLeaveDays')
         );
     }
@@ -114,7 +114,7 @@ class ReportsAnalyticsController extends Controller
         ];
 
         return view(
-            'hr.reports-analytics.employee-attendance',
+            'reports-analytics.employee-attendance',
             compact('employee', 'attendances', 'stats')
         );
     }
@@ -146,6 +146,6 @@ class ReportsAnalyticsController extends Controller
             );
         }
 
-        return view('hr.reports-analytics.leave', compact('employees'));
+        return view('reports-analytics.leave', compact('employees'));
     }
 }

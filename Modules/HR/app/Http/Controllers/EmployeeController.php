@@ -53,16 +53,18 @@ class EmployeeController extends Controller
             return $this->ajaxListResponse('employees.partials.list-results', compact('employees'));
         }
 
-        return view('hr.employees.index', compact('employees'));
+        return view('employees.index', compact('employees'));
     }
 
     public function create()
     {
-        return view('hr.employees.create');
+        return redirect()->route('hr.onboarding.step1');
     }
 
     public function store(Request $request)
     {
+        abort_unless((int) session('employee_client_id') > 0, 403);
+
         $request->validate([
             'first_name'      => 'required',
             'last_name'       => 'required',
@@ -102,6 +104,8 @@ Employee::create([
     'marital_status' => $request->marital_status,
     'address' => $request->address,
     'profile_picture' => $imageName,
+    'client_id' => (int) session('employee_client_id'),
+    'approval_status' => 'Pending',
 ]);
         return redirect()->route('hr.dashboard')
             ->with('success', 'Employee added successfully!');
@@ -153,7 +157,7 @@ public function destroy($id)
 
     $employee->delete();
 
-    return redirect('/employees')
+    return redirect()->route('hr.employees.index')
     ->with('success','Employee deleted successfully!');
 }
 }
