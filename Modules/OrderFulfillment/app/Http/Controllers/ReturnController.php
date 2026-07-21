@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\OrderFulfillment\Http\Controllers;
 
 use Modules\OrderFulfillment\Models\ReturnItem;
 

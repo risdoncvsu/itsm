@@ -18,12 +18,18 @@ class EcommerceServiceProvider extends ServiceProvider
             EnsureEcommerceClientColumns::class,
             AssignEcommerceCatalogToClient::class,
         ]);
-        $this->app->register(\Modules\Ecommerce\Providers\Filament\EcommercePanelProvider::class);
+        // Filament belongs to the original standalone admin panel and is not
+        // required for the unified storefront. Do not prevent the ERP from
+        // booting when that optional package is absent.
+        if (class_exists(\Filament\PanelProvider::class)) {
+            $this->app->register(\Modules\Ecommerce\Providers\Filament\EcommercePanelProvider::class);
+        }
     }
 
     public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'ecommerce');
+        Route::middleware('web')->group(__DIR__.'/../../routes/web.php');
         // The standalone storefront uses <x-navbar>, <x-footer>, and related
         // anonymous components directly, so retain those component names after
         // moving its views into this module.
