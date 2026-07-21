@@ -20,12 +20,7 @@ Route::get('/debug-session', function () {
     ];
 });
 
-Route::get('/', function () {
-    $prebuiltPcs = \Modules\Ecommerce\Models\PrebuiltConfig::with(['cpu', 'gpu', 'ram', 'storage', 'powerSupply'])->take(6)->get();
-    $customConfigs = \Modules\Ecommerce\Models\CustombuiltConfig::with(['intelCpu', 'amdCpu', 'gpu', 'intelRam', 'amdRam', 'storage', 'powerSupply'])->take(4)->get();
-    $storefrontListings = \Modules\Ecommerce\Models\StorefrontListing::query()->where('status', 'active')->latest()->take(8)->get();
-    return view('ecommerce::welcome', compact('prebuiltPcs', 'customConfigs', 'storefrontListings'));
-})->name('home');
+Route::get('/', [\Modules\Ecommerce\Http\Controllers\StorefrontController::class, 'index'])->name('home');
 
 Route::get('/login', function () {
     return view('ecommerce::auth.login');
@@ -273,6 +268,10 @@ Route::prefix('ecommerce-admin')->name('ecommerce.admin.')->group(function (): v
         Route::put('/listings/{listing}', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'updateListing'])->name('listings.update');
         Route::delete('/listings/{listing}', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'destroyListing'])->name('listings.destroy');
         Route::get('/orders', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'orders'])->name('orders');
+        Route::get('/layout', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'editLayout'])->name('layout.edit');
+        Route::put('/layout', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'saveLayout'])->name('layout.save');
+        Route::get('/layout/preview', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'previewLayout'])->name('layout.preview');
+        Route::post('/layout/publish', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'publishLayout'])->name('layout.publish');
         Route::post('/logout', [\Modules\Ecommerce\Http\Controllers\EcommerceAdminController::class, 'logout'])->name('logout');
     });
 });

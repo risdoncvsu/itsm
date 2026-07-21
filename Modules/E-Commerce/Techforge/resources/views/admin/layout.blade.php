@@ -47,6 +47,19 @@
         .hint { margin: 6px 0 0; color: #64748b; font-size: 12px; line-height: 1.45; }
         .success { margin-bottom: 16px; border-radius: 7px; padding: 12px; background: #dcfce7; color: #166534; }
         .error { color: #b91c1c; font-size: 13px; }
+        .editor-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(280px, .8fr); gap: 20px; align-items: start; }
+        .section-card { margin-top: 16px; padding: 18px; border: 1px solid #d8e2ee; border-radius: 9px; background: #fbfdff; }
+        .section-card h3 { margin: 0; color: #0b1e3d; font-size: 17px; }
+        .section-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .toggle { display: inline-flex; align-items: center; gap: 7px; color: #0b1e3d; font-size: 13px; font-weight: 700; }
+        .toggle input { width: auto; margin: 0; accent-color: #1d4e89; }
+        .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+        .order-list { display: grid; gap: 8px; margin-top: 14px; }
+        .order-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #d8e2ee; border-radius: 7px; padding: 10px 12px; background: #fff; font-size: 13px; font-weight: 700; }
+        .order-item button { padding: 4px 8px; border-radius: 5px; font-size: 12px; }
+        .publish-note { border-left: 4px solid #1d4e89; background: #edf4fc; padding: 13px; color: #1e3a5f; font-size: 13px; line-height: 1.5; }
+        @media(max-width:900px) { .editor-grid { grid-template-columns: 1fr; } }
+        @media(max-width:600px) { .field-grid { grid-template-columns: 1fr; } }
         @media (max-width: 900px) { .itsm-header { min-height: auto; padding: 12px 20px; align-items: flex-start; } .brand { height: 60px; } .brand img { max-width: 190px; } .header-actions { gap: 18px; flex-wrap: wrap; } .top-nav { gap: 16px; flex-wrap: wrap; justify-content: flex-end; } .top-nav a { font-size: 14px; } .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .page { width: min(100% - 30px, 1280px); padding-top: 28px; } }
         @media (max-width: 600px) { .itsm-header { gap: 14px; padding: 10px 14px; } .brand { height: 45px; } .brand img { max-width: 130px; } .header-actions { gap: 12px; } .top-nav { gap: 10px; } .top-nav a { font-size: 12px; } .user-button img { width: 30px; height: 30px; } .page-heading { align-items: flex-start; flex-direction: column; } .grid { grid-template-columns: 1fr; } .card { overflow-x: auto; padding: 16px; } }
     </style>
@@ -61,6 +74,7 @@
                 <a class="{{ request()->routeIs('ecommerce.admin.dashboard') ? 'active' : '' }}" href="{{ route('ecommerce.admin.dashboard') }}">Overview</a>
                 <a class="{{ request()->routeIs('ecommerce.admin.listings*') ? 'active' : '' }}" href="{{ route('ecommerce.admin.listings') }}">Storefront Listings</a>
                 <a class="{{ request()->routeIs('ecommerce.admin.orders') ? 'active' : '' }}" href="{{ route('ecommerce.admin.orders') }}">Storefront Orders</a>
+                <a class="{{ request()->routeIs('ecommerce.admin.layout.*') ? 'active' : '' }}" href="{{ route('ecommerce.admin.layout.edit') }}">Edit Storefront</a>
             </nav>
             <div class="user-menu" data-user-menu>
                 <button type="button" class="user-button" data-user-menu-button aria-label="Open user menu" aria-expanded="false"><img src="{{ asset('images/icon.png') }}" alt="User"></button>
