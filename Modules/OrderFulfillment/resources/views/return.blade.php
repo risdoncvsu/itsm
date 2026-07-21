@@ -575,33 +575,22 @@
 
     <!-- Navbar -->
     <div class="navbar">
-<<<<<<< Updated upstream
-      <a href="{{ route('order-fulfillment.dashboard') }}" class="brand">
-        <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
-        <div class="brand-text">
-            <div class="title">NEXORA</div>
-            <div class="subtitle">ENTERPRISE RESOURCE PLANNING</div>
-        </div>
-      </a>
-=======
-      <div class="brand brand-logo">
-    <img class="logo" src="{{ asset('orderfulfillment/logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
-    <div class="brand-text">
-        <div class="title">NEXORA</div>
-        <div class="subtitle">ENTERPRISE RESOURCE PLANNING</div>
-    </div>
-</div>
->>>>>>> Stashed changes
+      <form method="POST" action="{{ route('order-fulfillment.logout') }}" style="display:inline;">
+        @csrf
+        <button type="submit" class="brand brand-logo" style="background:none;border:none;padding:0;font:inherit;">
+          <img class="logo" src="{{ asset('orderfulfillment/logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
+          <div class="brand-text">
+              <div class="title">NEXORA</div>
+              <div class="subtitle">ENTERPRISE RESOURCE PLANNING</div>
+          </div>
+        </button>
+      </form>
       <div class="nav-links">
         <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
         <a href="{{ route('order-fulfillment.orders') }}">Orders</a>
         <a href="{{ route('order-fulfillment.packing') }}">Packing</a>
         <a href="{{ route('order-fulfillment.shipping') }}">Shipping</a>
         <a href="{{ route('order-fulfillment.return') }}" class="active">Returns</a>
-        <form method="POST" action="{{ route('order-fulfillment.logout') }}" style="display:inline;margin-left:12px;">
-          @csrf
-          <button type="submit" style="background:none;border:none;color:var(--text-muted);font-size:15px;font-weight:500;cursor:pointer;padding:0;">Logout</button>
-        </form>
       </div>
     </div>
 

@@ -37,6 +37,7 @@ class OrderController extends Controller
         // The legacy Orders template uses these names for its stat cards.
         $inPackingCount = $inPacking;
         $ShippedCount = $shippedToday;
+        $shippedTodayCount = $shippedToday;
 
 
         // Any status other than NEW represents a change that happened after
@@ -68,7 +69,7 @@ class OrderController extends Controller
             });
 
         return view('order-fulfillment::order', compact(
-            'orders', 'ordersReceivedToday', 'inPacking', 'inPackingCount', 'shippedToday', 'ShippedCount', 'onTimeRate', 'recentActivity'
+            'orders', 'ordersReceivedToday', 'inPacking', 'inPackingCount', 'shippedToday', 'ShippedCount', 'shippedTodayCount', 'onTimeRate', 'recentActivity'
         ));
     }
 
