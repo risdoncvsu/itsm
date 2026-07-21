@@ -53,12 +53,12 @@
       // Persist delivery status to backend when possible
       const delId = row.dataset.id;
       if(delId){
-        fetch(`/deliveries/${delId}`, { method: 'PUT', headers: { 'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: new URLSearchParams({ status: 'delivered', remarks: row.dataset.note || '' }).toString() }).then(()=>{}).catch(()=>showToast('Unable to persist delivery status to server.', 'no'));
+        fetch(procurementUrl(`deliveries/${delId}`), { method: 'PUT', headers: { 'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: new URLSearchParams({ status: 'delivered', remarks: row.dataset.note || '' }).toString() }).then(()=>{}).catch(()=>showToast('Unable to persist delivery status to server.', 'no'));
       }
       // Persist related PO status if present
       const relatedPoRow = findPoRowByNumber(row.dataset.po || '');
       if(relatedPoRow && relatedPoRow.dataset.id){
-        fetch(`/purchase-orders/${relatedPoRow.dataset.id}`, { method: 'PUT', headers: { 'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: new URLSearchParams({ status: 'processing' }).toString() }).then(()=>{}).catch(()=>{});
+        fetch(procurementUrl(`purchase-orders/${relatedPoRow.dataset.id}`), { method: 'PUT', headers: { 'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: new URLSearchParams({ status: 'processing' }).toString() }).then(()=>{}).catch(()=>{});
       }
       const reqRow = findReqRowByRef(row.dataset.po || '');
       if(reqRow){
@@ -83,11 +83,11 @@
       }
       const delId = row.dataset.id;
       if(delId){
-        fetch(`/deliveries/${delId}`, { method: 'PUT', headers: { 'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: new URLSearchParams({ status: 'completed', remarks: row.dataset.note || '' }).toString() }).then(()=>{}).catch(()=>showToast('Unable to persist delivery status to server.', 'no'));
+        fetch(procurementUrl(`deliveries/${delId}`), { method: 'PUT', headers: { 'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: new URLSearchParams({ status: 'completed', remarks: row.dataset.note || '' }).toString() }).then(()=>{}).catch(()=>showToast('Unable to persist delivery status to server.', 'no'));
       }
       const relatedPoRow2 = findPoRowByNumber(row.dataset.po || '');
       if(relatedPoRow2 && relatedPoRow2.dataset.id){
-        fetch(`/purchase-orders/${relatedPoRow2.dataset.id}`, { method: 'PUT', headers: { 'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: new URLSearchParams({ status: 'completed' }).toString() }).then(()=>{}).catch(()=>{});
+        fetch(procurementUrl(`purchase-orders/${relatedPoRow2.dataset.id}`), { method: 'PUT', headers: { 'Content-Type':'application/x-www-form-urlencoded', 'X-Requested-With':'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: new URLSearchParams({ status: 'completed' }).toString() }).then(()=>{}).catch(()=>{});
       }
       const reqRow2 = findReqRowByRef(row.dataset.po || '');
       if(reqRow2){
@@ -98,4 +98,3 @@
     }
     closeTrackModal();
   }
-

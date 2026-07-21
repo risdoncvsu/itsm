@@ -17,8 +17,8 @@
       const headers = { 'X-Requested-With': 'XMLHttpRequest' };
       // Fetch recent requisitions
       const [reqRes, delRes] = await Promise.all([
-        fetch('/requisitions', { headers }),
-        fetch('/deliveries', { headers })
+        fetch(procurementUrl('requisitions'), { headers }),
+        fetch(procurementUrl('deliveries'), { headers })
       ]);
       const reqJson = await safeJson(reqRes);
       const delJson = await safeJson(delRes);
@@ -211,4 +211,3 @@
       refreshTabCounts();
     }, 340);
   }
-

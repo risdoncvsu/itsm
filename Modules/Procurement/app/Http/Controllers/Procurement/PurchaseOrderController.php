@@ -220,14 +220,20 @@ class PurchaseOrderController extends Controller
             }
         }
 
-        $this->table('purchase_orders')->where('id', $purchaseOrder)->update([
+        $purchaseOrderQuery = $this->table('purchase_orders')->where('id', $purchaseOrder);
+
+        if (! $purchaseOrderQuery->exists()) {
+            abort(404, 'Purchase order not found for this client.');
+        }
+
+        $purchaseOrderQuery->update([
             'status' => $status ?? DB::raw('status'),
             'amount' => $validated['amount'] ?? DB::raw('amount'),
             'remarks' => $validated['remarks'] ?? DB::raw('remarks'),
             'updated_at' => now(),
         ]);
 
-        return response()->json(['status' => 'ok']);
+        return response()->json(['status' => 'ok', 'purchase_order_id' => (int) $purchaseOrder]);
     }
 
     public function destroy($purchaseOrder)

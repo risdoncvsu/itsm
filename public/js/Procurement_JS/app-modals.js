@@ -63,7 +63,7 @@
     if(!row || !row.dataset.id) return Promise.resolve();
     const id = row.dataset.id;
     const normalizedStatus = normalizePoStatus(status);
-    return fetch(`/purchase-orders/${id}`, {
+    return fetch(procurementUrl(`purchase-orders/${id}`), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -71,14 +71,18 @@
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
       },
       body: new URLSearchParams({ status: normalizedStatus }).toString()
-    }).then(() => {}).catch(() => {
-      console.warn('Unable to persist PO status for', id);
+    }).then(async response => {
+      if (!response.ok) {
+        throw new Error(`PO status update failed (${response.status})`);
+      }
+
+      return response.json();
     });
   }
   function persistRequisitionStatus(row, status){
     if(!row || !row.dataset.id) return Promise.resolve();
     const id = row.dataset.id;
-    return fetch(`/requisitions/${id}`, {
+    return fetch(procurementUrl(`requisitions/${id}`), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -86,8 +90,12 @@
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
       },
       body: new URLSearchParams({ status: status }).toString()
-    }).then(() => {}).catch(() => {
-      console.warn('Unable to persist requisition status for', id);
+    }).then(async response => {
+      if (!response.ok) {
+        throw new Error(`Requisition status update failed (${response.status})`);
+      }
+
+      return response.json();
     });
   }
   function syncRelatedRequisitionStatusForPO(row, poStatus){
@@ -234,8 +242,8 @@
       const statusKey = String(record.status || '').toLowerCase();
       if(statusKey === 'pending'){
         setViewActions(
-          {label:'Reject PO', className:'btn-reject', onClick:()=>{ updateRowStatus(row, 'Rejected'); persistPurchaseOrderStatus(row, 'Rejected').then(() => { syncRelatedRequisitionStatusForPO(row, 'Rejected'); }); closeViewModal(); showToast(`${record.po} rejected`, 'no'); }},
-          {label:'Approve PO', className:'btn-approve', onClick:()=>{ updateRowStatus(row, 'Approved'); persistPurchaseOrderStatus(row, 'Approved').then(() => { syncRelatedRequisitionStatusForPO(row, 'Approved'); }); closeViewModal(); showToast(`${record.po} approved for fulfillment`, 'ok'); }}
+          {label:'Reject PO', className:'btn-reject', onClick:()=>{ persistPurchaseOrderStatus(row, 'Rejected').then(() => { updateRowStatus(row, 'Rejected'); syncRelatedRequisitionStatusForPO(row, 'Rejected'); closeViewModal(); showToast(`${record.po} rejected`, 'no'); }).catch(() => showToast('Unable to reject this PO. It was not changed.', 'no')); }},
+          {label:'Approve PO', className:'btn-approve', onClick:()=>{ persistPurchaseOrderStatus(row, 'Approved').then(() => { updateRowStatus(row, 'Approved'); syncRelatedRequisitionStatusForPO(row, 'Approved'); closeViewModal(); showToast(`${record.po} approved for fulfillment`, 'ok'); }).catch(() => showToast('Unable to approve this PO. It remains pending.', 'no')); }}
         );
       } else if(statusKey === 'approved'){
         setViewActions(
@@ -383,7 +391,7 @@
       // Persist PO update to backend if we have an id
       const id = row.dataset.id;
       if(id){
-        fetch(`/purchase-orders/${id}`, {
+        fetch(procurementUrl(`purchase-orders/${id}`), {
           method: 'PUT',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
           body: new URLSearchParams({ status: d.status || '', amount: String(amount || 0), remarks: d.remarks || '' }).toString()
@@ -409,7 +417,7 @@
       // Persist supplier update to backend if we have an id
       const supId = row.dataset.id;
       if(supId){
-        fetch(`/suppliers/${supId}`, {
+        fetch(procurementUrl(`suppliers/${supId}`), {
           method: 'PUT',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
           body: new URLSearchParams({ name: d.name || '', contact: d.contact || '', email: d.email || '', phone: d.phone || '', address: d.address || '', brand: d.brand || '', productsJson: JSON.stringify(products) }).toString()
@@ -430,7 +438,7 @@
       // Persist requisition update to backend if id exists
       const reqId = row.dataset.id;
       if(reqId){
-        fetch(`/requisitions/${reqId}`, {
+        fetch(procurementUrl(`requisitions/${reqId}`), {
           method: 'PUT',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
           body: new URLSearchParams({ status: d.status || '', notes: d.notes || '' }).toString()
@@ -469,7 +477,7 @@
       row.dataset.status = String(d.status || '').toLowerCase().replace(/\s+/g,'');
       const delId = row.dataset.id;
       if(delId){
-        fetch(`/deliveries/${delId}`, {
+        fetch(procurementUrl(`deliveries/${delId}`), {
           method: 'PUT',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
           body: new URLSearchParams({ status: d.status || '', remarks: d.note || '' }).toString()
@@ -505,10 +513,15 @@
       const type = getTableType(row);
       const id = row.dataset.id;
       if(id){
-        const urlMap = { 'po': '/purchase-orders/', 'supplier': '/suppliers/', 'req': '/requisitions/', 'delivery': '/deliveries/' };
+        const urlMap = { 'po': 'purchase-orders/', 'supplier': 'suppliers/', 'req': 'requisitions/', 'delivery': 'deliveries/' };
         const base = urlMap[type];
         if(base){
-          fetch(`${base}${id}`, { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' } }).then(()=>{ row.remove(); refreshTabCounts(); showToast('Record deleted', 'no'); }).catch(()=>{ showToast('Unable to delete record on server.', 'no'); });
+          fetch(procurementUrl(`${base}${id}`), { method: 'DELETE', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' } }).then(response => {
+            if (!response.ok) throw new Error('Delete failed');
+            row.remove();
+            refreshTabCounts();
+            showToast('Record deleted', 'no');
+          }).catch(()=>{ showToast('Unable to delete record on server.', 'no'); });
           closeDeleteModal();
           return;
         }
@@ -566,4 +579,3 @@
     else if(idx === 2) openDeleteModal(row);
   });
   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape'){ closeViewModal(); closeEditModal(); closeDeleteModal(); } });
-

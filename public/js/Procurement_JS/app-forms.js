@@ -641,7 +641,7 @@
           updateRowStatus(reqRow, 'Processing');
           const reqId = reqRow.dataset.id;
           if(reqId){
-            fetch(`/requisitions/${reqId}`, {
+            fetch(procurementUrl(`requisitions/${reqId}`), {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -735,7 +735,7 @@
     e.preventDefault();
     const d = Object.fromEntries(new FormData(e.target).entries());
 
-    fetch('/requisitions', {
+    fetch(procurementUrl('requisitions'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
       body: new URLSearchParams({
@@ -792,7 +792,7 @@
     const statusLabel = isDelayed ? 'Delayed' : 'intransit';
     const stage = isDelayed ? '1' : '2';
 
-    fetch('/deliveries', {
+    fetch(procurementUrl('deliveries'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
       body: new URLSearchParams({
