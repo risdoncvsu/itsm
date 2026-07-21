@@ -21,11 +21,25 @@
       <div>
         <p class="text-sm uppercase tracking-[0.4em] text-slate-400">Employee Dashboard</p>
         <h1 class="mt-2 text-3xl sm:text-4xl font-bold">Welcome back, {{ session('employee_name') }}</h1>
-        <p class="mt-3 text-slate-300 max-w-2xl">This is your secured employee dashboard. You can only stay here and log out from this area.</p>
+        <p class="mt-3 text-slate-300 max-w-2xl">
+          @if(!empty($isHr))
+            You are viewing the employee dashboard. Use the button below to return to the HR dashboard anytime.
+          @else
+            This is your secured employee dashboard. You can only stay here and log out from this area.
+          @endif
+        </p>
       </div>
-      <div class="rounded-3xl bg-[#0B1E3D] border border-white/10 px-5 py-4 text-right">
-        <p class="text-sm text-slate-400">Department</p>
-        <p class="mt-2 text-xl font-semibold text-white">{{ session('employee_department') }}</p>
+      <div class="flex flex-col gap-3 sm:items-end">
+        @if(!empty($isHr))
+          <a href="{{ route('dashboard') }}"
+             class="rounded-2xl bg-[#2D7EFF] px-5 py-3 text-white font-semibold transition hover:bg-[#4D95FF] no-underline text-center">
+            Back to HR Dashboard
+          </a>
+        @endif
+        <div class="rounded-3xl bg-[#0B1E3D] border border-white/10 px-5 py-4 text-right">
+          <p class="text-sm text-slate-400">Department</p>
+          <p class="mt-2 text-xl font-semibold text-white">{{ session('employee_department') }}</p>
+        </div>
       </div>
     </header>
 

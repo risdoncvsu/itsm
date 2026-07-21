@@ -187,6 +187,21 @@
             </div>
           </div>
 
+          <!-- Company Email Preview -->
+          <div class="pt-2">
+            <label class="block text-slate-300 text-xs mb-1">Company Email (auto-generated)</label>
+            <div class="relative">
+              <input
+                  type="text"
+                  id="company_email_preview"
+                  readonly
+                  value="{{ $companyEmailPreview ?? '' }}"
+                  placeholder="Generated from first and last name"
+                  class="w-[452px] h-[28px] bg-[#0d1730] text-slate-300 text-sm rounded px-3 py-2 outline-none border border-white/10" />
+            </div>
+            <p class="mt-1 text-[11px] text-slate-400">If the same name already exists, a number is added (e.g. johnsmith2@nexora.com).</p>
+          </div>
+
           <!-- Next button -->
           <div class="pt-8">
            <button
@@ -422,6 +437,36 @@ emailInput.addEventListener('input', function () {
     }
 
 });
+
+const firstNameInput = document.querySelector('input[name="first_name"]');
+const lastNameInput = document.querySelector('input[name="last_name"]');
+const companyEmailPreview = document.getElementById('company_email_preview');
+const existingCompanyEmails = @json(\App\Models\Employee::pluck('company_email')->filter()->values());
+
+function buildCompanyEmail(firstName, lastName) {
+    const first = (firstName || '').replace(/\s+/g, '').toLowerCase();
+    const last = (lastName || '').replace(/\s+/g, '').toLowerCase();
+    if (!first || !last) return '';
+
+    const base = first + last;
+    let email = base + '@nexora.com';
+    if (!existingCompanyEmails.includes(email)) return email;
+
+    let suffix = 2;
+    while (existingCompanyEmails.includes(base + suffix + '@nexora.com')) {
+        suffix++;
+    }
+    return base + suffix + '@nexora.com';
+}
+
+function updateCompanyEmailPreview() {
+    if (!companyEmailPreview) return;
+    companyEmailPreview.value = buildCompanyEmail(firstNameInput?.value, lastNameInput?.value);
+}
+
+firstNameInput?.addEventListener('input', updateCompanyEmailPreview);
+lastNameInput?.addEventListener('input', updateCompanyEmailPreview);
+updateCompanyEmailPreview();
 </script>
 
 </body>

@@ -148,9 +148,7 @@
                         </div>
                     </div>
 
-                    <div class="relative z-[5] flex justify-center items-center pt-[7px]">
-                        <img src="{{ asset('images/logo.png') }}" class="w-[268px] h-auto opacity-95" alt="Nexora Logo">
-                    </div>
+                   
                 </div>
 
             </div>
@@ -395,28 +393,61 @@
 
                     <h3 class="text-[13px] font-light text-white uppercase whitespace-nowrap">Supporting Documents</h3>
 
+                    @php
+                        $docUrl = function (?string $path) {
+                            return $path ? asset('storage/'.$path) : null;
+                        };
+                        $docName = function (?string $path) {
+                            return $path ? basename($path) : null;
+                        };
+                    @endphp
+
                     <div class="relative w-[536px]">
                         <label class="absolute top-[3px] left-2.5 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">CV</label>
-                        <input type="file"
-                            class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @if($employee->curriculum_vitae)
+                            <div class="w-[536px] min-h-8 box-border py-2 px-2.5 pt-4 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[12px] flex items-center justify-between gap-2">
+                                <span class="truncate pl-0.5">{{ $docName($employee->curriculum_vitae) }}</span>
+                                <a href="{{ $docUrl($employee->curriculum_vitae) }}" target="_blank" rel="noopener"
+                                   class="shrink-0 text-[#5D8CFF] hover:text-white text-[11px] no-underline">View</a>
+                            </div>
+                        @else
+                            <input type="file" name="curriculum_vitae"
+                                class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @endif
                     </div>
 
                     <div class="relative w-[536px]">
                         <label class="absolute top-[3px] left-2.5 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Birth Certificate</label>
-                        <input type="file"
-                            class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @if($employee->birth_certificate)
+                            <div class="w-[536px] min-h-8 box-border py-2 px-2.5 pt-4 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[12px] flex items-center justify-between gap-2">
+                                <span class="truncate pl-0.5">{{ $docName($employee->birth_certificate) }}</span>
+                                <a href="{{ $docUrl($employee->birth_certificate) }}" target="_blank" rel="noopener"
+                                   class="shrink-0 text-[#5D8CFF] hover:text-white text-[11px] no-underline">View</a>
+                            </div>
+                        @else
+                            <input type="file" name="birth_certificate"
+                                class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @endif
                     </div>
 
                     <div class="relative w-[536px]">
                         <label class="absolute top-[3px] left-2.5 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Contract</label>
-                        <input type="file"
+                        <input type="file" name="contract"
                             class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
                     </div>
 
                     <div class="relative w-[536px]">
                         <label class="absolute top-[3px] left-2.5 text-[9px] font-semibold text-[#6B7280] pointer-events-none z-[2]">Valid ID</label>
-                        <input type="file"
-                            class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @if($employee->valid_id)
+                            <div class="w-[536px] min-h-8 box-border py-2 px-2.5 pt-4 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[12px] flex items-center justify-between gap-2">
+                                <span class="truncate pl-0.5">{{ $docName($employee->valid_id) }}</span>
+                                <a href="{{ $docUrl($employee->valid_id) }}" target="_blank" rel="noopener"
+                                   class="shrink-0 text-[#5D8CFF] hover:text-white text-[11px] no-underline">View</a>
+                            </div>
+                        @else
+                            <input type="file" name="valid_id"
+                                class="w-[536px] h-8 box-border py-3 px-2.5 pt-3 pr-[38px] bg-[#0B1E3D] text-[#8FA6D8] border-0 shadow-[0_4px_8px_rgba(0,0,0,.35)] rounded-[10px] text-[13px] cursor-pointer file:hidden">
+                        @endif
                     </div>
 
                 </div>

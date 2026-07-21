@@ -45,6 +45,12 @@ method="POST"
         </div>
     @endif
 
+    <div class="mb-6 w-[1335px] bg-[#0D1730] rounded-xl px-8 py-5 border border-white/10">
+        <p class="text-slate-400 text-xs uppercase tracking-wide mb-1">Company Email (auto-generated)</p>
+        <p class="text-white text-sm font-semibold">{{ $companyEmailPreview }}</p>
+        <p class="mt-1 text-[11px] text-slate-400">If another employee already has this name, a number is added after the last name.</p>
+    </div>
+
 <div class="w-[1335px] bg-[#0D1730] rounded-xl p-8 space-y-8">
 
     <!-- Policy 1 -->
