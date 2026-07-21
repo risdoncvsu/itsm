@@ -433,7 +433,7 @@
 
   <!-- Navbar -->
   <div class="navbar">
-    <a href="{{ route('logout') }}" class="brand logout-logo" title="Logout">
+    <a href="{{ route('order-fulfillment.dashboard') }}" class="brand">
     <img class="logo" src="{{ asset('logo/Nexora_Logo_Transparent.png') }}" alt="Nexora Logo">
     <div class="brand-text">
         <div class="title">NEXORA</div>
@@ -441,11 +441,15 @@
     </div>
   </a>
     <div class="nav-links">
-      <a href="{{ route('dashboard') }}" class="active">Dashboard</a>
-      <a href="{{ route('orders') }}">Orders</a>
-      <a href="{{ route('packing') }}">Packing</a>
-      <a href="{{ route('shipping') }}">Shipping</a>
-      <a href="{{ route('return') }}">Returns</a>
+      <a href="{{ route('order-fulfillment.dashboard') }}">Dashboard</a>
+      <a href="{{ route('order-fulfillment.orders') }}" class="active">Orders</a>
+      <a href="{{ route('order-fulfillment.packing') }}">Packing</a>
+      <a href="{{ route('order-fulfillment.shipping') }}">Shipping</a>
+      <a href="{{ route('order-fulfillment.return') }}">Returns</a>
+      <form method="POST" action="{{ route('order-fulfillment.logout') }}" style="display:inline;margin-left:12px;">
+        @csrf
+        <button type="submit" style="background:none;border:none;color:var(--text-muted);font-size:15px;font-weight:500;cursor:pointer;padding:0;">Logout</button>
+      </form>
     </div>
   </div>
 
