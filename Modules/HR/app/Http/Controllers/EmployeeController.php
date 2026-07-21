@@ -151,6 +151,8 @@ public function update(Request $request, Employee $employee)
 
 public function destroy($id)
 {
+    abort_unless(session('employee_role') === 'admin', 403, 'Only an HR manager can delete employees.');
+
     $employee = Employee::findOrFail($id);
     $clientId = (int) $employee->client_id;
     $employeeId = (int) $employee->id;

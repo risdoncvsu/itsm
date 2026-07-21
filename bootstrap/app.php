@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->appendToGroup('web', \App\Http\Middleware\AuditModuleAction::class);
         $middleware->alias([
             'hr.access' => \Modules\HR\Http\Middleware\EmployeeAuth::class,
             'inventory.access' => \Modules\Inventory\Http\Middleware\InventoryAccess::class,

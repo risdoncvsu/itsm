@@ -319,9 +319,12 @@ class HrEmployeeProfileProvisioner
 
     private function putEmployeeSession(object $employee): void
     {
+        $isHrManager = strtolower(trim((string) ($employee->department ?? ''))) === 'human resources'
+            && strtolower(trim((string) ($employee->position ?? ''))) === 'hr manager';
+
         session([
             'employee_logged_in' => true,
-            'employee_role' => 'employee',
+            'employee_role' => $isHrManager ? 'admin' : 'employee',
             'employee_id' => $employee->id,
             'employee_name' => $employee->first_name ?? 'HR Manager',
             'employee_email' => $employee->company_email,
