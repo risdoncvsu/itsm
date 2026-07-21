@@ -1,3 +1,8 @@
+@php
+    $storefrontCompany = request()->attributes->get('ecommerce_company');
+    $storefrontName = $storefrontCompany?->company_name ?: 'Nexora Store';
+    $storefrontVisitKey = 'storefront_visited_'.($storefrontCompany?->ecommerce_slug ?: 'store');
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
@@ -7,7 +12,7 @@
     
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <title>{{ config('app.name', 'TechForge') }} | Built for Performance</title>
+    <title>{{ $storefrontName }} | Nexora Storefront</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -166,15 +171,15 @@
 <body class="relative antialiased selection:bg-primary selection:text-white">
 
     <!-- Preloader -->
-    <div id="preloader" class="fixed inset-0 bg-[#050505] z-[100] flex items-center justify-center transition-opacity duration-1000 ease-in-out">
+    <div id="preloader" data-visit-key="{{ $storefrontVisitKey }}" class="fixed inset-0 bg-[#050505] z-[100] flex items-center justify-center transition-opacity duration-1000 ease-in-out">
         <script>
-            if (!sessionStorage.getItem('techforge_visited')) {
+            if (!sessionStorage.getItem(@json($storefrontVisitKey))) {
                 document.write(`
                     <div class="relative flex items-center justify-center">
                         <div class="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
                         <div class="flex items-center relative z-10">
-                            <img src="{{ Vite::asset('Modules/E-Commerce/Techforge/resources/img/Techforge_Logo.png') }}" alt="TechForge Logo" class="h-20 w-auto object-contain animate-spin-fast drop-shadow-[0_0_25px_rgba(255,107,0,0.6)]">
-                            <span class="text-4xl md:text-5xl font-black text-white tracking-widest animate-slide-text">TECHFORGE</span>
+                            <img src="{{ asset('ecommerce/Nexora_Logo.png') }}" alt="{{ $storefrontName }} logo" class="h-20 w-auto object-contain animate-spin-fast drop-shadow-[0_0_25px_rgba(255,107,0,0.6)]">
+                            <span class="text-4xl md:text-5xl font-black text-white tracking-widest animate-slide-text">{{ $storefrontName }}</span>
                         </div>
                     </div>
                 `);

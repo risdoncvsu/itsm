@@ -1,3 +1,8 @@
+    @php
+        $storefrontCompany = request()->attributes->get('ecommerce_company');
+        $storefrontName = $storefrontCompany?->company_name ?: 'Nexora Store';
+    @endphp
+
     <!-- Search Overlay -->
     <div id="search-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[75] opacity-0 pointer-events-none transition-all duration-300"></div>
 
@@ -12,9 +17,9 @@
         <!-- Logo & Name -->
         <a href="{{ url('/') }}" class="flex items-center gap-3 shrink-0 relative z-30">
             <div class="bg-gradient-to-br from-primary to-orange-400 w-10 h-10 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(255,107,0,0.4)]">
-                <img src="{{ Vite::asset('Modules/E-Commerce/Techforge/resources/img/Techforge_Logo.png') }}" alt="TechForge Logo" class="h-6 w-auto object-contain">
+                <img src="{{ asset('ecommerce/Nexora_Logo.png') }}" alt="{{ $storefrontName }} logo" class="h-6 w-auto object-contain">
             </div>
-            <span class="hidden md:block text-xl font-bold tracking-wide text-white">TECHFORGE</span>
+            <span class="hidden md:block text-xl font-bold tracking-wide text-white">{{ $storefrontName }}</span>
         </a>
 
 
@@ -98,7 +103,7 @@
                 
                 <!-- Unauthenticated Dropdown -->
                 <div class="opacity-0 pointer-events-none scale-95 group-hover/guest:opacity-100 group-hover/guest:pointer-events-auto group-hover/guest:scale-100 transition-all duration-300 origin-top-right absolute top-full right-0 mt-0 w-64 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-4 z-50">
-                    <h4 class="text-sm font-bold text-white mb-2">Join TechForge</h4>
+                    <h4 class="text-sm font-bold text-white mb-2">Join {{ $storefrontName }}</h4>
                     <p class="text-[11px] text-gray-400 mb-4 leading-snug">Earn Forge Points, track orders, and checkout faster.</p>
                     <a href="{{ route('ecommerce.login') }}" class="block w-full bg-gradient-to-r from-primary to-orange-400 hover:from-primary hover:to-orange-500 text-white text-center py-2.5 rounded-xl font-bold text-sm transition-colors mb-2 shadow-[0_0_15px_rgba(255,107,0,0.3)]">Sign In</a>
                     <a href="{{ route('ecommerce.login') }}" class="block w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white text-center py-2.5 rounded-xl font-bold text-sm transition-colors">Create Account</a>
@@ -460,7 +465,6 @@
             });
         });
     </script>
-
 
 
 

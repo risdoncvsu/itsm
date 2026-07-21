@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'ecommerce.client' => \Modules\Ecommerce\Http\Middleware\ResolveStorefrontClient::class,
             'ecommerce.admin' => \Modules\Ecommerce\Http\Middleware\ResolveEcommerceAdminClient::class,
             'manufacturing.access' => \Modules\Manufacturing\Http\Middleware\ManufacturingAccess::class,
+            'manufacturing.bom' => \Modules\Manufacturing\Http\Middleware\ManufacturingBomAccess::class,
         'finance.access' => \Modules\Finance\Http\Middleware\FinanceAccess::class,
         'bi.access' => \Modules\BusinessIntelligence\Http\Middleware\BusinessIntelligenceAccess::class,
             'root.admin' => \App\Http\Middleware\EnsureRootAdmin::class,
