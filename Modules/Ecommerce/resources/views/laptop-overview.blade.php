@@ -11,7 +11,20 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/ecommerce/tailwind-config.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: '#ff6b00', hover: '#e56000', glow: 'rgba(255, 107, 0, 0.5)' },
+                        dark: { bg: '#050505', surface: '#121212' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        };
+    </script>
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -58,11 +71,14 @@
             scrollbar-width: none;
         }
     </style>
+
+    @vite('Modules/Ecommerce/resources/css/liquidglass.css')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-    <link rel="stylesheet" href="/ecommerce/liquidglass.css">
-    <script defer src="/ecommerce/preloader.js"></script>
 </head>
 <body class="relative antialiased selection:bg-primary selection:text-white">
+
+    @vite('Modules/Ecommerce/resources/js/Common/Preloader.js')
+
     <!-- Background Ambient Effects -->
     <div class="ambient-light-1"></div>
 

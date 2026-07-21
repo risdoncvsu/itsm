@@ -5,7 +5,6 @@ namespace Modules\Ecommerce\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 use Modules\Ecommerce\Models\User;
 
 class AuthController extends Controller
@@ -19,7 +18,7 @@ class AuthController extends Controller
 
         $remember = $request->has('remember');
 
-        if (Auth::guard('ecommerce')->attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $remember)) {
+        if (Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $remember)) {
             $request->session()->regenerate();
             if (session()->has('redirect_after_auth')) {
                 return redirect(session()->pull('redirect_after_auth'));
@@ -35,7 +34,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('ecommerce.users', 'email')],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
         ]);
 
@@ -47,18 +46,18 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        Auth::guard('ecommerce')->login($user, $request->has('remember'));
+        Auth::login($user, $request->has('remember'));
 
         if (session()->has('redirect_after_auth')) {
             return redirect(session()->pull('redirect_after_auth'))->with('success', 'Account created successfully!');
         }
 
-        return redirect()->route('ecommerce.account.profile')->with('success', 'Account created successfully! Please complete your profile.');
+        return redirect()->route('account.profile')->with('success', 'Account created successfully! Please complete your profile.');
     }
 
     public function logout(Request $request)
     {
-        Auth::guard('ecommerce')->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');

@@ -37,16 +37,13 @@ class SearchController extends Controller
         $prebuiltCount = (clone $prebuiltBaseQuery)->count();
 
         // 2. CUSTOM
-        $customBaseQuery = CustombuiltConfig::with(['cpu', 'gpu', 'motherboard', 'ram', 'storage', 'powerSupply']);
+        $customBaseQuery = CustombuiltConfig::with(['intelCpu', 'amdCpu', 'gpu', 'intelMotherboard', 'amdMotherboard', 'intelRam', 'amdRam', 'storage', 'powerSupply']);
         if ($query) {
             $customBaseQuery->where(function($q) use ($query) {
                 $q->where('name', 'ILIKE', '%' . $query . '%')
-                  ->orWhereHas('cpu', function($sub) use ($query) {
-                      $sub->where('name', 'ILIKE', '%' . $query . '%');
-                  })
-                  ->orWhereHas('gpu', function($sub) use ($query) {
-                      $sub->where('name', 'ILIKE', '%' . $query . '%');
-                  });
+                  ->orWhereHas('intelCpu', function($sub) use ($query) { $sub->where('name', 'ILIKE', '%' . $query . '%'); })
+                  ->orWhereHas('amdCpu', function($sub) use ($query) { $sub->where('name', 'ILIKE', '%' . $query . '%'); })
+                  ->orWhereHas('gpu', function($sub) use ($query) { $sub->where('name', 'ILIKE', '%' . $query . '%'); });
             });
         }
         $customCount = (clone $customBaseQuery)->count();
@@ -157,9 +154,11 @@ class SearchController extends Controller
     private function populateFilterCounts($allConfigs, &$counts)
     {
         foreach ($allConfigs as $config) {
-            if (!$config->cpu || !$config->gpu || !$config->ram || !$config->storage) continue;
+            $cpu = $config->cpu ?? $config->intelCpu ?? $config->amdCpu;
+            $ram = $config->ram ?? $config->intelRam ?? $config->amdRam;
+            if (!$cpu || !$config->gpu || !$ram || !$config->storage) continue;
             
-            $procName = $config->cpu->name;
+            $procName = $cpu->name;
             if (!str_starts_with($procName, 'AMD') && str_contains($procName, 'Ryzen')) $procName = 'AMD ' . $procName;
             elseif (!str_starts_with($procName, 'Intel') && str_contains($procName, 'Core')) $procName = 'Intel ' . $procName;
             $counts['processors'][$procName] = ($counts['processors'][$procName] ?? 0) + 1;
@@ -169,7 +168,7 @@ class SearchController extends Controller
             elseif (!str_starts_with($gpuName, 'AMD') && str_contains($gpuName, 'RX')) $gpuName = 'AMD ' . $gpuName;
             $counts['gpus'][$gpuName] = ($counts['gpus'][$gpuName] ?? 0) + 1;
 
-            $ramName = $config->ram->name;
+            $ramName = $ram->name;
             $counts['rams'][$ramName] = ($counts['rams'][$ramName] ?? 0) + 1;
 
             $storageName = $config->storage->name;
@@ -186,8 +185,9 @@ class SearchController extends Controller
             $query->where('price', '<=', $request->price_max);
         }
 
+        $model = $query->getModel();
         if ($request->filled('processor') || $request->filled('processor_brand')) {
-            $query->whereHas('cpu', function($q) use ($request) {
+            $filterLogic = function($q) use ($request) {
                 $procs = $request->processor ?? [];
                 $brands = $request->processor_brand ?? [];
 
@@ -208,7 +208,14 @@ class SearchController extends Controller
                         }
                     }
                 });
-            });
+            };
+            if (method_exists($model, 'cpu')) {
+                $query->whereHas('cpu', $filterLogic);
+            } else {
+                $query->where(function($q) use ($filterLogic) {
+                    $q->whereHas('intelCpu', $filterLogic)->orWhereHas('amdCpu', $filterLogic);
+                });
+            }
         }
 
         if ($request->filled('gpu') || $request->filled('gpu_brand')) {
@@ -237,7 +244,7 @@ class SearchController extends Controller
         }
 
         if ($request->filled('ram') || $request->filled('ram_capacity')) {
-            $query->whereHas('ram', function($q) use ($request) {
+            $filterLogic = function($q) use ($request) {
                 $rams = $request->ram ?? [];
                 $capacities = $request->ram_capacity ?? [];
 
@@ -251,7 +258,14 @@ class SearchController extends Controller
                         }
                     }
                 });
-            });
+            };
+            if (method_exists($model, 'ram')) {
+                $query->whereHas('ram', $filterLogic);
+            } else {
+                $query->where(function($q) use ($filterLogic) {
+                    $q->whereHas('intelRam', $filterLogic)->orWhereHas('amdRam', $filterLogic);
+                });
+            }
         }
 
         $sort = $request->sort ?? 'Recommended';
@@ -326,3 +340,4 @@ class SearchController extends Controller
         return response()->json($formatted);
     }
 }
+

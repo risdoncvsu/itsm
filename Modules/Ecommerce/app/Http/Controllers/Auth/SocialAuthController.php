@@ -2,7 +2,7 @@
 
 namespace Modules\Ecommerce\Http\Controllers\Auth;
 
-use Modules\Ecommerce\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Modules\Ecommerce\Models\User;
@@ -18,11 +18,9 @@ class SocialAuthController extends Controller
      * @param  string  $provider
      * @return \Illuminate\Http\Response
      */
-    public function redirect($provider)
+    public function redirect($store, $provider)
     {
-        return redirect()->route('ecommerce.login')->withErrors([
-            'email' => 'Social sign-in is not enabled for this storefront.',
-        ]);
+        return Socialite::driver($provider)->redirect();
     }
 
     /**
@@ -31,10 +29,8 @@ class SocialAuthController extends Controller
      * @param  string  $provider
      * @return \Illuminate\Http\Response
      */
-    public function callback($provider)
+    public function callback($store, $provider)
     {
-        return $this->redirect($provider);
-
         try {
             $driver = Socialite::driver($provider);
             if (app()->environment('local')) {
@@ -43,7 +39,7 @@ class SocialAuthController extends Controller
             $socialUser = $driver->user();
         } catch (\Exception $e) {
             \Log::error('SocialAuth Exception: ' . $e->getMessage(), ['exception' => $e]);
-            return redirect()->route('ecommerce.login')->withErrors(['login' => 'Authentication failed or was cancelled.']);
+            return redirect()->route('login')->withErrors(['login' => 'Authentication failed or was cancelled.']);
         }
 
         // Find existing user by provider ID or email
@@ -69,11 +65,11 @@ class SocialAuthController extends Controller
                     'provider' => $provider,
                     'provider_id' => $socialUser->getId(),
                 ]);
-                return redirect()->route('ecommerce.social.complete-registration');
+                return redirect()->route('social.complete-registration');
             }
         }
 
-        Auth::guard('ecommerce')->login($user);
+        Auth::login($user);
 
         if (session()->has('redirect_after_auth')) {
             return redirect(session()->pull('redirect_after_auth'))->with('success', 'Logged in successfully with ' . ucfirst($provider) . '!');
@@ -85,7 +81,7 @@ class SocialAuthController extends Controller
     public function completeRegistration()
     {
         if (!session()->has('social_new_user')) {
-            return redirect()->route('ecommerce.login');
+            return redirect()->route('login');
         }
         
         $socialUser = session()->get('social_new_user');
@@ -95,7 +91,7 @@ class SocialAuthController extends Controller
     public function processRegistration(Request $request)
     {
         if (!session()->has('social_new_user')) {
-            return redirect()->route('ecommerce.login');
+            return redirect()->route('login');
         }
 
         $request->validate([
@@ -114,12 +110,13 @@ class SocialAuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        Auth::guard('ecommerce')->login($user, $request->has('remember'));
+        Auth::login($user, $request->has('remember'));
 
         if (session()->has('redirect_after_auth')) {
             return redirect(session()->pull('redirect_after_auth'))->with('success', 'Account created successfully!');
         }
 
-        return redirect()->route('ecommerce.account.profile')->with('success', 'Account created successfully! Please complete your profile.');
+        return redirect()->route('account.profile')->with('success', 'Account created successfully! Please complete your profile.');
     }
 }
+

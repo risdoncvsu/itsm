@@ -35,14 +35,29 @@ return [
         ],
     ],
 
-    'hr' => [
+        'hr' => [
         'dashboard_url' => env('HR_MODULE_URL'),
     ],
 
+<<<<<<< Updated upstream
     'digitalocean_inference' => [
         'key' => env('DO_INFERENCE_API_KEY'),
         'model' => env('DO_INFERENCE_MODEL'),
         'base_url' => env('DO_INFERENCE_BASE_URL', 'https://inference.do-ai.run/v1'),
+=======
+    'google' => [
+        'client_id' => env('ECOMMERCE_GOOGLE_CLIENT_ID'),
+        'client_secret' => env('ECOMMERCE_GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('ECOMMERCE_GOOGLE_REDIRECT_URI', '/auth/google/callback'),
+    ],
+
+    'github' => [
+        'client_id' => env('ECOMMERCE_GITHUB_CLIENT_ID'),
+        'client_secret' => env('ECOMMERCE_GITHUB_CLIENT_SECRET'),
+        'redirect' => env('ECOMMERCE_GITHUB_REDIRECT_URI', '/auth/github/callback'),
+>>>>>>> Stashed changes
     ],
 
 ];
+
+

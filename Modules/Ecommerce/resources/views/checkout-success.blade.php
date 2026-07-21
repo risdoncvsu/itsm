@@ -6,7 +6,20 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <title>{{ config('app.name', 'TechForge') }} | Order Successful</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/ecommerce/tailwind-config.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: '#ff6b00', hover: '#e56000', glow: 'rgba(255, 107, 0, 0.5)' },
+                        dark: { bg: '#050505', surface: '#121212' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        };
+    </script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
@@ -27,8 +40,6 @@
             pointer-events: none;
         }
     </style>
-    <link rel="stylesheet" href="/ecommerce/liquidglass.css">
-    <script defer src="/ecommerce/preloader.js"></script>
 </head>
 <body class="relative antialiased selection:bg-primary selection:text-white min-h-screen flex flex-col items-center justify-center py-12">
 

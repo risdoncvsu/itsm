@@ -94,3 +94,4 @@ class PcPartController extends Controller
         return view('ecommerce::store.pc-parts', compact('items', 'initialCategory'));
     }
 }
+

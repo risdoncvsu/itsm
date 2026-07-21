@@ -10,7 +10,7 @@ class AccountController extends Controller
 {
     public function updateProfile(Request $request)
     {
-        $user = Auth::guard('ecommerce')->user();
+        $user = Auth::user();
 
         $validated = $request->validate([
             'name' => 'nullable|string|max:255',
@@ -37,6 +37,6 @@ class AccountController extends Controller
 
         $user->save();
 
-        return redirect()->route('ecommerce.account.profile')->with('success', 'Profile updated successfully!');
+        return redirect()->route('account.profile')->with('success', 'Profile updated successfully!');
     }
 }

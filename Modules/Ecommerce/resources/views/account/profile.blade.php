@@ -11,7 +11,20 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/ecommerce/tailwind-config.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: '#ff6b00', hover: '#e56000', glow: 'rgba(255, 107, 0, 0.5)' },
+                        dark: { bg: '#050505', surface: '#121212' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        };
+    </script>
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -130,8 +143,8 @@
             max-width: 0;
         }
     </style>
-    <link rel="stylesheet" href="/ecommerce/liquidglass.css">
-    <script defer src="/ecommerce/preloader.js"></script>
+
+    @vite('Modules/Ecommerce/resources/css/liquidglass.css')
 </head>
 <body class="relative antialiased selection:bg-primary selection:text-white">
 
@@ -143,7 +156,7 @@
                     <div class="relative flex items-center justify-center">
                         <div class="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
                         <div class="flex items-center relative z-10">
-                            <img src="{{ asset('ecommerce/Techforge_Logo.png') }}" alt="TechForge Logo" class="h-20 w-auto object-contain animate-spin-fast drop-shadow-[0_0_25px_rgba(255,107,0,0.6)]">
+                            <img src="{{ Vite::asset('Modules/Ecommerce/resources/img/Techforge_Logo.png') }}" alt="TechForge Logo" class="h-20 w-auto object-contain animate-spin-fast drop-shadow-[0_0_25px_rgba(255,107,0,0.6)]">
                             <span class="text-4xl md:text-5xl font-black text-white tracking-widest animate-slide-text">TECHFORGE</span>
                         </div>
                     </div>
@@ -223,7 +236,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
                                 <label class="w-32 text-sm text-gray-400 font-medium shrink-0">Username</label>
                                 <div class="flex-1">
-                                    <input type="text" value="{{ Auth::guard('ecommerce')->check() ? Auth::guard('ecommerce')->user()->name : 'user123' }}" disabled class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-500 cursor-not-allowed focus:outline-none shadow-inner">
+                                    <input type="text" value="{{ Auth::check() ? Auth::user()->name : 'user123' }}" disabled class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-500 cursor-not-allowed focus:outline-none shadow-inner">
                                 </div>
                             </div>
 
@@ -231,7 +244,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
                                 <label class="w-32 text-sm text-gray-400 font-medium shrink-0">Name</label>
                                 <div class="flex-1">
-                                    <input type="text" value="{{ Auth::guard('ecommerce')->check() ? Auth::guard('ecommerce')->user()->name : 'John Doe' }}" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl px-4 py-2.5 text-sm text-white transition-all outline-none placeholder-gray-600">
+                                    <input type="text" value="{{ Auth::check() ? Auth::user()->name : 'John Doe' }}" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl px-4 py-2.5 text-sm text-white transition-all outline-none placeholder-gray-600">
                                 </div>
                             </div>
 
@@ -239,7 +252,7 @@
                             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
                                 <label class="w-32 text-sm text-gray-400 font-medium shrink-0">Email</label>
                                 <div class="flex-1">
-                                    <input type="email" value="{{ Auth::guard('ecommerce')->check() ? Auth::guard('ecommerce')->user()->email : 'johndoe@example.com' }}" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl px-4 py-2.5 text-sm text-white transition-all outline-none placeholder-gray-600">
+                                    <input type="email" value="{{ Auth::check() ? Auth::user()->email : 'johndoe@example.com' }}" class="w-full bg-black/40 border border-white/10 focus:border-primary focus:ring-1 focus:ring-primary focus:bg-black/60 rounded-xl px-4 py-2.5 text-sm text-white transition-all outline-none placeholder-gray-600">
                                 </div>
                             </div>
 
@@ -351,6 +364,12 @@
             </div>
         </div>
     </main>
+
+    
+
+    @vite(['Modules/Ecommerce/resources/js/Common/Preloader.js', 'Modules/Ecommerce/resources/js/Common/AmbientEffects.js'])
+
     <!-- Load our compiled JavaScript -->
+    @vite('Modules/Ecommerce/resources/js/HomePage/Homepage.js')
 </body>
 </html>

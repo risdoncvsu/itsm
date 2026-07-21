@@ -22,7 +22,7 @@
                     if(request()->has('q')) $resetParams['q'] = request('q');
                     if(request()->has('tab')) $resetParams['tab'] = request('tab');
                 @endphp
-                <a href="{{ route($route, $resetParams) }}" class="text-xs text-primary hover:text-orange-400 font-bold uppercase tracking-widest transition-colors">Reset All</a>
+                <a href="{{ route(str_starts_with($route, 'ecommerce.') ? $route : 'ecommerce.' . $route, $resetParams) }}" class="text-xs text-primary hover:text-orange-400 font-bold uppercase tracking-widest transition-colors">Reset All</a>
             </div>
 
             <!-- Price Accordion -->

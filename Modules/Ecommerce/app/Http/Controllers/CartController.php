@@ -32,8 +32,8 @@ class CartController extends Controller
 
         // Rely on the frontend payload for name and price since we have multiple distinct product tables
 
-        if (Auth::guard('ecommerce')->check()) {
-            $cart = Cart::firstOrCreate(['user_id' => Auth::guard('ecommerce')->id()]);
+        if (Auth::check()) {
+            $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
             $item = $cart->items()->where('product_id', $productId)->first();
 
             if ($item) {
@@ -86,8 +86,8 @@ class CartController extends Controller
     
     public function getCount()
     {
-        if (Auth::guard('ecommerce')->check()) {
-            $cart = Cart::where('user_id', Auth::guard('ecommerce')->id())->first();
+        if (Auth::check()) {
+            $cart = Cart::where('user_id', Auth::id())->first();
             $totalItems = $cart ? $cart->items()->sum('quantity') : 0;
             $cartItems = $cart ? $this->formatDbCartItems($cart) : [];
         } else {
@@ -112,8 +112,8 @@ class CartController extends Controller
         $productId = $request->input('product_id');
         $quantity = $request->input('quantity');
 
-        if (Auth::guard('ecommerce')->check()) {
-            $cart = Cart::where('user_id', Auth::guard('ecommerce')->id())->first();
+        if (Auth::check()) {
+            $cart = Cart::where('user_id', Auth::id())->first();
             if ($cart) {
                 $item = $cart->items()->where('product_id', $productId)->first();
                 if ($item) {
@@ -140,8 +140,8 @@ class CartController extends Controller
 
         $productId = $request->input('product_id');
 
-        if (Auth::guard('ecommerce')->check()) {
-            $cart = Cart::where('user_id', Auth::guard('ecommerce')->id())->first();
+        if (Auth::check()) {
+            $cart = Cart::where('user_id', Auth::id())->first();
             if ($cart) {
                 $cart->items()->where('product_id', $productId)->delete();
             }
@@ -156,8 +156,8 @@ class CartController extends Controller
 
     public function index()
     {
-        if (Auth::guard('ecommerce')->check()) {
-            $cartModel = Cart::with('items')->firstOrCreate(['user_id' => Auth::guard('ecommerce')->id()]);
+        if (Auth::check()) {
+            $cartModel = Cart::with('items')->firstOrCreate(['user_id' => Auth::id()]);
             $cart = $cartModel->items->map(function($item) {
                 return [
                     'id' => $item->product_id,
@@ -217,3 +217,4 @@ class CartController extends Controller
         })->values()->toArray();
     }
 }
+

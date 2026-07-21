@@ -8,7 +8,7 @@
     $originalPrice = $config->price + (floor(rand(5000, 15000) / 1000) * 1000);
     
     // Determine the route name and parameters based on the type
-    $routeName = $type === 'custom' ? 'configurator-overview' : ($type === 'laptop' ? 'laptop-overview' : 'prebuilt-overview');
+    $routeName = $type === 'custom' ? 'ecommerce.configurator-overview' : ($type === 'laptop' ? 'ecommerce.laptop-overview' : 'ecommerce.prebuilt-overview');
     $routeParams = ['id' => $config->id];
 @endphp
 
@@ -111,3 +111,4 @@
         </a>
     </div>
 </div>
+

@@ -24,7 +24,7 @@ class AddressController extends Controller
             'is_default' => 'nullable|boolean',
         ]);
 
-        $user = Auth::guard('ecommerce')->user();
+        $user = Auth::user();
 
         // Check max 5 addresses to prevent spam
         if ($user->addresses()->count() >= 5) {
@@ -63,7 +63,7 @@ class AddressController extends Controller
 
     public function update(Request $request, Address $address)
     {
-        if ($address->user_id !== Auth::guard('ecommerce')->id()) {
+        if ($address->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -85,7 +85,7 @@ class AddressController extends Controller
         
         // If they checked set as default
         if ($isDefault) {
-            Auth::guard('ecommerce')->user()->addresses()->update(['is_default' => false]);
+            Auth::user()->addresses()->update(['is_default' => false]);
         } else {
             // Cannot unset default if it's the only one, or if they are unsetting the current default (must have at least one default)
             if ($address->is_default) {
@@ -113,7 +113,7 @@ class AddressController extends Controller
 
     public function destroy(Address $address)
     {
-        if ($address->user_id !== Auth::guard('ecommerce')->id()) {
+        if ($address->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -121,7 +121,7 @@ class AddressController extends Controller
 
         // If we deleted the default, set another one to default if exists
         if ($address->is_default) {
-            $newDefault = Auth::guard('ecommerce')->user()->addresses()->first();
+            $newDefault = Auth::user()->addresses()->first();
             if ($newDefault) {
                 $newDefault->update(['is_default' => true]);
             }
@@ -133,11 +133,11 @@ class AddressController extends Controller
 
     public function setDefault(Address $address)
     {
-        if ($address->user_id !== Auth::guard('ecommerce')->id()) {
+        if ($address->user_id !== Auth::id()) {
             abort(403);
         }
 
-        Auth::guard('ecommerce')->user()->addresses()->update(['is_default' => false]);
+        Auth::user()->addresses()->update(['is_default' => false]);
         $address->update(['is_default' => true]);
 
         if (request()->ajax()) return response()->json(['success' => 'Default address updated.']);

@@ -36,7 +36,7 @@ class PaymentMethodController extends Controller
             'cardholder_name' => 'required|string|max:255',
         ]);
 
-        $user = Auth::guard('ecommerce')->user();
+        $user = Auth::user();
         
         $cleanCardNumber = str_replace(' ', '', $validated['card_number']);
 
@@ -95,7 +95,7 @@ class PaymentMethodController extends Controller
             'account_number' => 'required|string',
         ]);
 
-        $user = Auth::guard('ecommerce')->user();
+        $user = Auth::user();
 
         $cleanAccountNumber = str_replace(' ', '', $validated['account_number']);
         $mask = substr($cleanAccountNumber, -4);
@@ -134,7 +134,7 @@ class PaymentMethodController extends Controller
 
     public function destroy(PaymentMethod $paymentMethod)
     {
-        if ($paymentMethod->user_id !== Auth::guard('ecommerce')->id()) {
+        if ($paymentMethod->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -146,7 +146,7 @@ class PaymentMethodController extends Controller
 
     public function update(Request $request, PaymentMethod $paymentMethod)
     {
-        if ($paymentMethod->user_id !== Auth::guard('ecommerce')->id()) {
+        if ($paymentMethod->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -183,11 +183,11 @@ class PaymentMethodController extends Controller
 
     public function setDefault(PaymentMethod $paymentMethod)
     {
-        if ($paymentMethod->user_id !== Auth::guard('ecommerce')->id()) {
+        if ($paymentMethod->user_id !== Auth::id()) {
             abort(403);
         }
 
-        Auth::guard('ecommerce')->user()->paymentMethods()->update(['is_default' => false]);
+        Auth::user()->paymentMethods()->update(['is_default' => false]);
         $paymentMethod->update(['is_default' => true]);
 
         return back()->with('success', 'Default payment method updated.');

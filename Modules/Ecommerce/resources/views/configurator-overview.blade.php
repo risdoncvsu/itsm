@@ -11,7 +11,20 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/ecommerce/tailwind-config.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: '#ff6b00', hover: '#e56000', glow: 'rgba(255, 107, 0, 0.5)' },
+                        dark: { bg: '#050505', surface: '#121212' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        };
+    </script>
+        
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -209,13 +222,21 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="/ecommerce/liquidglass.css">
-    <script defer src="/ecommerce/preloader.js"></script>
+
+    @vite('Modules/Ecommerce/resources/css/liquidglass.css')
 </head>
 <body class="relative antialiased selection:bg-primary selection:text-white">
+
+    @vite('Modules/Ecommerce/resources/js/Common/Preloader.js')
+
+
     <!-- Background Ambient Effects -->
     <div class="ambient-light-1"></div>
     <div class="ambient-light-2"></div>
+    @vite('Modules/Ecommerce/resources/js/Common/AmbientEffects.js')
+
+
+
     <x-navbar />
     <!-- Product Selection Modal -->
     <div id="product-modal" data-lenis-prevent class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4">
@@ -555,7 +576,7 @@
 
     <x-footer />
 
-        <script src="{{ asset('ecommerce/configurator-engine.js') }}"></script>
+        <script src="{{ asset('js/configurator-engine.js') }}"></script>
     <script>
         const allComponents = @json($allComponents);
         
@@ -1224,6 +1245,8 @@
             }
         });
     </script>
+    @vite('Modules/Ecommerce/resources/js/HomePage/Homepage.js')
+    
     <!-- Lenis Smooth Scroll -->
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
     <script>
