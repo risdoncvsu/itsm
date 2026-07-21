@@ -22,6 +22,13 @@
 @include('procurement::partials.modals')
 @include('procurement::partials.toast')
 
+<script>
+  window.procurementUrl = (path = '') => {
+    const base = @json(url('procurement'));
+    return `${base}/${String(path).replace(/^\/+/, '')}`;
+  };
+</script>
+
 {{-- Shared scripts, split by concern so no single file is too long --}}
 <script src="{{ asset('js/Procurement_JS/app-core.js') }}"></script>       {{-- page/notif/toast/stat helpers --}}
 <script src="{{ asset('js/Procurement_JS/app-modals.js') }}"></script>     {{-- view/edit/delete record modals --}}

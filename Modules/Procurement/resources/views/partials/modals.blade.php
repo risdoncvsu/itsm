@@ -151,9 +151,19 @@
           <label>Created By</label>
           <input name="createdBy" value="John Reyes">
         </div>
-         <div class="form-field">
+        <div class="form-field">
           <label>Expected Delivery <span class="req">*</span></label>
           <input type="date" name="expected" required>
+        </div>
+        <div class="form-field full">
+          <label>Destination Warehouse <span class="req">*</span></label>
+          <select name="warehouse_id" required>
+            <option value="">Select the receiving warehouse...</option>
+            @foreach($warehouses ?? collect() as $warehouse)
+              <option value="{{ $warehouse->id }}">{{ $warehouse->name }}{{ $warehouse->address ? ' — '.$warehouse->address : '' }}</option>
+            @endforeach
+          </select>
+          <span class="hint">The selected warehouse becomes the purchase order delivery address.</span>
         </div>
         <div class="form-field full">
           <label>Remarks</label>
@@ -348,4 +358,3 @@
     </div>
   </div>
 </div>
-

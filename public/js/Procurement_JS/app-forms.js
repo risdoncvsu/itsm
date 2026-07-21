@@ -9,7 +9,8 @@
 
   // simple auto-increment counters (initial values based on existing sample data)
   const NEXT_ID = { po: 420, req: 45, dr: 232, inv: 3, sup: 20 };
-const ID_COUNTS = { po: 419, req: 44, dr: 231 }; // Track highest used number per year
+  const ID_COUNTS = { po: 419, req: 44, dr: 231 }; // Track highest used number per year
+  const procurementUrl = window.procurementUrl || ((path = '') => `/procurement/${String(path).replace(/^\/+/, '')}`);
 
   function pad(n, len){ return String(n).padStart(len, '0'); }
   function todayISO(){ return new Date().toISOString().slice(0,10); }
@@ -75,7 +76,7 @@ const ID_COUNTS = { po: 419, req: 44, dr: 231 }; // Track highest used number pe
       return Promise.resolve();
     }
     // No supplier rows on this page — fetch suppliers JSON from server
-    return fetch('/suppliers', { headers: { 'Accept': 'application/json' } })
+    return fetch(procurementUrl('suppliers'), { headers: { 'Accept': 'application/json' } })
       .then(res => res.json())
       .then(json => {
         const list = (json?.data || []);
@@ -217,7 +218,7 @@ const ID_COUNTS = { po: 419, req: 44, dr: 231 }; // Track highest used number pe
     }
 
     poField.innerHTML = `<option value="">${noApprovedText}</option>`;
-    fetch('/purchase-orders/approved', {
+    fetch(procurementUrl('purchase-orders/approved'), {
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     }).then(res => res.ok ? res.json() : Promise.reject()).then(data => {
       if(!Array.isArray(data)) throw new Error('Invalid response');
@@ -573,7 +574,7 @@ const ID_COUNTS = { po: 419, req: 44, dr: 231 }; // Track highest used number pe
     const poDate = todayISO();
     const priorityLabel = d.priority || 'Normal';
 
-    fetch('/purchase-orders', {
+    fetch(procurementUrl('purchase-orders'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
       body: new URLSearchParams({
@@ -586,6 +587,7 @@ const ID_COUNTS = { po: 419, req: 44, dr: 231 }; // Track highest used number pe
         amount: String(amountNum),
         priority: priorityLabel,
         expected: d.expected || '',
+        warehouse_id: d.warehouse_id || '',
         createdBy: d.createdBy || '',
         remarks: d.remarks || '',
         reqRef: d.reqRef || ''
@@ -665,7 +667,7 @@ const ID_COUNTS = { po: 419, req: 44, dr: 231 }; // Track highest used number pe
     const d = Object.fromEntries(new FormData(e.target).entries());
     const products = Array.isArray(JSON.parse(d.productsJson || '[]')) ? JSON.parse(d.productsJson || '[]') : [];
 
-    fetch('/suppliers', {
+    fetch(procurementUrl('suppliers'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' },
       body: new URLSearchParams({
@@ -679,7 +681,11 @@ const ID_COUNTS = { po: 419, req: 44, dr: 231 }; // Track highest used number pe
         status: d.status || 'active',
         productsJson: JSON.stringify(products)
       }).toString()
-    }).then(res => res.json()).then(json => {
+    }).then(async res => {
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json?.message || 'Unable to save supplier right now.');
+      return json;
+    }).then(json => {
       const table = document.querySelector('#suppliers-table tbody');
       if(table){
         const tr = document.createElement('tr');
@@ -712,8 +718,8 @@ const ID_COUNTS = { po: 419, req: 44, dr: 231 }; // Track highest used number pe
       refreshDeliverySupplierOptions();
       showToast(`Supplier ${d.name} added successfully`, 'ok');
       closeAddModal('supplier');
-    }).catch(() => {
-      showToast('Unable to save supplier right now.', 'no');
+    }).catch(error => {
+      showToast(error.message || 'Unable to save supplier right now.', 'no');
     });
   }
 
@@ -874,4 +880,3 @@ const ID_COUNTS = { po: 419, req: 44, dr: 231 }; // Track highest used number pe
     showToast(`Invoice ${d.inv} recorded`, 'ok');
     closeAddModal('invoice');
   }
-
