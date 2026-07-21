@@ -64,7 +64,7 @@ class OrderController extends Controller
                 return $o;
             });
 
-        return view('order', compact(
+        return view('order-fulfillment::order', compact(
             'orders', 'ordersToday', 'inPacking', 'shippedToday', 'onTimeRate', 'recentActivity'
         ));
     }
@@ -84,7 +84,7 @@ class OrderController extends Controller
         // silently queries the wrong database and returns nothing.
         $materials = PackingMaterial::all();
 
-        return view('packing', compact(
+        return view('order-fulfillment::packing', compact(
             'packingOrders', 'readyToShipCount', 'packingErrorToday', 'materials'
         ));
     }

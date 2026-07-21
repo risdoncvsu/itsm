@@ -34,7 +34,7 @@ class DeliveryController extends Controller
             ->map(fn (string $n) => (int) preg_replace('/\D/', '', $n))
             ->max() ?? 0) + 1;
 
-        return view('procurement::procurement.partials.deliveries', compact('deliveries', 'counts', 'nextShipmentSeq'));
+        return view('procurement::pages.deliveries', compact('deliveries', 'counts', 'nextShipmentSeq'));
     }
 
     public function store(Request $request): JsonResponse

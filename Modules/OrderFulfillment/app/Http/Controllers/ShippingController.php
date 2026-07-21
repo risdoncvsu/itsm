@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Modules\OrderFulfillment\Models\Order;
 use Modules\OrderFulfillment\Models\Shipment;
 use Modules\OrderFulfillment\Models\DeliveryMan;
-use Modules\App\Models\ReturnItem;
-use Modules\OrderFulfillment\Helpers\OrderStatus;
+use Modules\OrderFulfillment\Models\ReturnItem;
+use Modules\OrderFulfillment\App\Helpers\OrderStatus;
+use Modules\OrderFulfillment\Models\OrderItem;
 use Illuminate\Support\Str;
 
 class ShippingController extends Controller
@@ -108,7 +109,7 @@ class ShippingController extends Controller
             ];
         })->values();
 
-        return view('shipping', compact(
+        return view('order-fulfillment::shipping', compact(
             'shipments',
             'shippedToday',
             'inTransit',

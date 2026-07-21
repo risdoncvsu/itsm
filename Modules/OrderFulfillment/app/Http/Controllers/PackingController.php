@@ -66,7 +66,7 @@ class PackingController extends Controller
             ];
         });
 
-        return view('packing', compact(
+        return view('order-fulfillment::packing', compact(
             'packingOrders',
             'inPackingCount',
             'ShippedCount',
