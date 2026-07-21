@@ -1,17 +1,26 @@
 <?php
 
-namespace Modules\HR\Http\Controllers;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Modules\HR\Models\Employee;
+use App\Models\Employee;
 use Illuminate\Support\Str;
-use Illuminate\Routing\Controller;
 
 class EmployeeOnboardingController extends Controller
 {
     public function step1()
     {
-        return view('employees.onboarding.step1');
+        $step1 = session('step1', []);
+        $companyEmailPreview = null;
+
+        if (! empty($step1['first_name']) && ! empty($step1['last_name'])) {
+            $companyEmailPreview = self::generateUniqueCompanyEmail(
+                $step1['first_name'],
+                $step1['last_name']
+            );
+        }
+
+        return view('employees.onboarding.step1', compact('step1', 'companyEmailPreview'));
     }
 
     public function storeStep1(Request $request)
@@ -20,7 +29,7 @@ class EmployeeOnboardingController extends Controller
     $request->validate([
         'first_name' => 'required',
         'last_name' => 'required',
-        'email' => 'required|email|unique:hr.employees,email',
+        'email' => 'required|email|unique:employees,email',
         'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
     ]);
 
@@ -103,26 +112,17 @@ class EmployeeOnboardingController extends Controller
                 ->with('error', 'Your onboarding session expired. Please start again.');
         }
 
-        $data = $request->except([
-            'birth_certificate',
-            'curriculum_vitae',
-            'valid_id',
+        $request->validate([
+            'birth_certificate' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'curriculum_vitae' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+            'valid_id' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
-        if ($request->hasFile('birth_certificate')) {
-            $data['birth_certificate'] =
-                $request->file('birth_certificate')->store('documents', 'public');
-        }
-
-        if ($request->hasFile('curriculum_vitae')) {
-            $data['curriculum_vitae'] =
-                $request->file('curriculum_vitae')->store('documents', 'public');
-        }
-
-        if ($request->hasFile('valid_id')) {
-            $data['valid_id'] =
-                $request->file('valid_id')->store('documents', 'public');
-        }
+        $data = [
+            'birth_certificate' => $request->file('birth_certificate')->store('documents', 'public'),
+            'curriculum_vitae' => $request->file('curriculum_vitae')->store('documents', 'public'),
+            'valid_id' => $request->file('valid_id')->store('documents', 'public'),
+        ];
 
         session(['step3' => $data]);
 
@@ -146,7 +146,13 @@ class EmployeeOnboardingController extends Controller
                 ->with('error', 'Please complete step 3 first.');
         }
 
-        return view('employees.onboarding.step4');
+        $step1 = session('step1');
+        $companyEmailPreview = self::generateUniqueCompanyEmail(
+            $step1['first_name'],
+            $step1['last_name']
+        );
+
+        return view('employees.onboarding.step4', compact('companyEmailPreview'));
     }
 
     public function storeStep4(Request $request)
@@ -169,10 +175,10 @@ class EmployeeOnboardingController extends Controller
             'policy_6' => 'accepted',
         ]);
 
-        $firstName = preg_replace('/\s+/', '', $step1['first_name']);
-        $lastName = preg_replace('/\s+/', '', $step1['last_name']);
-
-        $companyEmail = strtolower($firstName . $lastName . '@nexora.com');
+        $companyEmail = self::generateUniqueCompanyEmail(
+            $step1['first_name'],
+            $step1['last_name']
+        );
         $password = 'NEX-' . Str::upper(Str::random(6));
 
     $employee = Employee::create([
@@ -197,8 +203,6 @@ class EmployeeOnboardingController extends Controller
         'medical_certificate' => $step3['medical_certificate'] ?? null,
         'company_email' => $companyEmail,
         'temporary_password' => $password,
-        'must_change_password' => true,
-        'approval_status' => 'Pending',
     ]);
 
     // Ngayon meron na tayong auto-increment id, gamitin natin siya
@@ -220,5 +224,27 @@ class EmployeeOnboardingController extends Controller
         }
 
         return view('employees.onboarding.success', compact('employee'));
+    }
+
+    /**
+     * firstnamelastname@nexora.com, or firstnamelastname2@nexora.com when the name already exists.
+     */
+    public static function generateUniqueCompanyEmail(string $firstName, string $lastName): string
+    {
+        $firstName = preg_replace('/\s+/', '', $firstName);
+        $lastName = preg_replace('/\s+/', '', $lastName);
+        $base = strtolower($firstName.$lastName);
+        $email = $base.'@nexora.com';
+
+        if (! Employee::where('company_email', $email)->exists()) {
+            return $email;
+        }
+
+        $suffix = 2;
+        while (Employee::where('company_email', $base.$suffix.'@nexora.com')->exists()) {
+            $suffix++;
+        }
+
+        return $base.$suffix.'@nexora.com';
     }
 }

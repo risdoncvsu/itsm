@@ -1,12 +1,11 @@
 <?php
 
-namespace Modules\HR\Http\Controllers;
+namespace App\Http\Controllers;
 
-use Modules\HR\Http\Controllers\Concerns\ResolvesPerPage;
-use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
-use Modules\HR\Models\Attendance;
-use Modules\HR\Models\Employee;
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Concerns\ResolvesPerPage;
+use App\Http\Controllers\Concerns\RespondsWithAjaxList;
+use App\Models\Attendance;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 
 class ReportsAnalyticsController extends Controller
@@ -16,18 +15,60 @@ class ReportsAnalyticsController extends Controller
 
     public function index(Request $request)
     {
-        $employees = Employee::when($request->search, function ($query, $search) {
-                $query->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('id', $search)
-                    ->orWhere('employee_id', 'like', "%{$search}%");
+        $employees = Employee::query()
+            ->withCount([
+                'attendances as present_days' => function ($query) {
+                    $query->whereNotNull('time_in')
+                        ->where(function ($q) {
+                            $q->whereNull('status')
+                                ->orWhereNotIn('status', ['Absent', 'Leave']);
+                        });
+                },
+                'attendances as absent_days' => function ($query) {
+                    $query->where(function ($q) {
+                        $q->where('status', 'Absent')
+                            ->orWhereNull('time_in');
+                    })->where(function ($q) {
+                        $q->whereNull('status')
+                            ->orWhere('status', '!=', 'Leave');
+                    });
+                },
+                'attendances as leave_days' => function ($query) {
+                    $query->where('status', 'Leave');
+                },
+            ])
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"])
+                        ->orWhere('employee_id', 'like', "%{$search}%")
+                        ->orWhere('id', $search);
+                });
             })
-            ->when($request->department, function ($query, $department) {
-                $query->where('department', $department);
+            ->when($request->filled('department'), function ($query) use ($request) {
+                $query->where('department', $request->department);
             })
             ->orderBy('id')
             ->paginate($this->perPage($request))
             ->withQueryString();
+
+        $totalPresentDays = (int) Attendance::whereNotNull('time_in')
+            ->where(function ($q) {
+                $q->whereNull('status')
+                    ->orWhereNotIn('status', ['Absent', 'Leave']);
+            })
+            ->count();
+
+        $totalAbsentDays = (int) Attendance::where(function ($q) {
+            $q->where('status', 'Absent')->orWhereNull('time_in');
+        })->where(function ($q) {
+            $q->whereNull('status')->orWhere('status', '!=', 'Leave');
+        })->count();
+
+        $totalLeaveDays = (int) Attendance::where('status', 'Leave')->count();
+        $employeeCount = Employee::count();
 
         if ($this->wantsAjaxList($request)) {
             return $this->ajaxListResponse(
@@ -38,7 +79,7 @@ class ReportsAnalyticsController extends Controller
 
         return view(
             'reports-analytics.attendance-overview',
-            compact('employees')
+            compact('employees', 'employeeCount', 'totalPresentDays', 'totalAbsentDays', 'totalLeaveDays')
         );
     }
 
@@ -80,14 +121,19 @@ class ReportsAnalyticsController extends Controller
 
     public function leave(Request $request)
     {
-        $employees = Employee::when($request->search, function ($query, $search) {
-                $query->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('id', $search)
-                    ->orWhere('employee_id', 'like', "%{$search}%");
+        $employees = Employee::query()
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"])
+                        ->orWhere('employee_id', 'like', "%{$search}%")
+                        ->orWhere('id', $search);
+                });
             })
-            ->when($request->department, function ($query, $department) {
-                $query->where('department', $department);
+            ->when($request->filled('department'), function ($query) use ($request) {
+                $query->where('department', $request->department);
             })
             ->orderBy('id')
             ->paginate($this->perPage($request))

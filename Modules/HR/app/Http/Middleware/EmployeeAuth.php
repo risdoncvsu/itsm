@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\HR\Http\Middleware;
+namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -15,28 +15,16 @@ class EmployeeAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (config('nexora.root_admin_module_testing') && $request->user()?->role === 'root_admin') {
-            return $next($request);
-        }
-
         if (! session('employee_logged_in')) {
-            return redirect()->route('login');
-        }
-
-        if (! session('employee_client_id')) {
-            session()->forget(['employee_logged_in', 'employee_role', 'employee_id', 'employee_name', 'employee_email', 'employee_department', 'employee_client_id']);
-
-            return redirect()->route('login')->withErrors([
-                'username' => 'This HR account is not linked to a client company.',
-            ]);
+            return redirect()->route('signin');
         }
 
         $role = session('employee_role');
         $department = strtolower(trim(session('employee_department', '')));
 
         if ($role === 'employee' && $department !== 'human resources') {
-            if (! $request->routeIs('hr.employee.dashboard') && ! $request->routeIs('logout')) {
-                return redirect()->route('hr.employee.dashboard');
+            if (! $request->routeIs('employee.dashboard') && ! $request->routeIs('logout')) {
+                return redirect()->route('employee.dashboard');
             }
         }
 

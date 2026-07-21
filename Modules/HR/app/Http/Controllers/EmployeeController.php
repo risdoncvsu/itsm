@@ -1,11 +1,10 @@
 <?php
 
-namespace Modules\HR\Http\Controllers;
+namespace App\Http\Controllers;
 
-use Modules\HR\Http\Controllers\Concerns\ResolvesPerPage;
-use Modules\HR\Http\Controllers\Concerns\RespondsWithAjaxList;
-use Modules\HR\Models\Employee;
-use Illuminate\Routing\Controller;
+use App\Http\Controllers\Concerns\ResolvesPerPage;
+use App\Http\Controllers\Concerns\RespondsWithAjaxList;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -45,6 +44,7 @@ class EmployeeController extends Controller
             case 'position_desc':  $employees->orderBy('position', 'desc'); break;
             case 'newest':         $employees->orderBy('created_at', 'desc'); break;
             case 'oldest':         $employees->orderBy('created_at', 'asc'); break;
+            default:               $employees->orderBy('id', 'asc'); break;
         }
 
         $employees = $employees->paginate($this->perPage($request))->withQueryString();
@@ -58,7 +58,7 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        return redirect()->route('onboarding.step1');
+        return view('employees.create');
     }
 
     public function store(Request $request)
@@ -66,7 +66,7 @@ class EmployeeController extends Controller
         $request->validate([
             'first_name'      => 'required',
             'last_name'       => 'required',
-            'email'           => 'required|email|unique:hr.employees,email',
+            'email'           => 'required|email|unique:employees,email',
             'phone'           => 'nullable',
     'position'        => 'nullable',
     'department'      => 'required',
@@ -103,7 +103,7 @@ Employee::create([
     'address' => $request->address,
     'profile_picture' => $imageName,
 ]);
-        return redirect()->route('hr.dashboard')
+        return redirect()->route('dashboard')
             ->with('success', 'Employee added successfully!');
     }
 
@@ -116,7 +116,7 @@ Employee::create([
 public function update(Request $request, Employee $employee)
 {
     $request->validate([
-        'email'           => 'required|email|unique:hr.employees,email,' . $employee->id,
+        'email'           => 'required|email|unique:employees,email,' . $employee->id,
         'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 2MB
     ]);
 
@@ -153,7 +153,7 @@ public function destroy($id)
 
     $employee->delete();
 
-    return redirect()->route('employees.index')
+    return redirect('/employees')
     ->with('success','Employee deleted successfully!');
 }
 }
