@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PurchaseOrderController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\RequisitionController;
-use App\Http\Controllers\DeliveryController;
+use Modules\Procurement\Http\Controllers\Procurement\DashboardController;
+use Modules\Procurement\Http\Controllers\Procurement\PurchaseOrderController;
+use Modules\Procurement\Http\Controllers\Procurement\SupplierController;
+use Modules\Procurement\Http\Controllers\Procurement\RequisitionController;
+use Modules\Procurement\Http\Controllers\Procurement\DeliveryController;
 
 /*
 |--------------------------------------------------------------------------

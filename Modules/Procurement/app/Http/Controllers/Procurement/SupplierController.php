@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\Procurement\Http\Controllers\Procurement;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class SupplierController extends Controller
