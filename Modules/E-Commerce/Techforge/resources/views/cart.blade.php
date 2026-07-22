@@ -142,9 +142,10 @@
             <!-- Free Shipping Progress Bar -->
             @if(count($cart) > 0)
             @php
-                $shippingProgress = min(($subtotal / $freeShippingThreshold) * 100, 100);
-                $remaining = max($freeShippingThreshold - $subtotal, 0);
-            @endphp
+    $storefrontCompany = request()->attributes->get('ecommerce_company');
+    $store = $storefrontCompany?->ecommerce_slug ?: 'techforge';
+@endphp
+
             <div class="mb-8 liquid-glass rounded-2xl p-5 border border-white/10">
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
@@ -254,7 +255,7 @@
                             
                             <div class="flex items-center gap-4">
                                 @guest('ecommerce')
-                                <a href="{{ route('ecommerce.login') }}" class="bg-gradient-to-r from-primary to-[#ff8c33] hover:from-[#ff8c33] hover:to-primary text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(255,107,0,0.3)]">
+                                <a href="{{ route('ecommerce.login', ['store' => $store]) }}" class="bg-gradient-to-r from-primary to-[#ff8c33] hover:from-[#ff8c33] hover:to-primary text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-[0_0_15px_rgba(255,107,0,0.3)]">
                                     Sign In
                                 </a>
                                 @endguest
@@ -318,7 +319,7 @@
                         </div>
                         
                         @if(count($cart) > 0)
-                            <a href="{{ \Illuminate\Support\Facades\Auth::guard('ecommerce')->check() ? route('ecommerce.checkout.index') : route('ecommerce.cart.checkout.redirect') }}" id="checkout-btn" class="w-full bg-gradient-to-r from-primary to-orange-400 hover:from-primary-hover hover:to-primary text-white py-4 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(255,107,0,0.3)] hover:shadow-[0_0_25px_rgba(255,107,0,0.5)] hover:-translate-y-1 flex items-center justify-center gap-2 text-lg group">
+                            <a href="{{ \Illuminate\Support\Facades\Auth::guard('ecommerce')->check() ? route('ecommerce.checkout.index', ['store' => $store]) : route('ecommerce.cart.checkout.redirect', ['store' => $store]) }}" id="checkout-btn" class="w-full bg-gradient-to-r from-primary to-orange-400 hover:from-primary-hover hover:to-primary text-white py-4 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(255,107,0,0.3)] hover:shadow-[0_0_25px_rgba(255,107,0,0.5)] hover:-translate-y-1 flex items-center justify-center gap-2 text-lg group">
                                 Proceed to Checkout <i class="ph-bold ph-arrow-right group-hover:translate-x-1 transition-transform"></i>
                             </a>
                         @else

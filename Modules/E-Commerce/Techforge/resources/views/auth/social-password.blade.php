@@ -1,3 +1,7 @@
+@php
+    $storefrontCompany = request()->attributes->get('ecommerce_company');
+    $store = $storefrontCompany?->ecommerce_slug ?: 'techforge';
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
@@ -86,7 +90,7 @@
     <div class="ambient-light-2"></div>
 
     <div class="w-full max-w-md px-6 relative z-10 py-12">
-        <a href="{{ route('ecommerce.login') }}" class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group text-sm font-medium">
+        <a href="{{ route('ecommerce.login', ['store' => $store]) }}" class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group text-sm font-medium">
             <i class="ph ph-arrow-left group-hover:-translate-x-1 transition-transform"></i> Back to Login
         </a>
 
@@ -109,7 +113,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('ecommerce.social.process-registration') }}" method="POST" class="space-y-4">
+                <form action="{{ route('ecommerce.social.process-registration', ['store' => $store]) }}" method="POST" class="space-y-4">
                     @csrf
                     <div>
                         <label for="password" class="block text-xs font-medium text-gray-300 mb-1.5 ml-1">Password</label>

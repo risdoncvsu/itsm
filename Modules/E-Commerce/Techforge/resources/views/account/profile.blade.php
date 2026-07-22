@@ -1,3 +1,7 @@
+@php
+    $storefrontCompany = request()->attributes->get('ecommerce_company');
+    $store = $storefrontCompany?->ecommerce_slug ?: 'techforge';
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
@@ -195,7 +199,7 @@
                             </div>
                             <!-- Subcategories -->
                             <div class="flex flex-col ml-8 gap-3 border-l border-white/10 pl-4 py-1">
-                                <a href="{{ route('ecommerce.account.profile') }}" class="text-primary font-bold text-sm hover:text-primary transition-colors">Profile</a>
+                                <a href="{{ route('ecommerce.account.profile', ['store' => $store]) }}" class="text-primary font-bold text-sm hover:text-primary transition-colors">Profile</a>
                                 <a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Bank & Cards</a>
                                 <a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Addresses</a>
                                 <a href="#" class="text-gray-400 hover:text-white transition-colors text-sm">Change Password</a>
@@ -203,7 +207,7 @@
                         </div>
 
                         <!-- Other Categories -->
-                        <a href="{{ route('ecommerce.account.purchases') }}" class="flex items-center gap-3 text-gray-400 hover:text-white transition-colors font-bold text-base mt-4">
+                        <a href="{{ route('ecommerce.account.purchases', ['store' => $store]) }}" class="flex items-center gap-3 text-gray-400 hover:text-white transition-colors font-bold text-base mt-4">
                             <i class="ph ph-receipt text-xl"></i>
                             Purchases
                         </a>

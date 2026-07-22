@@ -79,7 +79,10 @@
             <div class="user-menu" data-user-menu>
                 <button type="button" class="user-button" data-user-menu-button aria-label="Open user menu" aria-expanded="false"><img src="{{ asset('images/icon.png') }}" alt="User"></button>
                 <div class="user-dropdown" data-user-menu-dropdown>
-                    <a href="{{ route('ecommerce.home', ['store' => auth('ecommerce_admin')->user()?->getCompany()?->ecommerce_slug]) }}" target="_blank" rel="noopener">Open Storefront</a>
+                    @php($slug = auth('ecommerce_admin')->user()?->getCompany()?->ecommerce_slug)
+                    @if($slug)
+                        <a href="{{ route('ecommerce.home', ['store' => $slug]) }}" target="_blank" rel="noopener">Open Storefront</a>
+                    @endif
                     <form method="post" action="{{ route('ecommerce.admin.logout') }}">@csrf<button type="submit">Log Out</button></form>
                 </div>
             </div>

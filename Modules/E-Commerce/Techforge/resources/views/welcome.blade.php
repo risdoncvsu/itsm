@@ -1,8 +1,8 @@
 @php
     $storefrontCompany = request()->attributes->get('ecommerce_company');
-    $storefrontName = $storefrontCompany?->company_name ?: 'Nexora Store';
-    $storefrontVisitKey = 'storefront_visited_'.($storefrontCompany?->ecommerce_slug ?: 'store');
+    $store = $storefrontCompany?->ecommerce_slug ?: 'techforge';
 @endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
@@ -220,7 +220,7 @@
                 
                 <!-- Buttons -->
                 <div class="flex flex-wrap items-center gap-4 mb-16">
-                    <a href="{{ route('ecommerce.prebuilt-pcs') }}" class="bg-primary text-black px-8 py-3.5 font-black hover:bg-white transition-colors uppercase tracking-widest text-xs sm:text-sm shadow-[0_0_20px_rgba(255,107,0,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]">
+                    <a href="{{ route('ecommerce.prebuilt-pcs', ['store' => $store]) }}" class="bg-primary text-black px-8 py-3.5 font-black hover:bg-white transition-colors uppercase tracking-widest text-xs sm:text-sm shadow-[0_0_20px_rgba(255,107,0,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]">
                         SHOP ALL BUILDS &rarr;
                     </a>
                     <a href="#" class="bg-transparent text-white border border-white/20 px-8 py-3.5 font-black hover:border-white transition-colors uppercase tracking-widest text-xs sm:text-sm">
@@ -710,7 +710,7 @@
                         <div class="text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-2">Built for you</div>
                         <h3 class="text-white text-3xl font-black tracking-wide uppercase mb-4 group-hover:text-primary transition-colors">Custom Gaming PCs</h3>
                         <p class="text-sm text-gray-400 mb-8 max-w-md">Customize your PC with top brands like Intel, AMD, and ASUS, with no compatibility worries.</p>
-                        <a href="{{ route('ecommerce.pc-configurator') }}" class="border border-primary/50 hover:border-primary text-primary hover:text-white hover:bg-primary text-[10px] font-black uppercase tracking-widest px-6 py-3 transition-all flex items-center gap-2 w-max">
+                        <a href="{{ route('ecommerce.pc-configurator', ['store' => $store]) }}" class="border border-primary/50 hover:border-primary text-primary hover:text-white hover:bg-primary text-[10px] font-black uppercase tracking-widest px-6 py-3 transition-all flex items-center gap-2 w-max">
                             Start Building &rarr;
                         </a>
                     </div>
@@ -726,7 +726,7 @@
                     <div class="relative z-10 p-6 border-t border-white/5 bg-black/60 backdrop-blur-md">
                         <h3 class="text-white text-xl font-black tracking-wide uppercase mb-2 group-hover:text-primary transition-colors">PC Forge</h3>
                         <p class="text-[11px] text-gray-400 mb-6 line-clamp-2">Customize your ideal PC from scratch.</p>
-                        <a href="{{ route('ecommerce.build-pc') }}" class="border border-primary/30 hover:border-primary text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 transition-all flex items-center gap-2 w-max">
+                        <a href="{{ route('ecommerce.build-pc', ['store' => $store]) }}" class="border border-primary/30 hover:border-primary text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 transition-all flex items-center gap-2 w-max">
                             Build Now &rarr;
                         </a>
                     </div>
@@ -739,7 +739,7 @@
                     <div class="relative z-10 p-6 border-t border-white/5 bg-black/60 backdrop-blur-md">
                         <h3 class="text-white text-xl font-black tracking-wide uppercase mb-2 group-hover:text-primary transition-colors">Gaming Laptops</h3>
                         <p class="text-[11px] text-gray-400 mb-6 line-clamp-2">Immerse yourself on the go.</p>
-                        <a href="{{ route('ecommerce.gaming-laptops') }}" class="border border-primary/30 hover:border-primary text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 transition-all flex items-center gap-2 w-max">
+                        <a href="{{ route('ecommerce.gaming-laptops', ['store' => $store]) }}" class="border border-primary/30 hover:border-primary text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 transition-all flex items-center gap-2 w-max">
                             Browse &rarr;
                         </a>
                     </div>
@@ -752,7 +752,7 @@
                     <div class="relative z-10 p-6 border-t border-white/5 bg-black/60 backdrop-blur-md">
                         <h3 class="text-white text-xl font-black tracking-wide uppercase mb-2 group-hover:text-primary transition-colors">Forge Store</h3>
                         <p class="text-[11px] text-gray-400 mb-6 line-clamp-2">Gear up with your favorite parts.</p>
-                        <a href="{{ route('ecommerce.forge-store') }}" class="border border-primary/30 hover:border-primary text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 transition-all flex items-center gap-2 w-max">
+                        <a href="{{ route('ecommerce.forge-store', ['store' => $store]) }}" class="border border-primary/30 hover:border-primary text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 transition-all flex items-center gap-2 w-max">
                             Gear Up &rarr;
                         </a>
                     </div>

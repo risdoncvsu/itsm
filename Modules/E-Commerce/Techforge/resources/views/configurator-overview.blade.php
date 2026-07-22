@@ -497,31 +497,10 @@
                     </div>
 
                     @php
-                        // Map specs to nice icons and labels
-                        $specs = [
-                            ['label' => 'Operating System', 'value' => $product->os ?? 'Windows 11 Home', 'icon' => 'ph-windows-logo', 'price' => 0],
-                            ['label' => 'Case', 'value' => $product->pcCase->name ?? 'TechForge Standard Case', 'icon' => 'ph-computer-tower', 'price' => $product->pcCase->price ?? 0],
-                            ['label' => 'Processor', 'value' => $product->intelCpu->name ?? 'N/A', 'icon' => 'ph-cpu', 'price' => $product->intelCpu->price ?? 0],
-                            ['label' => 'Video Card', 'value' => $product->gpu->name ?? 'N/A', 'icon' => 'ph-graphics-card', 'price' => $product->gpu->price ?? 0],
-                            ['label' => 'Memory', 'value' => $product->intelRam->name ?? 'N/A', 'icon' => 'ph-memory', 'price' => $product->intelRam->price ?? 0],
-                            ['label' => 'Primary Storage', 'value' => $product->storage->name ?? 'N/A', 'icon' => 'ph-hard-drives', 'price' => $product->storage->price ?? 0],
-                            ['label' => 'Power Supply', 'value' => $product->powerSupply->name ?? 'N/A', 'icon' => 'ph-plug', 'price' => $product->powerSupply->price ?? 0],
-                            ['label' => 'Motherboard', 'value' => $product->intelMotherboard->name ?? 'N/A', 'icon' => 'ph-circuitry', 'price' => $product->intelMotherboard->price ?? 0],
-                            ['label' => 'Cooling', 'value' => $product->cooler->name ?? 'Standard Air Cooler', 'icon' => 'ph-fan', 'price' => $product->cooler->price ?? 0],
-                            
-                        ];
-                        
-                        $editUrl = route('ecommerce.build-pc', [
-                            'cpu' => $product->cpu->name ?? null, 
-                            'gpu' => $product->gpu->name ?? null, 
-                            'ram' => $product->ram->name ?? null, 
-                            'storage' => $product->storage->name ?? null, 
-                            'motherboard' => $product->motherboard->name ?? null, 
-                            'psu' => $product->powerSupply->name ?? null, 
-                            'case' => $product->pcCase->name ?? null, 
-                            'cooler' => $product->cooler ?? null
-                        ]);
-                    @endphp
+    $storefrontCompany = request()->attributes->get('ecommerce_company');
+    $store = $storefrontCompany?->ecommerce_slug ?: 'techforge';
+@endphp
+
 
                     <div class="liquid-glass backdrop-blur-2xl bg-[#050505]/60 rounded-2xl border border-white/5 divide-y divide-white/5" id="specs-list">
                         @foreach($specs as $spec)

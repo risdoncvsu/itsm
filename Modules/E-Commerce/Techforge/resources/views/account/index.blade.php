@@ -1,3 +1,7 @@
+@php
+    $storefrontCompany = request()->attributes->get('ecommerce_company');
+    $store = $storefrontCompany?->ecommerce_slug ?: 'techforge';
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
@@ -231,7 +235,7 @@
                         <p class="text-sm text-gray-400 mt-1">Manage your account</p>
                     </div>
 
-                    <form action="{{ route('ecommerce.account.profile.update') }}" method="POST" class="flex flex-col-reverse md:flex-row gap-12 relative z-10">
+                    <form action="{{ route('ecommerce.account.profile.update', ['store' => $store]) }}" method="POST" class="flex flex-col-reverse md:flex-row gap-12 relative z-10">
                         @csrf
                         <!-- Form (Left side) -->
                         <div class="flex-1 space-y-6">
@@ -1027,7 +1031,7 @@
                                 <i class="ph-bold ph-x text-xl"></i>
                             </button>
                         </div>
-                        <form action="{{ route('ecommerce.account.payment-methods.store-card') }}" method="POST">
+                        <form action="{{ route('ecommerce.account.payment-methods.store-card', ['store' => $store]) }}" method="POST">
                             @csrf
                             <div class="flex flex-col gap-4">
                                 <div class="flex flex-col gap-2">
@@ -1175,7 +1179,7 @@
                                 <i class="ph-bold ph-x text-xl"></i>
                             </button>
                         </div>
-                        <form action="{{ route('ecommerce.account.payment-methods.store-bank') }}" method="POST">
+                        <form action="{{ route('ecommerce.account.payment-methods.store-bank', ['store' => $store]) }}" method="POST">
                             @csrf
                             <div class="flex flex-col gap-4">
                                 <div class="flex flex-col gap-2">
@@ -1310,7 +1314,7 @@
                                 <i class="ph-bold ph-x text-xl"></i>
                             </button>
                         </div>
-                        <form id="addAddressForm" action="{{ route('ecommerce.account.addresses.store') }}" method="POST">
+                        <form id="addAddressForm" action="{{ route('ecommerce.account.addresses.store', ['store' => $store]) }}" method="POST">
                             @csrf
                             <input type="hidden" id="latitude" name="latitude" value="">
                             <input type="hidden" id="longitude" name="longitude" value="">
@@ -1427,7 +1431,7 @@
                         const form = document.getElementById('addAddressForm');
                         
                         modal.querySelector('h3').textContent = 'Add New Address';
-                        form.action = `{{ route('ecommerce.account.addresses.store') }}`;
+                        form.action = `{{ route('ecommerce.account.addresses.store', ['store' => $store]) }}`;
                         
                         const methodInput = form.querySelector('input[name="_method"]');
                         if (methodInput) methodInput.remove();

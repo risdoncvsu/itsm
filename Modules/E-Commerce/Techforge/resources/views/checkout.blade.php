@@ -1,3 +1,7 @@
+@php
+    $storefrontCompany = request()->attributes->get('ecommerce_company');
+    $store = $storefrontCompany?->ecommerce_slug ?: 'techforge';
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
@@ -659,7 +663,7 @@
                 const formData = new FormData(this);
                 const data = Object.fromEntries(formData.entries());
 
-                fetch('{{ route('ecommerce.checkout.process') }}', {
+                fetch('{{ route('ecommerce.checkout.process', ['store' => $store]) }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

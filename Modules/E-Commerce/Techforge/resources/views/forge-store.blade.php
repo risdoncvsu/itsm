@@ -1,3 +1,7 @@
+@php
+    $storefrontCompany = request()->attributes->get('ecommerce_company');
+    $store = $storefrontCompany?->ecommerce_slug ?: 'techforge';
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
@@ -195,21 +199,21 @@
         <h2 class="text-3xl font-black text-white tracking-wide mb-8 text-center">Shop by category</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Accessories -->
-            <a href="{{ route('ecommerce.store.accessories') }}" class="group relative overflow-hidden rounded-2xl liquid-glass-heavy border border-white/5 hover:border-primary/50 transition-all duration-300 p-8 flex flex-col items-center justify-center text-center aspect-[4/3] md:aspect-auto md:h-64">
+            <a href="{{ route('ecommerce.store.accessories', ['store' => $store]) }}" class="group relative overflow-hidden rounded-2xl liquid-glass-heavy border border-white/5 hover:border-primary/50 transition-all duration-300 p-8 flex flex-col items-center justify-center text-center aspect-[4/3] md:aspect-auto md:h-64">
                 <i class="ph ph-headphones text-5xl text-gray-500 group-hover:text-primary transition-colors mb-4 drop-shadow-[0_0_15px_rgba(255,107,0,0)] group-hover:drop-shadow-[0_0_15px_rgba(255,107,0,0.5)]"></i>
                 <h3 class="text-xl font-bold text-white mb-2">Accessories</h3>
                 <p class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">Keyboards, mice, headsets & more.</p>
             </a>
 
             <!-- Monitors -->
-            <a href="{{ route('ecommerce.store.monitors') }}" class="group relative overflow-hidden rounded-2xl liquid-glass-heavy border border-white/5 hover:border-primary/50 transition-all duration-300 p-8 flex flex-col items-center justify-center text-center aspect-[4/3] md:aspect-auto md:h-64">
+            <a href="{{ route('ecommerce.store.monitors', ['store' => $store]) }}" class="group relative overflow-hidden rounded-2xl liquid-glass-heavy border border-white/5 hover:border-primary/50 transition-all duration-300 p-8 flex flex-col items-center justify-center text-center aspect-[4/3] md:aspect-auto md:h-64">
                 <i class="ph ph-desktop text-5xl text-gray-500 group-hover:text-primary transition-colors mb-4 drop-shadow-[0_0_15px_rgba(255,107,0,0)] group-hover:drop-shadow-[0_0_15px_rgba(255,107,0,0.5)]"></i>
                 <h3 class="text-xl font-bold text-white mb-2">Monitors</h3>
                 <p class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">High refresh rate gaming displays.</p>
             </a>
 
             <!-- PC Parts -->
-            <a href="{{ route('ecommerce.store.pc-parts') }}" class="group relative overflow-hidden rounded-2xl liquid-glass-heavy border border-white/5 hover:border-primary/50 transition-all duration-300 p-8 flex flex-col items-center justify-center text-center aspect-[4/3] md:aspect-auto md:h-64">
+            <a href="{{ route('ecommerce.store.pc-parts', ['store' => $store]) }}" class="group relative overflow-hidden rounded-2xl liquid-glass-heavy border border-white/5 hover:border-primary/50 transition-all duration-300 p-8 flex flex-col items-center justify-center text-center aspect-[4/3] md:aspect-auto md:h-64">
                 <i class="ph ph-cpu text-5xl text-gray-500 group-hover:text-primary transition-colors mb-4 drop-shadow-[0_0_15px_rgba(255,107,0,0)] group-hover:drop-shadow-[0_0_15px_rgba(255,107,0,0.5)]"></i>
                 <h3 class="text-xl font-bold text-white mb-2">PC Parts</h3>
                 <p class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">Processors, GPUs, Motherboards.</p>

@@ -1,3 +1,7 @@
+@php
+    $storefrontCompany = request()->attributes->get('ecommerce_company');
+    $store = $storefrontCompany?->ecommerce_slug ?: 'techforge';
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
@@ -167,7 +171,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('ecommerce.login.post') }}" method="POST" class="space-y-4">
+                        <form action="{{ route('ecommerce.login.post', ['store' => $store]) }}" method="POST" class="space-y-4">
                             @csrf
                             <div>
                                 <label for="email" class="block text-xs font-medium text-gray-300 mb-1.5 ml-1">Email</label>
@@ -234,7 +238,7 @@
                             <p class="text-sm text-gray-400 font-light">Join TechForge today</p>
                         </div>
 
-                        <form action="{{ route('ecommerce.register.post') }}" method="POST" class="space-y-4">
+                        <form action="{{ route('ecommerce.register.post', ['store' => $store]) }}" method="POST" class="space-y-4">
                             @csrf
                             <div>
                                 <label for="reg-email" class="block text-xs font-medium text-gray-300 mb-1.5 ml-1">Email</label>

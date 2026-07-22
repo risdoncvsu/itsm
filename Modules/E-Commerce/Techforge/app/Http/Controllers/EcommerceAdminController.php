@@ -78,7 +78,7 @@ class EcommerceAdminController extends Controller
         ]);
     }
 
-    public function saveLayout(Request $request): RedirectResponse
+    public function saveLayout(Request $request): \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $company = $this->company();
         $record = StorefrontLayout::query()->first();
@@ -86,7 +86,11 @@ class EcommerceAdminController extends Controller
         $layout = $this->layoutData($request, $current);
 
         if ($request->hasFile('logo')) {
-            $layout['logo_path'] = $request->file('logo')->store('storefront-layouts', 'public');
+            $file = $request->file('logo');
+            $filename = $file->getClientOriginalName();
+            $path = base_path('Modules/E-Commerce/Techforge/resources/img');
+            $file->move($path, $filename);
+            $layout['logo_path'] = 'Modules/E-Commerce/Techforge/resources/img/' . $filename;
         }
 
         if ($request->hasFile('hero_image')) {
@@ -103,6 +107,10 @@ class EcommerceAdminController extends Controller
             $record->update(['draft_layout' => $layout]);
         } else {
             StorefrontLayout::create(['draft_layout' => $layout]);
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Saved successfully']);
         }
 
         return redirect()->route('ecommerce.admin.layout.edit')->with('success', 'Draft saved. Preview it, then publish when you are ready.');
@@ -194,6 +202,18 @@ class EcommerceAdminController extends Controller
             'benefit_three' => ['nullable', 'string', 'max:100'],
             'logo' => ['nullable', 'image', 'max:4096'],
             'hero_image' => ['nullable', 'image', 'max:4096'],
+            'announcement_text' => ['nullable', 'string', 'max:100'],
+            'announcement_url' => ['nullable', 'string', 'max:255'],
+            'search_placeholder' => ['nullable', 'string', 'max:50'],
+            'trending_searches' => ['nullable', 'string', 'max:255'],
+                        'nav_links' => ['nullable', 'array', 'max:10'],
+            'nav_links.*.label' => ['required_with:nav_links', 'string', 'max:50'],
+            'nav_links.*.url' => ['required_with:nav_links', 'string', 'max:255'],
+            'nav_links.*.type' => ['required_with:nav_links', 'in:simple,mega'],
+            'nav_links.*.promo_title' => ['nullable', 'string', 'max:100'],
+            'nav_links.*.promo_subtitle' => ['nullable', 'string', 'max:200'],
+            'nav_links.*.promo_button' => ['nullable', 'string', 'max:60'],
+            'nav_links.*.promo_button_url' => ['nullable', 'string', 'max:255'],
         ]);
 
         $allowedSections = ['hero', 'featured_listings', 'promo', 'benefits'];
@@ -227,6 +247,14 @@ class EcommerceAdminController extends Controller
             'accent_color' => $validated['accent_color'],
             'logo_path' => $current['logo_path'] ?? null,
             'sections' => array_map(fn (string $id): array => $sectionsById[$id], $order),
+            'navbar' => [
+                'announcement_enabled' => $request->boolean('announcement_enabled'),
+                'announcement_text' => $validated['announcement_text'] ?: '🔥 Free shipping on all orders over ₱50,000!',
+                'announcement_url' => $validated['announcement_url'] ?: '',
+                'search_placeholder' => $validated['search_placeholder'] ?: 'What are we searching?',
+                'trending_searches' => $validated['trending_searches'] ?: 'RTX 4090, Ryzen 7 7800X3D, Prebuilt Gaming PC, 32GB DDR5 RAM',
+                'links' => $validated['nav_links'] ?? [],
+            ],
         ];
     }
 

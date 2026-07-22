@@ -1,3 +1,7 @@
+@php
+    $storefrontCompany = request()->attributes->get('ecommerce_company');
+    $store = $storefrontCompany?->ecommerce_slug ?: 'techforge';
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
@@ -196,7 +200,7 @@
     <div id="search-results-container" class="transition-opacity duration-300">
 
     <!-- Category Content -->
-    <form id="filter-form" method="GET" action="{{ route('ecommerce.prebuilt-pcs') }}" class="max-w-[1500px] mx-auto px-6 lg:px-8 pb-24 relative z-10 flex flex-col lg:flex-row gap-8">
+    <form id="filter-form" method="GET" action="{{ route('ecommerce.prebuilt-pcs', ['store' => $store]) }}" class="max-w-[1500px] mx-auto px-6 lg:px-8 pb-24 relative z-10 flex flex-col lg:flex-row gap-8">
         
         <!-- Product Filter Component -->
         <x-pcs-filter :counts="$counts" route="prebuilt-pcs" :globalMinPrice="$globalMinPrice" :globalMaxPrice="$globalMaxPrice" />
