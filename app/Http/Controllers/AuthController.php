@@ -95,6 +95,10 @@ class AuthController extends Controller
     {
         $company = $user->company_id ? \App\Models\Company::find($user->company_id) : null;
 
+        if ($company && $this->restoreLegacyClientSetup($company)) {
+            return route('client.itsm.employees');
+        }
+
         if ($company && ! $company->setup_completed_at) {
             return route('newuser.show');
         }
@@ -104,6 +108,36 @@ class AuthController extends Controller
         }
 
         return route('client.itsm.employees');
+    }
+
+    /**
+     * Older client accounts existed before the onboarding fields were added
+     * to ITSM.  A rollback can therefore leave a real client with no setup
+     * timestamp even though HR already owns its employee records.  Repair the
+     * ITSM marker from that authoritative HR data instead of forcing the
+     * system admin through initial onboarding again.
+     */
+    private function restoreLegacyClientSetup(\App\Models\Company $company): bool
+    {
+        if ($company->setup_completed_at && $company->hr_employee_id
+            && $this->hrEmployeeProfileProvisioner->hasEmployeeForCompany($company, (int) $company->hr_employee_id)) {
+            return false;
+        }
+
+        $employees = $this->hrEmployeeProfileProvisioner->employeesForCompany($company);
+        if ($employees->isEmpty()) {
+            return false;
+        }
+
+        $hrManager = $employees->first(fn (object $employee): bool => strcasecmp((string) $employee->department, 'Human Resources') === 0)
+            ?? $employees->first();
+
+        $company->forceFill([
+            'hr_employee_id' => (int) $hrManager->id,
+            'setup_completed_at' => $company->setup_completed_at ?? now(),
+        ])->save();
+
+        return true;
     }
 
     /**
