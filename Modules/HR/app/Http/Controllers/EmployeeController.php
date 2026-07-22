@@ -65,8 +65,6 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        abort_unless(session('employee_role') === 'admin', 403, 'Only an HR manager can add employees.');
-
         $clientId = (int) session('employee_client_id');
         abort_unless($clientId > 0, 403);
 
@@ -75,106 +73,102 @@ class EmployeeController extends Controller
             'last_name'       => 'required',
             'email'           => ['required', 'email', Rule::unique('hr.employees', 'email')->where('client_id', $clientId)],
             'phone'           => 'nullable',
-            'position'        => 'nullable',
-            'department'      => 'required',
-            'gender'          => 'nullable',
-            'marital_status'  => 'nullable',
-            'address'         => 'nullable',
-            'profile_picture' => 'nullable|file',
-        ]);
+    'position'        => 'nullable',
+    'department'      => 'required',
+    'gender'          => 'nullable',
+    'marital_status'  => 'nullable',
+    'address'         => 'nullable',
+    'profile_picture' => 'nullable|file',
+]);
 
-        $imageName = null;
 
-        if ($request->hasFile('profile_picture')) {
-            $imageName = time() . '.' . $request->file('profile_picture')->extension();
-            $request->file('profile_picture')->move(public_path('profile_pictures'), $imageName);
-        }
+$imageName = null;
 
-        $lastEmployee = Employee::latest('id')->first();
+if ($request->hasFile('profile_picture')) {
+    $imageName = time() . '.' . $request->file('profile_picture')->extension();
+    $request->file('profile_picture')->move(public_path('profile_pictures'), $imageName);
+}
 
-        $nextNumber = $lastEmployee ? intval(substr($lastEmployee->employee_id, 4)) + 1 : 1;
+$lastEmployee = Employee::latest('id')->first();
 
-        $employeeId = date('Y') . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+$nextNumber = $lastEmployee ? intval(substr($lastEmployee->employee_id, 4)) + 1 : 1;
 
-        Employee::create([
-            'employee_id' => $employeeId,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'middle_name' => $request->middle_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'position' => $request->position,
-            'department' => $request->department,
-            'gender' => $request->gender,
-            'marital_status' => $request->marital_status,
-            'address' => $request->address,
-            'profile_picture' => $imageName,
-            'client_id' => $clientId,
-            'approval_status' => 'Pending',
-        ]);
-
+$employeeId = date('Y') . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+Employee::create([
+    'employee_id' => $employeeId,
+    'first_name' => $request->first_name,
+    'last_name' => $request->last_name,
+    'middle_name' => $request->middle_name,
+    'email' => $request->email,
+    'phone' => $request->phone,
+    'position' => $request->position,
+    'department' => $request->department,
+    'gender' => $request->gender,
+    'marital_status' => $request->marital_status,
+    'address' => $request->address,
+    'profile_picture' => $imageName,
+    'client_id' => $clientId,
+    'approval_status' => 'Pending',
+]);
         return redirect()->route('hr.dashboard')
             ->with('success', 'Employee added successfully!');
     }
 
     public function show($id)
-    {
-        $employee = Employee::findOrFail($id);
+{
+    $employee = Employee::findOrFail($id);
 
-        return view('employees.employeeform', compact('employee'));
+    return view('employees.employeeform', compact('employee'));
+}
+public function update(Request $request, Employee $employee)
+{
+    $clientId = (int) session('employee_client_id');
+
+    $request->validate([
+        'email'           => ['required', 'email', Rule::unique('hr.employees', 'email')->where('client_id', $clientId)->ignore($employee->id)],
+        'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 2MB
+    ]);
+
+    $data = [
+        'first_name'     => $request->first_name,
+        'middle_name'    => $request->middle_name,
+        'last_name'      => $request->last_name,
+        'suffix'         => $request->suffix,
+        'department'     => $request->department,
+        'position'       => $request->position,
+        'gender'         => $request->gender,
+        'marital_status' => $request->marital_status,
+        'nationality'    => $request->nationality,
+        'address'        => $request->address,
+        'email'          => $request->email,
+        'phone'          => $request->phone,
+    ];
+
+    $employee->update($data);
+
+    return back()->with('success', 'Employee updated successfully.');
+}
+
+public function destroy($id)
+{
+    abort_unless(session('employee_role') === 'admin', 403, 'Only an HR manager can delete employees.');
+
+    $employee = Employee::findOrFail($id);
+    $clientId = (int) $employee->client_id;
+    $employeeId = (int) $employee->id;
+    $email = (string) $employee->email;
+
+    // Delete profile picture if meron
+    if ($employee->profile_picture &&
+        file_exists(public_path('profile_pictures/' . $employee->profile_picture))) {
+
+        unlink(public_path('profile_pictures/' . $employee->profile_picture));
     }
 
-    public function update(Request $request, Employee $employee)
-    {
-        abort_unless(session('employee_role') === 'admin', 403, 'Only an HR manager can edit employees.');
+    $employee->delete();
+    app(ErpIntegrationService::class)->employeeRemoved($clientId, $employeeId, $email);
 
-        $clientId = (int) session('employee_client_id');
-
-        $request->validate([
-            'email'           => ['required', 'email', Rule::unique('hr.employees', 'email')->where('client_id', $clientId)->ignore($employee->id)],
-            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 2MB
-        ]);
-
-        $data = [
-            'first_name'     => $request->first_name,
-            'middle_name'    => $request->middle_name,
-            'last_name'      => $request->last_name,
-            'suffix'         => $request->suffix,
-            'department'     => $request->department,
-            'position'       => $request->position,
-            'gender'         => $request->gender,
-            'marital_status' => $request->marital_status,
-            'nationality'    => $request->nationality,
-            'address'        => $request->address,
-            'email'          => $request->email,
-            'phone'          => $request->phone,
-        ];
-
-        $employee->update($data);
-
-        return back()->with('success', 'Employee updated successfully.');
-    }
-
-    public function destroy($id)
-    {
-        abort_unless(session('employee_role') === 'admin', 403, 'Only an HR manager can delete employees.');
-
-        $employee = Employee::findOrFail($id);
-        $clientId = (int) $employee->client_id;
-        $employeeId = (int) $employee->id;
-        $email = (string) $employee->email;
-
-        // Delete profile picture if meron
-        if ($employee->profile_picture &&
-            file_exists(public_path('profile_pictures/' . $employee->profile_picture))) {
-
-            unlink(public_path('profile_pictures/' . $employee->profile_picture));
-        }
-
-        $employee->delete();
-        app(ErpIntegrationService::class)->employeeRemoved($clientId, $employeeId, $email);
-
-        return redirect()->route('hr.employees.index')
-        ->with('success','Employee deleted successfully!');
-    }
+    return redirect()->route('hr.employees.index')
+    ->with('success','Employee deleted successfully!');
+}
 }
