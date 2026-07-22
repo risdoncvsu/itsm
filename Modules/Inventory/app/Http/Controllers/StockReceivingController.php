@@ -14,18 +14,30 @@ use Modules\Inventory\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class StockReceivingController extends Controller
 {
     private function procurementDeliveriesQuery()
     {
+        $schema = Schema::connection('procurement');
+        $hasPurchaseOrderWarehouse = $schema->hasColumn('purchase_orders', 'warehouse_id');
+        $hasSupplierWarehouse = $schema->hasColumn('suppliers', 'warehouse_id');
+
+        $destinationWarehouse = match (true) {
+            $hasPurchaseOrderWarehouse && $hasSupplierWarehouse => DB::raw('COALESCE(purchase_orders.warehouse_id, suppliers.warehouse_id) as destination_warehouse_id'),
+            $hasPurchaseOrderWarehouse => DB::raw('purchase_orders.warehouse_id as destination_warehouse_id'),
+            $hasSupplierWarehouse => DB::raw('suppliers.warehouse_id as destination_warehouse_id'),
+            default => DB::raw('NULL as destination_warehouse_id'),
+        };
+
         $query = Procurement::query()
             ->leftJoin('suppliers', 'deliveries.supplier_id', '=', 'suppliers.id')
             ->leftJoin('purchase_orders', 'deliveries.purchase_order_id', '=', 'purchase_orders.id')
             ->select(
                 'deliveries.*',
                 'suppliers.name as supplier_name',
-                DB::raw('COALESCE(purchase_orders.warehouse_id, suppliers.warehouse_id) as destination_warehouse_id')
+                $destinationWarehouse
             );
 
         if (! (config('nexora.root_admin_module_testing') && auth()->user()?->role === 'root_admin')) {

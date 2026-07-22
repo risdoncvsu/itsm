@@ -31,6 +31,36 @@ class EnsureProcurementClientColumns extends Command
             $this->info("Added client_id to Procurement {$tableName}.");
         }
 
+        // These fields are used to route a supplier delivery to the correct
+        // Inventory warehouse. This command runs on every deployment, unlike
+        // a one-time Laravel migration record, so it also repairs Procurement
+        // databases that were connected after the original migration ran.
+        if ($schema->hasTable('purchase_orders')) {
+            if (! $schema->hasColumn('purchase_orders', 'warehouse_id')) {
+                $schema->table('purchase_orders', function (Blueprint $table): void {
+                    $table->unsignedBigInteger('warehouse_id')->nullable()->index();
+                });
+
+                $this->info('Added warehouse_id to Procurement purchase_orders.');
+            }
+
+            if (! $schema->hasColumn('purchase_orders', 'delivery_address')) {
+                $schema->table('purchase_orders', function (Blueprint $table): void {
+                    $table->string('delivery_address')->nullable();
+                });
+
+                $this->info('Added delivery_address to Procurement purchase_orders.');
+            }
+        }
+
+        if ($schema->hasTable('suppliers') && ! $schema->hasColumn('suppliers', 'warehouse_id')) {
+            $schema->table('suppliers', function (Blueprint $table): void {
+                $table->unsignedBigInteger('warehouse_id')->nullable()->index();
+            });
+
+            $this->info('Added warehouse_id to Procurement suppliers.');
+        }
+
         return self::SUCCESS;
     }
 }
