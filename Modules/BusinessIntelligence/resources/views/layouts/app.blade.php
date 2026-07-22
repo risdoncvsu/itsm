@@ -150,8 +150,6 @@
     </div>
 
     <script>
-        console.log("APP.BLADE VERSION 4 — FIXED NOTIFICATIONS");
-
         lucide.createIcons();
 
         // Load read state from localStorage
@@ -446,23 +444,21 @@
                 salesTrendChart.update();
             }
         });
-
     </script>
-
-    {{-- Local debug (dev only) --}}
-    @if(app()->environment('local'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const queries = @json(DB::getQueryLog());
-                const count = queries.length;
-                const time = (performance.now() / 1000).toFixed(3);
-                console.log(`%c🔍 ${count} database queries executed`, 'font-weight:bold;color:#1B6FC8;');
-                console.log(`%c⏱️ Page loaded in ~${time} seconds`, 'font-weight:bold;color:#16A34A;');
-                console.table(queries.map(q => ({ query: q.query.substring(0, 100) + (q.query.length > 100 ? '...' : ''), time: q.time + 'ms' })));
-            });
-        </script>
-    @endif
-
+    <script>
+        const biClientScope = @json(request()->integer('client_id') ?: null);
+        const biLiveFeedUrl = @json(route('bi.live-feed'));
+        const biChatUrl = @json(route('bi.ai.chat'));
+        const biScopedUrl = (url) => url + (biClientScope ? (url.includes('?') ? '&' : '?') + 'client_id=' + biClientScope : '');
+        const biEscape = (text) => { const element = document.createElement('div'); element.textContent = text; return element.innerHTML; };
+        const biChatMessages = document.getElementById('aiChatMessages');
+        const biAddMessage = (role, text) => { const item = document.createElement('div'); item.className = 'ai-message ai-message-' + role; item.innerHTML = role === 'bot' ? '<div class="ai-message-avatar"><img src="{{ asset('bi/images/Nexora_Logo_Transparent.png') }}" class="msg-avatar-logo" alt="Nexora"></div><div class="ai-message-content">' + biEscape(text) + '</div>' : '<div class="ai-message-content">' + biEscape(text) + '</div>'; biChatMessages.appendChild(item); biChatMessages.scrollTop = biChatMessages.scrollHeight; return item; };
+        async function biAskAi(preset) { const input = document.getElementById('aiChatInput'); const message = preset || input.value.trim(); if (!message) return; biAddMessage('user', message); input.value = ''; const send = document.getElementById('aiChatSend'); send.disabled = true; const pending = biAddMessage('bot', 'Analyzing your client-scoped BI metrics…'); try { const response = await fetch(biScopedUrl(biChatUrl), { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }, body: JSON.stringify({ message }) }); const data = await response.json(); pending.remove(); biAddMessage('bot', data.message || 'AI Insights is temporarily unavailable.'); } catch (_) { pending.remove(); biAddMessage('bot', 'AI Insights is temporarily unavailable. Please try again shortly.'); } finally { send.disabled = false; } }
+        const biReadAlerts = new Set(JSON.parse(localStorage.getItem('nexora-bi-read-alerts') || '[]'));
+        function biRenderAlerts(alerts) { const list = document.getElementById('notificationList'); const unread = alerts.filter(alert => !biReadAlerts.has(alert.title)); document.getElementById('notificationBadge').textContent = unread.length || ''; document.getElementById('notificationBadge').style.display = unread.length ? 'flex' : 'none'; list.innerHTML = alerts.length ? alerts.slice(0, 6).map(alert => '<div class="notification-item ' + (biReadAlerts.has(alert.title) ? '' : 'unread') + '" data-alert="' + biEscape(alert.title) + '"><div class="notification-dot"></div><div class="notification-content"><p class="notification-title">' + biEscape(alert.title) + '</p><p class="notification-desc">' + biEscape(alert.description) + '</p></div></div>').join('') : '<p style="text-align:center;color:var(--slate-500);padding:2rem;font-size:11px">All clear for this client.</p>'; }
+        async function biLoadAlerts() { try { const response = await fetch(biScopedUrl(biLiveFeedUrl)); const data = await response.json(); biRenderAlerts(data.alerts || []); } catch (_) { document.getElementById('notificationList').innerHTML = '<p style="text-align:center;color:var(--slate-500);padding:2rem;font-size:11px">Alerts are temporarily unavailable.</p>'; } }
+        document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); document.getElementById('aiChatToggle').addEventListener('click', () => document.getElementById('aiChatBot').classList.toggle('ai-chat-open')); document.getElementById('aiChatClose').addEventListener('click', () => document.getElementById('aiChatBot').classList.remove('ai-chat-open')); document.getElementById('aiChatSend').addEventListener('click', () => biAskAi()); document.getElementById('aiChatInput').addEventListener('keydown', event => { if (event.key === 'Enter') biAskAi(); }); document.querySelectorAll('.ai-chip').forEach(button => button.addEventListener('click', () => biAskAi(button.dataset.question))); document.getElementById('headerProfileBtn').addEventListener('click', () => document.getElementById('notificationDropdown').classList.toggle('active')); document.getElementById('markRead').addEventListener('click', () => { document.querySelectorAll('.notification-item').forEach(item => biReadAlerts.add(item.dataset.alert)); localStorage.setItem('nexora-bi-read-alerts', JSON.stringify([...biReadAlerts])); biLoadAlerts(); }); biLoadAlerts(); setInterval(biLoadAlerts, 30000); });
+    </script>
     @yield('scripts')
 </body>
 
