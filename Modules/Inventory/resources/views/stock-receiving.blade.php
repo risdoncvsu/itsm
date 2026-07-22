@@ -10,6 +10,17 @@
     .status-approved { background: #dcfce7; color: #166534; }
     .status-rejected { background: #fee2e2; color: #991b1b; }
 
+    #tbodyPending tr[data-destination-warehouse] td:nth-child(4) { font-size: 0 !important; }
+    #tbodyPending tr[data-destination-warehouse] td:nth-child(4)::after {
+        content: attr(data-destination-warehouse);
+        font-size: 13px;
+    }
+    #tbodyHistory tr[data-history-supplier] td:nth-child(2) { font-size: 0 !important; }
+    #tbodyHistory tr[data-history-supplier] td:nth-child(2)::after {
+        content: attr(data-history-supplier);
+        font-size: 13px;
+    }
+
     #approveModal, #rejectModal { opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
     #approveModal.open, #rejectModal.open { opacity: 1; pointer-events: auto; }
 </style>
@@ -79,7 +90,7 @@
                 <thead>
                     <tr style="background:#1b3a6b;">
                         <th style="text-align:center;padding:10px 6px;color:#fff;font-size:11px;font-weight:600;white-space:nowrap;">SHIPMENT #</th>
-                        <th style="text-align:center;padding:10px 6px;color:#fff;font-size:11px;font-weight:600;white-space:nowrap;">ITEM</th>
+                        <th style="text-align:center;padding:10px 6px;color:#fff;font-size:11px;font-weight:600;white-space:nowrap;">SUPPLIER</th>
                         <th style="text-align:center;padding:10px 6px;color:#fff;font-size:11px;font-weight:600;white-space:nowrap;">QTY</th>
                         <th style="text-align:center;padding:10px 6px;color:#fff;font-size:11px;font-weight:600;white-space:nowrap;">WAREHOUSE</th>
                         <th style="text-align:center;padding:10px 6px;color:#fff;font-size:11px;font-weight:600;white-space:nowrap;">STATUS</th>
@@ -93,9 +104,9 @@
                         @php
                             $isProcessed = $deliveryProcessed[$delivery->id] ?? false;
                         @endphp
-                        <tr style="border-bottom:1px solid #e2e8f0;{{ $isProcessed ? 'opacity:0.5;' : '' }}">
+                        <tr data-destination-warehouse="{{ $delivery->destination_warehouse_name }}" style="border-bottom:1px solid #e2e8f0;{{ $isProcessed ? 'opacity:0.5;' : '' }}">
                             <td style="text-align:center;padding:12px 8px;font-size:13px;color:#132B52;">{{ $delivery->shipment_number }}</td>
-                            <td style="text-align:center;padding:12px 8px;font-size:13px;color:#132B52;">{{ $delivery->items }}</td>
+                            <td style="text-align:center;padding:12px 8px;font-size:13px;color:#132B52;">{{ $delivery->supplier_name }}</td>
                             <td style="text-align:center;padding:12px 8px;font-size:13px;color:#132B52;font-weight:600;">{{ $delivery->qty }}</td>
                             <td style="text-align:center;padding:12px 8px;font-size:13px;color:#5B7A9D;">â€”</td>
                             <td style="text-align:center;padding:12px 8px;">
@@ -106,7 +117,10 @@
                                     <p style="color:#ef4444;font-size:11px;margin:0 0 6px 0;">{{ $message }}</p>
                                 @enderror
                                 @if(!$isProcessed)
-                                    <button onclick="openApproveModal({{ $delivery->id }}, {{ $existingSkus[$delivery->shipment_number] ?? false ? 'true' : 'false' }})" style="background:#166534;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;margin-right:4px;">Approve</button>
+                                    <form method="POST" action="{{ route('inventory.stock-receiving.approve', $delivery->id) }}" style="display:inline;">
+                                        @csrf
+                                        <button type="submit" style="background:#166534;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;margin-right:4px;">Approve &amp; Receive</button>
+                                    </form>
                                     <button onclick="openRejectModal({{ $delivery->id }})" style="background:#991b1b;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;">Reject</button>
                                 @else
                                     <span style="color:#94a3b8;font-size:12px;">â€”</span>
@@ -128,7 +142,7 @@
                 <!-- History entries -->
                 <tbody id="tbodyHistory" style="display:none;">
                     @forelse ($history as $entry)
-                        <tr style="border-bottom:1px solid #e2e8f0;">
+                        <tr data-history-supplier="{{ $historySuppliers[$entry->shipment_number] ?? 'Unknown supplier' }}" style="border-bottom:1px solid #e2e8f0;">
                             <td style="text-align:center;padding:12px 8px;font-size:13px;color:#132B52;">{{ $entry->shipment_number }}</td>
                             <td style="text-align:center;padding:12px 8px;font-size:13px;color:#132B52;">{{ $entry->item?->name ?? 'â€”' }}</td>
                             <td style="text-align:center;padding:12px 8px;font-size:13px;color:#132B52;font-weight:600;">{{ $entry->quantity }}</td>
@@ -191,50 +205,6 @@
         }
     </script>
 
-    <!-- Approve Modal -->
-    <div id="approveModal" class="nexora-modal-overlay" style="display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:20;align-items:center;justify-content:center;">
-        <div class="nexora-modal">
-            <div class="nexora-modal-logo"></div>
-            <div class="nexora-modal-header">
-                <h2 class="nexora-modal-title">Approve Delivery</h2>
-                <button type="button" onclick="closeApproveModal()" class="nexora-modal-close">&times;</button>
-            </div>
-
-            <form id="approveForm" method="POST" action="">
-                @csrf
-
-                <div class="nexora-modal-form" style="grid-template-columns:1fr;">
-                    <div>
-                        <label class="nexora-modal-label">Warehouse <span style="color:#ef4444;">*</span></label>
-                        <select name="warehouse_id" required class="nexora-modal-select">
-                            <option value="">-- Select Warehouse --</option>
-                            @foreach($warehouses as $warehouse)
-                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('warehouse_id')<p class="nexora-modal-error">{{ $message }}</p>@enderror
-                    </div>
-
-                    <div id="categoryField">
-                        <label class="nexora-modal-label">Category <span style="color:#ef4444;">*</span></label>
-                        <select name="category_id" class="nexora-modal-select">
-                            <option value="">-- Select Category --</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('category_id')<p class="nexora-modal-error">{{ $message }}</p>@enderror
-                    </div>
-                </div>
-
-                <div class="nexora-modal-actions">
-                    <button type="button" onclick="closeApproveModal()" class="nexora-modal-btn-secondary">Cancel</button>
-                    <button type="submit" class="nexora-modal-btn-primary">Approve &amp; Receive</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Reject Modal -->
     <div id="rejectModal" class="nexora-modal-overlay" style="display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:20;align-items:center;justify-content:center;">
         <div class="nexora-modal" style="max-width:500px;">
@@ -264,28 +234,9 @@
     </div>
 
     <script>
-        function openApproveModal(deliveryId, itemExists) {
-            document.getElementById('approveModal').classList.add('open');
-            document.getElementById('approveForm').action = '/stock-receiving/' + deliveryId + '/approve';
-
-            const categoryField = document.getElementById('categoryField');
-            if (itemExists) {
-                categoryField.style.display = 'none';
-                document.querySelector('#approveForm [name="category_id"]').removeAttribute('required');
-            } else {
-                categoryField.style.display = '';
-                document.querySelector('#approveForm [name="category_id"]').setAttribute('required', '');
-            }
-        }
-
-        function closeApproveModal() {
-            document.getElementById('approveModal').classList.remove('open');
-            document.getElementById('approveForm').reset();
-        }
-
         function openRejectModal(deliveryId) {
             document.getElementById('rejectModal').classList.add('open');
-            document.getElementById('rejectForm').action = '/stock-receiving/' + deliveryId + '/reject';
+            document.getElementById('rejectForm').action = @json(url('inventory/stock-receiving')) + '/' + deliveryId + '/reject';
         }
 
         function closeRejectModal() {
@@ -294,12 +245,8 @@
         }
 
         // Close modal when clicking outside
-        document.getElementById('approveModal').addEventListener('click', function(e) {
-            if (e.target === this) closeApproveModal();
-        });
         document.getElementById('rejectModal').addEventListener('click', function(e) {
             if (e.target === this) closeRejectModal();
         });
     </script>
 @endsection
-

@@ -14,92 +14,79 @@ use Modules\Inventory\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class StockReceivingController extends Controller
 {
+    private function procurementDeliveriesQuery()
+    {
+        $query = Procurement::query()
+            ->leftJoin('suppliers', 'deliveries.supplier_id', '=', 'suppliers.id')
+            ->leftJoin('purchase_orders', 'deliveries.purchase_order_id', '=', 'purchase_orders.id')
+            ->select(
+                'deliveries.*',
+                'suppliers.name as supplier_name',
+                DB::raw('COALESCE(purchase_orders.warehouse_id, suppliers.warehouse_id) as destination_warehouse_id')
+            );
+
+        if (! (config('nexora.root_admin_module_testing') && auth()->user()?->role === 'root_admin')) {
+            $query->where('purchase_orders.client_id', (int) session('employee_client_id'));
+        }
+
+        return $query;
+    }
+
+    private function findDeliveryForCurrentClient(int $deliveryId): Procurement
+    {
+        return $this->procurementDeliveriesQuery()
+            ->where('deliveries.id', $deliveryId)
+            ->firstOrFail();
+    }
+
     public function index(Request $request)
     {
-        // Fetch deliveries from procurement database with status 'pending' or 'in transit'
-        $query = Procurement::whereIn('status', ['pending', 'intransit'])
-            ->orderByDesc('created_at');
+        // Incoming stock is sourced from this client's Procurement deliveries.
+        $baseQuery = $this->procurementDeliveriesQuery();
+        $query = (clone $baseQuery)
+            ->whereIn('deliveries.status', ['pending', 'intransit'])
+            ->orderByDesc('deliveries.created_at');
 
         if ($search = $request->input('search')) {
             $search = strtolower($search);
             $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(shipment_number) LIKE ?', ["%{$search}%"])
-                  ->orWhereRaw('LOWER(items) LIKE ?', ["%{$search}%"]);
+                $q->whereRaw('LOWER(deliveries.shipment_number) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(suppliers.name) LIKE ?', ["%{$search}%"]);
             });
         }
 
         if ($status = $request->input('status')) {
-            $query->where('status', $status);
+            $query->where('deliveries.status', $status);
         }
 
         $deliveries = $query->paginate(10)->appends($request->query());
 
-        // Build composite lookup: "shipment_number|item_id" for processed items
-        $processedKeys = StockReceiving::whereNotNull('item_id')
-            ->select('shipment_number', 'item_id')
-            ->get()
-            ->map(fn ($r) => $r->shipment_number . '|' . $r->item_id)
-            ->values()
-            ->toArray();
-
-        $rejectedShipments = StockReceiving::whereNull('item_id')
-            ->where('status', 'rejected')
-            ->pluck('shipment_number')
-            ->toArray();
+        $processedShipments = StockReceiving::query()->pluck('shipment_number')->all();
 
         // For kpi cards
-        $pendingCount = Procurement::whereIn('status', ['pending', 'intransit'])->count();
+        $pendingCount = (clone $baseQuery)->whereIn('deliveries.status', ['pending', 'intransit'])->count();
         $receivedTodayCount = StockReceiving::whereDate('processed_at', today())
             ->where('status', 'approved')
             ->count();
         $rejectedCount = StockReceiving::where('status', 'rejected')->count();
 
-        $warehouses = Warehouse::where('status', 'active')->whereNull('deleted_at')->get();
-        $categories = Category::all();
-
-        // Pre-check which deliveries already have an item in inventory (by SKU)
-        $existingSkus = [];
         $deliveryProcessed = [];
-        $poIds = $deliveries->pluck('purchase_order_id')->filter()->unique()->values()->toArray();
+        $warehouseNames = Warehouse::withTrashed()
+            ->whereIn('id', $deliveries->pluck('destination_warehouse_id')->filter()->unique())
+            ->pluck('name', 'id');
 
-        if (!empty($poIds)) {
-            $products = DB::connection('procurement')
-                ->table('purchase_order_items')
-                ->join('supplier_products', 'purchase_order_items.supplier_product_id', '=', 'supplier_products.id')
-                ->whereIn('purchase_order_items.purchase_order_id', $poIds)
-                ->select('purchase_order_items.purchase_order_id', 'supplier_products.sku')
-                ->get();
+        $deliveries->getCollection()->transform(function ($delivery) use ($processedShipments, $warehouseNames) {
+            $delivery->destination_warehouse_name = $warehouseNames[$delivery->destination_warehouse_id] ?? 'No warehouse assigned';
+            $delivery->supplier_name = $delivery->supplier_name ?? 'Unknown supplier';
 
-            $skus = $products->pluck('sku')->filter()->unique()->values()->toArray();
-            $knownSkus = [];
-            $skuToItemId = [];
-            if (!empty($skus)) {
-                $items = Item::whereIn('sku', $skus)->get(['id', 'sku']);
-                $knownSkus = $items->pluck('sku')->toArray();
-                $skuToItemId = $items->pluck('id', 'sku')->toArray();
-            }
+            return $delivery;
+        });
 
-            $skusByPo = $products->groupBy('purchase_order_id')->map(fn ($items) => $items->pluck('sku')->filter()->unique()->values());
-            foreach ($deliveries as $delivery) {
-                $poSkus = $skusByPo->get($delivery->purchase_order_id, collect());
-                $existingSkus[$delivery->shipment_number] = $poSkus->intersect($knownSkus)->isNotEmpty();
-
-                if (in_array($delivery->shipment_number, $rejectedShipments)) {
-                    $deliveryProcessed[$delivery->id] = true;
-                } else {
-                    foreach ($poSkus as $sku) {
-                        $itemId = $skuToItemId[$sku] ?? null;
-                        if ($itemId && in_array($delivery->shipment_number . '|' . $itemId, $processedKeys)) {
-                            $deliveryProcessed[$delivery->id] = true;
-                            break;
-                        }
-                    }
-                }
-            }
+        foreach ($deliveries as $delivery) {
+            $deliveryProcessed[$delivery->id] = in_array($delivery->shipment_number, $processedShipments, true);
         }
 
         // Audit trail â€” past approved/rejected records
@@ -108,16 +95,18 @@ class StockReceivingController extends Controller
             ->limit(50)
             ->get();
 
+        $historySuppliers = $this->procurementDeliveriesQuery()
+            ->whereIn('deliveries.shipment_number', $history->pluck('shipment_number')->filter()->unique())
+            ->pluck('suppliers.name', 'deliveries.shipment_number');
+
         return view('inventory::stock-receiving', [
             'deliveries' => $deliveries,
             'deliveryProcessed' => $deliveryProcessed,
-            'warehouses' => $warehouses,
-            'categories' => $categories,
-            'existingSkus' => $existingSkus,
             'pendingCount' => $pendingCount,
             'receivedTodayCount' => $receivedTodayCount,
             'rejectedCount' => $rejectedCount,
             'history' => $history,
+            'historySuppliers' => $historySuppliers,
             'filters' => $request->only(['search', 'status']),
             'activePage' => 'stock-receiving',
         ]);
@@ -125,21 +114,20 @@ class StockReceivingController extends Controller
 
     public function approve(Request $request, $deliveryId)
     {
-        $validated = $request->validate([
-            'warehouse_id' => ['required', Rule::exists('warehouses', 'id')->whereNull('deleted_at')->where('status', 'active')],
-            'category_id' => 'nullable|exists:categories,id',
-        ]);
+        $delivery = $this->findDeliveryForCurrentClient((int) $deliveryId);
+        $warehouse = Warehouse::query()
+            ->whereKey($delivery->destination_warehouse_id)
+            ->where('status', 'active')
+            ->first();
 
-        $delivery = Procurement::findOrFail($deliveryId);
+        if (! $warehouse) {
+            return back()->withErrors(["del_action_{$delivery->id}" => 'This purchase order has no active destination warehouse.']);
+        }
 
-        $result = $this->executeApproval($delivery, $validated);
+        $result = $this->executeApproval($delivery, ['warehouse_id' => $warehouse->id]);
 
         if ($result === true) {
             return back()->with('success', 'Delivery approved and stock updated.');
-        }
-
-        if ($result === 'Category is required for new items.') {
-            return back()->withErrors(['category_id' => $result])->withInput();
         }
 
         return back()->withErrors(["del_action_{$delivery->id}" => $result]);
@@ -159,14 +147,14 @@ class StockReceivingController extends Controller
             $item = Item::where('sku', $product->sku)->first();
 
             if (!$item) {
-                if (empty($validated['category_id'])) {
-                    return 'Category is required for new items.';
-                }
+                $defaultCategory = Category::query()->firstOrCreate([
+                    'name' => 'Uncategorized Incoming Goods',
+                ]);
 
                 $item = Item::create([
                     'sku' => $product->sku,
                     'name' => $product->item_name,
-                    'category_id' => $validated['category_id'],
+                    'category_id' => $defaultCategory->id,
                     'unit_cost' => $product->unit_price,
                 ]);
             }
@@ -246,7 +234,7 @@ class StockReceivingController extends Controller
             'reject_reason' => 'required|string',
         ]);
 
-        $delivery = Procurement::findOrFail($deliveryId);
+        $delivery = $this->findDeliveryForCurrentClient((int) $deliveryId);
 
         $result = DB::connection('inventory')->transaction(function () use ($delivery, $validated) {
             if (StockReceiving::where('shipment_number', $delivery->shipment_number)->where('status', 'rejected')->exists()) {
@@ -274,4 +262,3 @@ class StockReceivingController extends Controller
         return back()->withErrors(["del_action_{$delivery->id}" => $result]);
     }
 }
-
