@@ -148,8 +148,9 @@ class StockReceivingController extends Controller
     private function executeApproval(Procurement $delivery, array $validated): true|string
     {
         $actorLabel = trim((string) (session('employee_name') ?: session('employee_email') ?: 'Inventory user'));
+        $actorId = (int) (session('employee_id') ?: auth()->id() ?: 0);
 
-        return DB::connection('inventory')->transaction(function () use ($delivery, $validated, $actorLabel) {
+        return DB::connection('inventory')->transaction(function () use ($delivery, $validated, $actorLabel, $actorId) {
             // Fetch procurement product data (sku, name, unit_price)
             $product = $delivery->getSupplierProduct();
 
@@ -216,6 +217,7 @@ class StockReceivingController extends Controller
                 'quantity' => $delivery->qty,
                 'reference' => $delivery->shipment_number,
                 'notes' => "From delivery - Shipment: {$delivery->shipment_number}. Received by: {$actorLabel}.",
+                'performed_by' => $actorId,
                 'created_at' => now(),
             ]);
 
@@ -226,6 +228,7 @@ class StockReceivingController extends Controller
                 'warehouse_id' => $validated['warehouse_id'],
                 'quantity' => $delivery->qty,
                 'status' => 'approved',
+                'processed_by' => $actorId,
                 'remarks' => trim(collect([$delivery->remarks, "Received by: {$actorLabel}."])->filter()->implode("\n")),
                 'processed_at' => now(),
             ]);
@@ -249,8 +252,9 @@ class StockReceivingController extends Controller
         $delivery = $this->findDeliveryForCurrentClient((int) $deliveryId);
 
         $actorLabel = trim((string) (session('employee_name') ?: session('employee_email') ?: 'Inventory user'));
+        $actorId = (int) (session('employee_id') ?: auth()->id() ?: 0);
 
-        $result = DB::connection('inventory')->transaction(function () use ($delivery, $validated, $actorLabel) {
+        $result = DB::connection('inventory')->transaction(function () use ($delivery, $validated, $actorLabel, $actorId) {
             if (StockReceiving::where('shipment_number', $delivery->shipment_number)->where('status', 'rejected')->exists()) {
                 return 'This delivery has already been processed.';
             }
@@ -261,6 +265,7 @@ class StockReceivingController extends Controller
                 'warehouse_id' => null,
                 'quantity' => $delivery->qty,
                 'status' => 'rejected',
+                'processed_by' => $actorId,
                 'remarks' => trim($validated['reject_reason'] . "\nRejected by: {$actorLabel}."),
                 'processed_at' => now(),
             ]);
