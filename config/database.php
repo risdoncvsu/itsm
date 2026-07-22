@@ -163,6 +163,13 @@ return [
             'prefix_indexes' => true,
             'search_path' => env('PROCUREMENT_DB_SEARCH_PATH', 'public'),
             'sslmode' => env('PROCUREMENT_DB_SSLMODE', 'prefer'),
+            // Neon/PgBouncer can reuse a server-side prepared statement after
+            // a schema change, producing "cached plan must not change result
+            // type". Emulated prepares keep this tenant database compatible
+            // with the pooled Neon endpoint.
+            'options' => extension_loaded('pdo_pgsql') ? array_filter([
+                PDO::ATTR_EMULATE_PREPARES => true,
+            ]) : [],
         ],
         'order_fulfillment' => [
             'driver' => env('ORDER_FULFILLMENT_DB_CONNECTION', 'pgsql'),
